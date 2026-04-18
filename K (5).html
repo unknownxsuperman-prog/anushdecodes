@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Anush Decodes | XOS</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* ── XOS1 CORE SPECIFICATIONS ── */
+:root {
+  --bg: #000000;
+  --accent: #007aff;
+  --card-bg: #0a0a0a;
+  --border: #1a1a1a;
+  --text-main: #ffffff;
+  --text-dim: #888888;
+  --glass: rgba(10, 10, 10, 0.7);
+  --radius: 12px;
+  --transition: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-mode {
+  --bg: #f5f5f7;
+  --card-bg: #ffffff;
+  --border: #e5e5e7;
+  --text-main: #000000;
+  --text-dim: #666666;
+  --glass: rgba(255, 255, 255, 0.8);
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0; padding: 0; 
+  -webkit-tap-highlight-color: transparent; 
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  transition: background 0.4s var(--transition), color 0.4s var(--transition);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes xos-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-up { animation: xos-slide-up 0.6s var(--transition) forwards; }
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+/* ── MENU & TOGGLE ── */
+.menu-wrapper { position: absolute; top: 20px; right: 20px; z-index: 100; }
+.menu-btn {
+  width: 36px; height: 36px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-main);
+}
+
+.dropdown {
+  position: absolute; top: 45px; right: 0;
+  width: 200px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 6px;
+  display: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  animation: xos-slide-up 0.3s var(--transition);
+}
+.dropdown.active { display: block; }
+
+.dropdown-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-main);
+  cursor: pointer; border-radius: 10px;
+  transition: background 0.2s;
+}
+.dropdown-item:hover { background: var(--border); }
+
+/* System Pill Toggle */
+.pill-track {
+  width: 32px; height: 18px;
+  background: #222;
+  border-radius: 20px;
+  position: relative;
+  transition: 0.3s;
+  border: 1px solid var(--border);
+}
+.pill-thumb {
+  width: 12px; height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: 0.3s var(--transition);
+}
+
+/* State when Dark Mode is Active (Default) */
+body:not(.light-mode) .pill-track { background: var(--accent); border-color: var(--accent); }
+body:not(.light-mode) .pill-thumb { transform: translateX(14px); }
+
+/* ── PROFILE SECTION ── */
+.banner { width: 100%; height: 180px; background: #050505; position: relative; overflow: hidden; }
+.banner-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
+.banner-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--bg)); }
+
+.profile-section { padding: 0 24px; margin-top: -45px; position: relative; }
+.avatar { width: 84px; height: 84px; border-radius: 20px; background: var(--card-bg); border: 1px solid var(--border); padding: 4px; }
+.avatar img { width: 100%; height: 100%; border-radius: 16px; object-fit: cover; }
+
+.info-box { margin-top: 16px; }
+.name-row { display: flex; align-items: center; gap: 8px; }
+.name { font-size: 22px; font-weight: 700; }
+.verified-badge { color: var(--accent); font-size: 14px; }
+.bio { color: var(--text-dim); font-size: 13px; margin-top: 6px; font-weight: 300; }
+
+.link-row { margin-top: 16px; }
+.link-pill {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 18px; background: var(--card-bg);
+  border: 1px solid var(--border); border-radius: 8px;
+  text-decoration: none; color: var(--text-main); font-size: 11px;
+  font-weight: 600; letter-spacing: 0.05em; transition: 0.2s;
+}
+.link-pill:active { transform: scale(0.95); border-color: var(--accent); }
+.link-pill i { color: var(--accent); }
+
+/* ── MODULE CARDS ── */
+.modules { padding: 32px 24px; }
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.section-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); font-weight: 600; }
+
+.utility-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; display: flex; align-items: center; gap: 16px; margin-bottom: 12px;
+  text-decoration: none; transition: 0.2s var(--transition); opacity: 0;
+}
+.utility-card:active { transform: scale(0.96); border-color: var(--accent); }
+.card-icon { width: 42px; height: 42px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 16px; }
+.card-content { flex: 1; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text-main); }
+.card-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+.dev-badge { font-size: 8px; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-dim); }
+.badge-blue { color: var(--accent); border-color: rgba(0,122,255,0.3); }
+
+/* Delays */
+.utility-card:nth-child(1) { animation-delay: 0.1s; }
+.utility-card:nth-child(2) { animation-delay: 0.2s; }
+.utility-card:nth-child(3) { animation-delay: 0.3s; }
+.utility-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+</head>
+<body class="xos-theme">
+
+<div class="container">
+  <div class="menu-wrapper">
+    <div class="menu-btn" id="menuBtn">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </div>
+    <div class="dropdown" id="dropdownMenu">
+      <div class="dropdown-item" id="themeToggle">
+        <span>Dark Mode</span>
+        <div class="pill-track">
+          <div class="pill-thumb"></div>
+        </div>
+      </div>
+      <div class="dropdown-item" id="shareBtn">
+        <span>Share Link</span>
+        <i class="fa-solid fa-arrow-up-from-bracket" style="font-size: 12px; color: var(--accent);"></i>
+      </div>
+    </div>
+  </div>
+
+  <header class="banner">
+    <img src="WALLPAPER_URL_HERE" class="banner-img" alt="XOS">
+    <div class="banner-overlay"></div>
+  </header>
+
+  <section class="profile-section animate-up">
+    <div class="avatar">
+      <img src="PFP_URL_HERE" alt="Anush">
+    </div>
+    <div class="info-box">
+      <div class="name-row">
+        <h1 class="name">Anush Decodes</h1>
+        <div class="verified-badge"><i class="fa-solid fa-circle-check"></i></div>
+      </div>
+      <p class="bio">Engineering technical ecosystems. <br>Decoding logic at the kernel level.</p>
+      <div class="link-row">
+        <a href="https://github.com/YOUR_GITHUB" class="link-pill">
+          <i class="fa-solid fa-link"></i>
+          <span>X0S.LINK</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <main class="modules">
+    <div class="header-row">
+      <span class="section-label">System Modules</span>
+      <span class="dev-badge">4 Units</span>
+    </div>
+
+    <div class="grid">
+      <a href="loop.html" class="utility-card animate-up">
+        <div class="card-icon"><i class="fa-solid fa-rotate-right"></i></div>
+        <div class="card-content">
+          <div class="card-title">Loop Control</div>
+          <div class="card-sub">for · while · recursive</div>
+        </div>
+        <div class="dev-badge badge-blue">Unit 01</div>
+      </a>
+
+      <a href="matrix.html" class="utility-card animate-up">
+        <div class="card-icon"><i class="fa-solid fa-table-cells"></i></div>
+        <div class="card-content">
+          <div class="card-title">Matrix Ops</div>
+          <div class="card-sub">Multidimensional structures</div>
+        </div>
+        <div class="dev-badge">Unit 02</div>
+      </a>
+
+      <a href="functions.html" class="utility-card animate-up">
+        <div class="card-icon"><i class="fa-solid fa-code-branch"></i></div>
+        <div class="card-content">
+          <div class="card-title">Functions</div>
+          <div class="card-sub">Scope · Closures · ES6+</div>
+        </div>
+        <div class="dev-badge badge-blue">Unit 03</div>
+      </a>
+
+      <a href="sorting.html" class="utility-card animate-up">
+        <div class="card-icon"><i class="fa-solid fa-arrow-down-wide-short"></i></div>
+        <div class="card-content">
+          <div class="card-title">Sorting</div>
+          <div class="card-sub">Algorithmic complexity</div>
+        </div>
+        <div class="dev-badge">Unit 04</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+<script>
+  const menuBtn = document.getElementById('menuBtn');
+  const dropdown = document.getElementById('dropdownMenu');
+  const themeToggle = document.getElementById('themeToggle');
+  const shareBtn = document.getElementById('shareBtn');
+
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('active');
+  });
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+  });
+
+  shareBtn.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Anush Decodes | XOS',
+          text: 'Technical profile by Anush.',
+          url: window.location.href
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard');
+    }
+    dropdown.classList.remove('active');
+  });
+
+  document.addEventListener('click', () => dropdown.classList.remove('active'));
+</script>
+
+</body>
+</html>
