@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>x0s | Anush Profile</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&family=Orbitron:wght@500;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent: #3b82f6;
+            --glass: rgba(8, 8, 10, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #020202;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- PROFILE CARD --- */
+        .profile-card {
+            background: var(--glass);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 40px 24px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255,255,255,0.02);
+            position: relative;
+            animation: emerge 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes emerge {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- iOS GLASS FLOATING BUTTON --- */
+        .fav-music-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            z-index: 20;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-circle {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 0.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .note-icon {
+            width: 18px;
+            height: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s ease;
+        }
+
+        .fav-music-btn:hover .glass-circle {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .fav-music-btn:hover .note-icon { color: var(--accent); }
+        .fav-music-btn:active { transform: scale(0.9); }
+
+        .btn-badge {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            opacity: 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .fav-music-btn:hover .btn-badge { opacity: 1; bottom: -28px; }
+
+        /* --- AVATAR & TYPOGRAPHY --- */
+        .avatar-container {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--accent), #1e3a8a);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .avatar-container:active { transform: scale(0.92); }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #000;
+        }
+
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; letter-spacing: 3px; font-weight: 700; margin-bottom: 4px; }
+        .id-badge { color: var(--accent); font-size: 0.8rem; font-family: 'Fira Code', monospace; opacity: 0.7; margin-bottom: 30px; display: block; }
+
+        /* --- GRID --- */
+        .links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .link-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 18px 10px;
+            border-radius: 20px;
+            color: #a1a1aa;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .link-btn:hover, .link-btn:active {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: var(--accent);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .link-btn i { font-size: 1.4rem; }
+        .link-btn span { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; }
+
+        /* --- MODAL --- */
+        #photo-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            width: 85vw;
+            height: 85vw;
+            max-width: 340px;
+            max-height: 340px;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-content img { width: 100%; height: 100%; object-fit: cover; }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+        }
+
+        #photo-modal.active { display: flex; opacity: 1; }
+        #photo-modal.active .modal-content { transform: scale(1); }
+
+        .scan-line {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.1;
+            animation: scanMove 4s infinite linear;
+        }
+        @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
+    </style>
+</head>
+<body>
+
+    <div id="photo-modal" onclick="closePhoto()">
+        <div class="close-modal"><i class="fa-solid fa-xmark"></i></div>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="zoomed-img" src="Screenshot_20260418-234611.png" alt="Zoomed">
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <div class="scan-line"></div>
+
+        <div class="avatar-container" onclick="zoomPhoto('1771084954176 (1).png')">
+            <img src="1771084954176 (1).png" alt="Nikhil" class="avatar">
+        </div>
+        
+        <h1>Anush Belaladavar</h1>
+        <span class="id-badge">anush@x0s</span>
+
+        <div class="links-grid">
+            <a href="https://www.instagram.com/x0s.nikh_07?igsh=ZTc5YzM4ZDVhY3dw" target="_blank" class="link-btn">
+                <i class="fa-brands fa-instagram"></i>
+                <span>Instagram</span>
+            </a>
+            <a href="https://x.com/Nikhil_X7" target="_blank" class="link-btn">
+                <i class="fa-brands fa-x-twitter"></i>
+                <span>X / Twitter</span>
+            </a>
+            <a href="https://www.linkedin.com/in/nikhil-b-b41641363" target="_blank" class="link-btn">
+                <i class="fa-brands fa-linkedin-in"></i>
+                <span>LinkedIn</span>
+            </a>
+            <a href="https://pin.it/5IbyqmexC" target="_blank" class="link-btn">
+                <i class="fa-brands fa-pinterest"></i>
+                <span>Pinterest</span>
+            </a>
+            <a href="https://discord.gg/QyHXBqS3H" target="_blank" class="link-btn">
+                <i class="fa-brands fa-discord"></i>
+                <span>Discord</span>
+            </a>
+            <a href="index (6) (24).html" target="_blank" class="link-btn">
+                <i class="fa-solid fa-microchip"></i>
+                <span>Utility</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function zoomPhoto(src) {
+            const modal = document.getElementById('photo-modal');
+            const img = document.getElementById('zoomed-img');
+            img.src = src;
+            modal.style.display = 'flex';
+            history.pushState({ zoomed: true }, "");
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closePhoto() {
+            const modal = document.getElementById('photo-modal');
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+                if (history.state && history.state.zoomed) history.back();
+            }
+        }
+
+        window.addEventListener('popstate', () => {
+            const modal = document.getElementById('photo-modal');
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        });
+    </script>
+</body>
+</html>
