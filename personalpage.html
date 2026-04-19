@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Anush — Personal | x0s.link</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root {
+  --bg:#000; --card:#0a0a0a; --card2:#111; --border:#1a1a1a;
+  --border2:rgba(255,255,255,0.06); --accent:#007aff;
+  --text:#fff; --muted:#666; --muted2:#333;
+  --glass:rgba(10,10,10,0.75);
+  --ease:cubic-bezier(0.4,0,0.2,1); --font:'Space Grotesk',sans-serif;
+}
+.light-mode {
+  --bg:#f5f5f7; --card:#fff; --card2:#f0f0f2; --border:#e0e0e2;
+  --border2:rgba(0,0,0,0.07); --text:#000; --muted:#888;
+  --glass:rgba(255,255,255,0.82);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);
+  min-height:100vh;overflow-x:hidden;
+  transition:background .35s var(--ease),color .35s var(--ease);}
+::-webkit-scrollbar{display:none;}
+
+/* ANIMATIONS */
+@keyframes slideUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+/* PAGE */
+.page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
+
+/* TOP BAR */
+.top-bar{
+  position:sticky;top:0;z-index:80;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);transition:background .35s;
+}
+.light-mode .top-bar{background:rgba(245,245,247,0.72);}
+.top-bar-brand{font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+.top-bar-brand span{color:var(--accent);}
+.menu-btn{
+  width:36px;height:36px;background:var(--glass);backdrop-filter:blur(10px);
+  border:1px solid var(--border);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text);transition:all .2s;position:relative;
+}
+.menu-btn:active{transform:scale(.92);}
+
+/* DROPDOWN */
+.dropdown-overlay{position:fixed;inset:0;z-index:90;display:none;}
+.dropdown-overlay.active{display:block;}
+.dropdown{
+  position:absolute;top:48px;right:0;width:210px;
+  background:#0d0d0d;border:1px solid var(--border);
+  border-radius:16px;padding:6px;display:none;z-index:100;
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+  animation:slideUp .25s var(--ease);
+}
+.light-mode .dropdown{background:#fff;}
+.dropdown.active{display:block;}
+.dd-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;font-size:.72rem;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  color:var(--text);border-radius:10px;cursor:pointer;gap:10px;transition:background .15s;
+}
+.dd-item:hover{background:var(--border);}
+.dd-item i{color:var(--accent);font-size:.8rem;}
+.dd-sep{height:1px;background:var(--border);margin:4px 0;}
+.pill-track{width:34px;height:19px;background:var(--border);border-radius:99px;position:relative;transition:.3s;flex-shrink:0;}
+.pill-thumb{width:13px;height:13px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.3s var(--ease);}
+body:not(.light-mode) .pill-track.dark-track{background:var(--accent);}
+body:not(.light-mode) .pill-track.dark-track .pill-thumb{transform:translateX(15px);}
+
+/* BANNER */
+.banner{width:100%;height:200px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
+.banner-img{width:100%;height:100%;object-fit:cover;opacity:.35;}
+.banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%);}
+.banner-stripes{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(
+    -45deg,rgba(0,122,255,.04) 0px,rgba(0,122,255,.04) 1px,transparent 1px,transparent 12px);}
+
+/* PROFILE SECTION */
+.profile-section{padding:0 20px;margin-top:-52px;position:relative;animation:slideUp .6s var(--ease) both;}
+.avatar-wrap{width:84px;height:84px;position:relative;margin-bottom:14px;}
+.avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:1px solid var(--border);display:block;}
+.name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.name{font-size:1.35rem;font-weight:700;letter-spacing:-.01em;}
+.verified{color:var(--accent);font-size:.85rem;animation:pulse 2.5s infinite;}
+.handle{font-size:.72rem;font-weight:500;color:var(--accent);letter-spacing:.06em;margin-bottom:10px;}
+.bio{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:20px;}
+
+/* SECTION DIVIDER */
+.section-divider{display:flex;align-items:center;gap:12px;padding:0 20px;margin-bottom:18px;}
+.section-divider-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);white-space:nowrap;}
+.section-divider-line{flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent);}
+
+/* FILES SECTION */
+.files-section{padding:0 20px 100px;}
+.files-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* FILE BLOCK */
+.file-block{
+  aspect-ratio:1/1;background:var(--card);border:1px solid var(--border);
+  border-radius:16px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;transition:border-color .2s;
+  scroll-margin-top:70px;
+}
+/* deep-link highlight */
+.file-block:target{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,122,255,.18);}
+
+/* THUMB */
+.file-thumb{
+  flex:1;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);min-height:0;
+}
+.file-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.file-thumb canvas{width:100%;height:100%;object-fit:contain;display:block;}
+.file-icon-ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted2);}
+.file-icon-ph i{font-size:2rem;}
+.file-icon-ph span{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);}
+.pdf-badge{
+  position:absolute;top:7px;left:7px;
+  background:rgba(220,38,38,.85);backdrop-filter:blur(6px);
+  color:#fff;font-size:.46rem;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 6px;border-radius:5px;z-index:2;
+}
+
+/* INFO BAR */
+.file-info{
+  flex-shrink:0;display:flex;align-items:center;gap:6px;
+  padding:8px 10px;background:var(--card);border-top:1px solid var(--border);
+}
+.file-name{flex:1;font-size:.63rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+.file-name .ext{color:var(--muted);font-weight:400;}
+.file-actions{display:flex;gap:5px;flex-shrink:0;}
+.fab{
+  width:28px;height:28px;background:var(--card2);border:1px solid var(--border);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:.72rem;cursor:pointer;transition:all .18s;
+  text-decoration:none;
+}
+.fab:active{transform:scale(.9);}
+.fab.share:active{background:rgba(0,122,255,.15);color:var(--accent);border-color:var(--accent);}
+.fab.dl:active{background:rgba(48,209,88,.15);color:#30d158;border-color:#30d158;}
+
+/* ── PREVIEW MODAL ── */
+.preview-modal{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.95);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;transition:opacity .28s var(--ease);
+}
+.preview-modal.active{display:flex;opacity:1;}
+
+.preview-shell{
+  width:92vw;max-width:440px;
+  max-height:88vh;
+  background:#0a0a0a;
+  border:1px solid var(--border2);
+  border-radius:22px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transform:scale(.92);
+  transition:transform .32s cubic-bezier(.175,.885,.32,1.275);
+  box-shadow:0 32px 80px rgba(0,0,0,.95);
+}
+.preview-modal.active .preview-shell{transform:scale(1);}
+
+.preview-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;background:#0a0a0a;
+}
+.preview-title{font-size:.75rem;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:10px;}
+.preview-close{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:.75rem;cursor:pointer;flex-shrink:0;
+  transition:all .18s;
+}
+.preview-close:active{background:rgba(255,255,255,.18);}
+
+/* image view */
+.preview-img-wrap{
+  flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  padding:12px;min-height:0;background:#000;
+}
+.preview-img-wrap img{
+  max-width:100%;max-height:100%;
+  object-fit:contain;border-radius:10px;display:block;
+}
+
+/* pdf viewer */
+.pdf-viewer{
+  flex:1;overflow-y:auto;padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:0;background:#111;
+}
+.pdf-viewer canvas{
+  width:100%;border-radius:8px;display:block;
+  box-shadow:0 4px 20px rgba(0,0,0,.7);
+}
+.pdf-page-label{
+  font-size:.58rem;color:var(--muted);text-align:center;
+  font-family:monospace;letter-spacing:.1em;
+}
+.pdf-loading{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;color:var(--muted);
+}
+.pdf-loading .spinner{
+  width:28px;height:28px;
+  border:2px solid var(--border);
+  border-top:2px solid var(--accent);
+  border-radius:50%;animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:30px;left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:#1a1a1a;color:#fff;font-size:.72rem;font-weight:600;
+  padding:10px 18px;border-radius:99px;
+  border:1px solid var(--border2);
+  opacity:0;pointer-events:none;
+  transition:all .3s var(--ease);white-space:nowrap;z-index:999;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+
+</style>
+</head>
+<body>
+
+<!-- PREVIEW MODAL (image + PDF) -->
+<div class="preview-modal" id="preview-modal" onclick="closePreview()">
+  <div class="preview-shell" onclick="event.stopPropagation()">
+    <div class="preview-topbar">
+      <div class="preview-title" id="preview-title">Preview</div>
+      <div class="preview-close" onclick="closePreview()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <!-- image -->
+    <div class="preview-img-wrap" id="preview-img-wrap" style="display:none">
+      <img id="preview-img" src="" alt="">
+    </div>
+    <!-- pdf -->
+    <div class="pdf-viewer" id="pdf-viewer" style="display:none">
+      <div class="pdf-loading" id="pdf-loading">
+        <div class="spinner"></div>
+        <span style="font-size:.7rem;letter-spacing:.1em">Loading PDF…</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-brand">x<span>0</span>s.link</div>
+    <div style="position:relative">
+      <div class="menu-btn" id="menu-btn"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+      <div class="dropdown" id="dropdown">
+        <div class="dd-item" onclick="toggleDark()">
+          <span>Dark Mode</span>
+          <div class="pill-track dark-track"><div class="pill-thumb"></div></div>
+        </div>
+        <div class="dd-sep"></div>
+        <div class="dd-item" onclick="sharePage()">
+          <span>Share Page</span>
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNER -->
+  <div class="banner">
+    <img class="banner-img" src="Picsart_26-04-18_23-43-21-546.jpg" alt="" onerror="this.style.display='none'">
+    <div class="banner-stripes"></div>
+    <div class="banner-overlay"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <section class="profile-section">
+    <div class="avatar-wrap">
+      <img class="avatar-img" src="Screenshot_20260418-234611.png" alt="Anush" onerror="this.style.background='#0a0a14'">
+    </div>
+    <div class="name-row">
+      <h1 class="name">Anush Decodes</h1>
+      <span class="verified"><i class="fa-solid fa-circle-check"></i></span>
+    </div>
+    <div class="handle">anush@x0s</div>
+    <p class="bio">Decoding logic at the kernel level.<br>Building the future one commit at a time.</p>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="section-divider">
+    <span class="section-divider-label">Personal Page</span>
+    <div class="section-divider-line"></div>
+  </div>
+
+  <!-- FILES -->
+  <div class="files-section">
+    <div class="files-grid" id="files-grid"></div>
+  </div>
+
+</div>
+
+<div class="dropdown-overlay" id="dd-overlay" onclick="closeDropdown()"></div>
+
+<script>
+/* ── PDF.js worker ── */
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ════════════════════════════════════════
+   STATIC FILES — add all files here in code.
+   type: 'image' | 'pdf' | 'other'
+   src:  GitHub raw URL or relative path
+════════════════════════════════════════ */
+const STATIC_FILES = [
+  // {
+  //   id: 'physics-notes',
+  //   name: 'Physics Notes',
+  //   filename: 'physics_notes.pdf',
+  //   type: 'pdf',
+  //   src: 'https://raw.githubusercontent.com/unknownxsuperman-prog/anushdecodes/main/docs/physics_notes.pdf'
+  // },
+  // {
+  //   id: 'my-setup',
+  //   name: 'My Setup',
+  //   filename: 'setup.jpg',
+  //   type: 'image',
+  //   src: 'https://raw.githubusercontent.com/unknownxsuperman-prog/anushdecodes/main/photos/setup.jpg'
+  // },
+];
+
+/* ════════════════════════════════════════
+   RENDER GRID
+════════════════════════════════════════ */
+async function renderGrid() {
+  const grid = document.getElementById('files-grid');
+  grid.innerHTML = '';
+  for (const f of STATIC_FILES) {
+    grid.appendChild(await buildBlock(f));
+  }
+  handleDeepLink();
+}
+
+/* ════════════════════════════════════════
+   BUILD FILE BLOCK
+════════════════════════════════════════ */
+async function buildBlock(f) {
+  const block = document.createElement('div');
+  block.className = 'file-block';
+  block.id = f.id;
+
+  /* ── Thumb — clickable, opens preview ── */
+  const thumb = document.createElement('div');
+  thumb.className = 'file-thumb';
+  thumb.style.cursor = 'pointer';
+  thumb.onclick = () => openPreview(f);
+
+  if (f.type === 'image') {
+    const img = document.createElement('img');
+    img.src = f.src;
+    img.alt = f.name;
+    img.onerror = () => img.replaceWith(mkIcon('image', 'IMG'));
+    thumb.appendChild(img);
+
+  } else if (f.type === 'pdf') {
+    const badge = document.createElement('div');
+    badge.className = 'pdf-badge';
+    badge.textContent = 'PDF';
+    thumb.appendChild(badge);
+
+    const canvas = document.createElement('canvas');
+    thumb.appendChild(canvas);
+    renderPDFThumb(f.src, canvas).catch(() => canvas.replaceWith(mkIcon('file-pdf', 'PDF')));
+
+  } else {
+    const ext = (f.filename || '').split('.').pop().toUpperCase() || 'FILE';
+    const iconMap = { DOC:'file-word',DOCX:'file-word',XLS:'file-excel',XLSX:'file-excel',TXT:'file-lines',MP4:'file-video',MOV:'file-video',MP3:'file-audio' };
+    thumb.appendChild(mkIcon(iconMap[ext] || 'file', ext));
+  }
+
+  /* ── Info bar ── */
+  const info = document.createElement('div');
+  info.className = 'file-info';
+
+  const nameEl = document.createElement('div');
+  nameEl.className = 'file-name';
+  const dotExt = f.filename ? '.' + f.filename.split('.').pop() : '';
+  const base   = f.name || (f.filename ? f.filename.replace(/\.[^.]+$/, '') : 'File');
+  nameEl.innerHTML = `${escHtml(base)}<span class="ext">${escHtml(dotExt)}</span>`;
+  info.appendChild(nameEl);
+
+  const acts = document.createElement('div');
+  acts.className = 'file-actions';
+
+  const shareBtn = document.createElement('div');
+  shareBtn.className = 'fab share';
+  shareBtn.title = 'Share';
+  shareBtn.innerHTML = '<i class="fa-solid fa-share-nodes"></i>';
+  shareBtn.onclick = (e) => { e.stopPropagation(); shareFile(f); };
+  acts.appendChild(shareBtn);
+
+  const dlBtn = document.createElement('div');
+  dlBtn.className = 'fab dl';
+  dlBtn.title = 'Download';
+  dlBtn.innerHTML = '<i class="fa-solid fa-circle-arrow-down"></i>';
+  dlBtn.onclick = (e) => { e.stopPropagation(); downloadFile(f); };
+  acts.appendChild(dlBtn);
+
+  info.appendChild(acts);
+  block.appendChild(thumb);
+  block.appendChild(info);
+  return block;
+}
+
+function mkIcon(icon, label) {
+  const d = document.createElement('div');
+  d.className = 'file-icon-ph';
+  d.innerHTML = `<i class="fa-solid fa-${icon}"></i><span>${label}</span>`;
+  return d;
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ════════════════════════════════════════
+   PDF THUMBNAIL (grid block — first page only)
+════════════════════════════════════════ */
+async function renderPDFThumb(src, canvas) {
+  const pdf  = await pdfjsLib.getDocument(src).promise;
+  const page = await pdf.getPage(1);
+  const vp   = page.getViewport({ scale: 1.8 });
+  canvas.width  = vp.width;
+  canvas.height = vp.height;
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+}
+
+/* ════════════════════════════════════════
+   PREVIEW MODAL
+   — Image: shows full image, pinch-zoomable via CSS
+   — PDF: renders ALL pages sequentially as canvases,
+     scrollable inside the modal
+════════════════════════════════════════ */
+function openPreview(f) {
+  const modal    = document.getElementById('preview-modal');
+  const imgWrap  = document.getElementById('preview-img-wrap');
+  const pdfWrap  = document.getElementById('pdf-viewer');
+  const titleEl  = document.getElementById('preview-title');
+  const loading  = document.getElementById('pdf-loading');
+
+  // Reset
+  imgWrap.style.display = 'none';
+  pdfWrap.style.display = 'none';
+  titleEl.textContent = f.name || f.filename || 'Preview';
+
+  if (f.type === 'image') {
+    imgWrap.style.display = 'flex';
+    document.getElementById('preview-img').src = f.src;
+
+  } else if (f.type === 'pdf') {
+    pdfWrap.style.display = 'flex';
+    pdfWrap.innerHTML = ''; // clear old pages
+
+    // Loading indicator
+    const loadEl = document.createElement('div');
+    loadEl.className = 'pdf-loading';
+    loadEl.innerHTML = '<div class="spinner"></div><span style="font-size:.7rem;letter-spacing:.1em">Loading PDF…</span>';
+    pdfWrap.appendChild(loadEl);
+
+    renderAllPDFPages(f.src, pdfWrap, loadEl);
+
+  } else {
+    // Non-previewable: just download
+    closePreview();
+    downloadFile(f);
+    return;
+  }
+
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('active')));
+  history.pushState({ preview: true }, '');
+}
+
+async function renderAllPDFPages(src, container, loadingEl) {
+  try {
+    const pdf = await pdfjsLib.getDocument(src).promise;
+    loadingEl.remove();
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const vp   = page.getViewport({ scale: 2.0 });
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+
+      container.appendChild(canvas);
+
+      if (pdf.numPages > 1) {
+        const lbl = document.createElement('div');
+        lbl.className = 'pdf-page-label';
+        lbl.textContent = `Page ${i} of ${pdf.numPages}`;
+        container.appendChild(lbl);
+      }
+    }
+  } catch (err) {
+    loadingEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size:1.5rem;color:#666"></i><span style="font-size:.7rem">Could not load PDF</span>';
+  }
+}
+
+function closePreview() {
+  const modal = document.getElementById('preview-modal');
+  modal.classList.remove('active');
+  setTimeout(() => {
+    modal.style.display = 'none';
+    document.getElementById('preview-img').src = '';
+  }, 300);
+}
+
+/* ════════════════════════════════════════
+   DOWNLOAD
+════════════════════════════════════════ */
+async function downloadFile(f) {
+  const name = f.filename || f.name || 'download';
+  if (!f.src) return;
+  if (f.src.startsWith('data:')) {
+    const a = document.createElement('a');
+    a.href = f.src; a.download = name; a.click();
+    return;
+  }
+  showToast('Downloading…');
+  try {
+    const resp = await fetch(f.src);
+    if (!resp.ok) throw new Error();
+    const blob = await resp.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name; a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('Downloaded!');
+  } catch {
+    window.open(f.src, '_blank');
+  }
+}
+
+/* ════════════════════════════════════════
+   SHARE FILE — deep link  (#block-id)
+════════════════════════════════════════ */
+function shareFile(f) {
+  const deepLink = `${location.origin}${location.pathname}#${f.id}`;
+  const title    = f.name || f.filename || 'File';
+  if (navigator.share) {
+    navigator.share({ title, text: `"${title}" — shared via x0s.link`, url: deepLink }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(deepLink)
+      .then(() => showToast(`Link copied: "${title}"`))
+      .catch(() => prompt('Copy this link:', deepLink));
+  }
+}
+
+/* ════════════════════════════════════════
+   DEEP LINK
+════════════════════════════════════════ */
+function handleDeepLink() {
+  const hash = location.hash;
+  if (!hash) return;
+  const el = document.getElementById(hash.slice(1));
+  if (!el) return;
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+}
+
+/* SHARE PAGE */
+function sharePage() {
+  closeDropdown();
+  const url = location.origin + location.pathname;
+  if (navigator.share) {
+    navigator.share({ title: 'Anush — Personal | x0s.link', url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => showToast('Page link copied!'));
+  }
+}
+
+/* TOAST */
+let _tt;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* DARK MODE */
+function toggleDark() { document.body.classList.toggle('light-mode'); }
+
+/* DROPDOWN */
+document.getElementById('menu-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('dropdown').classList.toggle('active');
+  document.getElementById('dd-overlay').classList.toggle('active');
+});
+function closeDropdown() {
+  document.getElementById('dropdown').classList.remove('active');
+  document.getElementById('dd-overlay').classList.remove('active');
+}
+
+/* POPSTATE — back button closes preview */
+window.addEventListener('popstate', closePreview);
+
+/* BOOT */
+renderGrid();
+</script>
+</body>
+</html>
