@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Anush Decodes | x0s.link</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ══════════════════════════════════════════
+   BASE / TOKENS
+══════════════════════════════════════════ */
+:root {
+  --bg:        #000000;
+  --card:      #0a0a0a;
+  --card2:     #111111;
+  --border:    #1a1a1a;
+  --border2:   rgba(255,255,255,0.06);
+  --accent:    #007aff;
+  --text:      #ffffff;
+  --muted:     #666666;
+  --muted2:    #444444;
+  --glass:     rgba(10,10,10,0.75);
+  --radius:    14px;
+  --ease:      cubic-bezier(0.4,0,0.2,1);
+  --font:      'Space Grotesk', sans-serif;
+}
+.light-mode {
+  --bg:     #f5f5f7;
+  --card:   #ffffff;
+  --card2:  #f0f0f2;
+  --border: #e0e0e2;
+  --border2:rgba(0,0,0,0.07);
+  --text:   #000000;
+  --muted:  #888888;
+  --glass:  rgba(255,255,255,0.82);
+}
+
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.35s var(--ease), color 0.35s var(--ease);
+}
+
+/* scrollbar hide */
+::-webkit-scrollbar { display: none; }
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes slideUp   { from { transform:translateY(18px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+@keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+@keyframes spinRing  { to { transform:rotate(360deg); } }
+@keyframes pulse     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.85)} }
+@keyframes shimmer   { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+
+/* ══════════════════════════════════════════
+   LAYOUT WRAPPER
+══════════════════════════════════════════ */
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR
+══════════════════════════════════════════ */
+.top-bar {
+  position: sticky; top: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.35s;
+}
+.light-mode .top-bar { background: rgba(245,245,247,0.72); }
+
+.top-bar-brand {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.top-bar-brand span { color: var(--accent); }
+
+.menu-btn {
+  width: 36px; height: 36px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text);
+  transition: all 0.2s;
+  position: relative;
+}
+.menu-btn:active { transform: scale(0.92); }
+
+/* ══════════════════════════════════════════
+   BANNER
+══════════════════════════════════════════ */
+.banner {
+  width: 100%; height: 200px;
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #000814 0%, #001d3d 60%, #000000 100%);
+}
+.banner-img {
+  width: 100%; height: 100%;
+  object-fit: cover; opacity: 0.35;
+}
+.banner-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, var(--bg) 100%);
+}
+/* diagonal stripe on banner */
+.banner-stripes {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(0,122,255,0.04) 0px, rgba(0,122,255,0.04) 1px,
+    transparent 1px, transparent 12px
+  );
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   PROFILE SECTION
+══════════════════════════════════════════ */
+.profile-section {
+  padding: 0 20px;
+  margin-top: -52px;
+  position: relative;
+  animation: slideUp 0.6s var(--ease) both;
+}
+
+/* Avatar — clean square, no ring */
+.avatar-wrap {
+  width: 84px; height: 84px;
+  position: relative; margin-bottom: 14px;
+}
+.avatar-img {
+  width: 100%; height: 100%;
+  border-radius: 20px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+/* Info */
+.name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+.verified { color: var(--accent); font-size: 0.85rem; animation: pulse 2.5s infinite; }
+
+.handle {
+  font-size: 0.72rem; font-weight: 500;
+  color: var(--accent); letter-spacing: 0.06em;
+  margin-bottom: 10px; font-family: 'Space Grotesk', monospace;
+}
+
+.bio {
+  font-size: 0.82rem; color: var(--muted);
+  font-weight: 300; line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+/* ── BIO MUSIC — compact single line ── */
+.bio-music {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-bottom: 14px;
+  padding: 6px 10px 6px 8px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  width: fit-content;
+  max-width: 100%;
+  cursor: default;
+  transition: border-color 0.2s;
+  overflow: hidden;
+}
+.bio-music-play {
+  width: 24px; height: 24px;
+  background: rgba(0,122,255,0.13);
+  border: 1px solid rgba(0,122,255,0.22);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 0.58rem;
+  flex-shrink: 0; cursor: pointer;
+  transition: background 0.2s;
+}
+.bio-music-play.playing { background: rgba(0,122,255,0.22); }
+.bio-music-label {
+  font-size: 0.7rem; font-weight: 500;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer;
+}
+.bio-music-label .song-name { font-weight: 600; }
+.bio-music-label .dot { color: var(--muted); margin: 0 3px; }
+.bio-music-label .artist-name { color: var(--muted); font-weight: 300; }
+.bio-music-eq {
+  display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0;
+}
+.bio-music-eq span {
+  width: 2px; background: var(--accent); border-radius: 1px;
+  animation: eqBar 0.8s ease-in-out infinite alternate;
+}
+.bio-music-eq span:nth-child(1) { height: 5px;  animation-delay: 0s; }
+.bio-music-eq span:nth-child(2) { height: 9px;  animation-delay: 0.15s; }
+.bio-music-eq span:nth-child(3) { height: 6px;  animation-delay: 0.3s; }
+.bio-music-eq.paused span { animation-play-state: paused; opacity: 0.3; }
+@keyframes eqBar { from { opacity: 0.35; } to { opacity: 1; } }
+
+/* ── SOCIAL LINKS ROW — horizontal scroll ── */
+.links-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.links-row::-webkit-scrollbar { display: none; }
+.link-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none; color: var(--text);
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.link-pill:active { transform: scale(0.95); border-color: var(--accent); }
+.link-pill i { font-size: 0.88rem; }
+
+/* ══════════════════════════════════════════
+   POSTS SECTION
+══════════════════════════════════════════ */
+.posts-section { padding: 0 20px 100px; }
+
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-label {
+  font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.22em;
+  color: var(--muted);
+}
+
+/* Admin add button */
+.add-post-btn {
+  width: 32px; height: 32px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  display: none; /* shown only for admin */
+  align-items: center; justify-content: center;
+  color: var(--text); font-size: 0.8rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.add-post-btn:active { transform: scale(0.9); background: var(--accent); }
+.add-post-btn.visible { display: flex; }
+
+/* 3-column post grid */
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+}
+
+.post-thumb {
+  aspect-ratio: 1/1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
+}
+.post-thumb:active { transform: scale(0.96); }
+.post-thumb img, .post-thumb video {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+.post-video-badge {
+  position: absolute; top: 5px; right: 5px;
+  width: 18px; height: 18px;
+  background: rgba(0,0,0,0.65);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.55rem;
+}
+.post-thumb-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted2); font-size: 1.2rem;
+  background: linear-gradient(135deg, var(--card), var(--card2));
+}
+
+/* empty posts state */
+.posts-empty {
+  grid-column: 1/-1;
+  padding: 48px 0;
+  text-align: center;
+  color: var(--muted2);
+  font-size: 0.78rem;
+}
+.posts-empty i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.3; }
+
+/* ══════════════════════════════════════════
+   FLOATING POST VIEWER
+══════════════════════════════════════════ */
+.post-modal {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+.post-modal.active { opacity: 1; }
+
+.post-modal-inner {
+  width: 92vw; max-width: 420px;
+  aspect-ratio: 4/5;
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+  border: 1px solid var(--border2);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+  transform: scale(0.92);
+  transition: transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.post-modal.active .post-modal-inner { transform: scale(1); }
+
+.post-modal-media {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.post-modal-caption {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 24px 18px 18px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.88));
+  font-size: 0.78rem; color: rgba(255,255,255,0.85);
+  font-weight: 300; line-height: 1.5;
+}
+.post-modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 34px; height: 34px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.8rem; cursor: pointer;
+  z-index: 10;
+}
+
+/* ══════════════════════════════════════════
+   ADD POST MODAL (upload floating window)
+══════════════════════════════════════════ */
+.upload-modal {
+  position: fixed; inset: 0; z-index: 210;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  opacity: 0; transition: opacity 0.3s;
+}
+.upload-modal.active { display: flex; opacity: 1; }
+
+.upload-sheet {
+  width: 100%; max-width: 480px;
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 28px 28px 0 0;
+  padding: 24px 20px 44px;
+  transform: translateY(30px);
+  transition: transform 0.35s var(--ease);
+}
+.upload-modal.active .upload-sheet { transform: translateY(0); }
+
+.upload-sheet h3 {
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 20px;
+}
+
+.upload-drop {
+  width: 100%; aspect-ratio: 4/3;
+  border: 1.5px dashed var(--border);
+  border-radius: 16px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; color: var(--muted);
+  cursor: pointer; background: var(--card);
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.upload-drop:hover { border-color: var(--accent); }
+.upload-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-drop i { font-size: 1.8rem; opacity: 0.4; }
+.upload-drop span { font-size: 0.75rem; font-weight: 500; }
+.upload-drop img, .upload-drop video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; border-radius: 16px;
+}
+
+.upload-caption {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.82rem; font-weight: 300;
+  outline: none; resize: none;
+  margin-bottom: 14px;
+  min-height: 60px;
+}
+.upload-caption:focus { border-color: var(--accent); }
+
+.upload-status {
+  font-size: 0.7rem; color: var(--muted);
+  text-align: center; margin-bottom: 12px;
+  min-height: 18px;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: white; border: none;
+  border-radius: 12px; padding: 14px;
+  font-family: var(--font); font-size: 0.88rem;
+  font-weight: 700; letter-spacing: 0.04em;
+  cursor: pointer; transition: all 0.2s;
+  margin-bottom: 8px;
+}
+.btn-primary:active { transform: scale(0.97); opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ghost {
+  width: 100%;
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px;
+  font-family: var(--font); font-size: 0.82rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-ghost:active { background: var(--card); }
+
+/* ══════════════════════════════════════════
+   MUSIC PLAYER MODAL
+══════════════════════════════════════════ */
+.music-modal {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: none; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s;
+}
+.music-modal.active { display: flex; opacity: 1; }
+
+.music-box {
+  width: 82vw; max-width: 340px;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 26px; overflow: hidden;
+  padding: 24px 20px 28px;
+  transform: scale(0.9);
+  transition: transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+}
+.music-modal.active .music-box { transform: scale(1); }
+
+.music-thumb-wrap {
+  width: 100%; aspect-ratio: 1/1;
+  border-radius: 18px; overflow: hidden;
+  background: #0a0a14;
+  position: relative; margin-bottom: 18px;
+}
+.music-thumb { width: 100%; height: 100%; object-fit: cover; }
+.music-play-big {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.music-play-circle {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: rgba(0,122,255,0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.1rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.music-play-circle:active { transform: scale(0.9); }
+
+.music-title { font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 2px; }
+.music-artist { font-size: 0.68rem; color: var(--muted); text-align: center; margin-bottom: 16px; }
+
+.music-progress {
+  width: 100%; height: 3px;
+  -webkit-appearance: none; appearance: none;
+  background: var(--border); border-radius: 2px; outline: none;
+  cursor: pointer; accent-color: var(--accent);
+  margin-bottom: 6px;
+}
+.music-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent);
+  border: 2px solid white; cursor: pointer;
+}
+.music-times {
+  display: flex; justify-content: space-between;
+  font-size: 0.6rem; color: var(--muted);
+  margin-bottom: 16px; font-family: monospace;
+}
+.music-controls {
+  display: flex; align-items: center; justify-content: center; gap: 28px;
+}
+.music-ctrl { color: var(--muted); font-size: 0.9rem; cursor: pointer; transition: color 0.2s; }
+.music-ctrl:active { color: var(--text); }
+.music-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.8rem; cursor: pointer;
+}
+
+/* ══════════════════════════════════════════
+   DROPDOWN MENU
+══════════════════════════════════════════ */
+.dropdown-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  display: none;
+}
+.dropdown-overlay.active { display: block; }
+
+.dropdown {
+  position: absolute; top: 48px; right: 0;
+  width: 210px;
+  background: #0d0d0d;
+  border: 1px solid var(--border);
+  border-radius: 16px; padding: 6px;
+  display: none; z-index: 100;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  animation: slideUp 0.25s var(--ease);
+}
+.light-mode .dropdown { background: #ffffff; }
+.dropdown.active { display: block; }
+
+.dd-item {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text); border-radius: 10px;
+  cursor: pointer; transition: background 0.15s;
+  gap: 10px;
+}
+.dd-item:hover { background: var(--border); }
+.dd-item i { color: var(--accent); font-size: 0.8rem; }
+.dd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* Pill toggle */
+.pill-track {
+  width: 34px; height: 19px;
+  background: var(--border);
+  border-radius: 99px;
+  position: relative; transition: 0.3s;
+  flex-shrink: 0;
+}
+.pill-thumb {
+  width: 13px; height: 13px;
+  background: #fff; border-radius: 50%;
+  position: absolute; top: 3px; left: 3px;
+  transition: 0.3s var(--ease);
+}
+body:not(.light-mode) .pill-track.dark-mode-track { background: var(--accent); }
+body:not(.light-mode) .pill-track.dark-mode-track .pill-thumb { transform: translateX(15px); }
+
+/* Private/Public toggle */
+.view-tag {
+  font-size: 0.58rem; color: var(--muted); font-weight: 400;
+  letter-spacing: 0.1em; margin-left: 2px;
+}
+.pill-track.view-track.is-private { background: #ff3b30; }
+.pill-track.view-track.is-private .pill-thumb { transform: translateX(15px); }
+
+/* ══════════════════════════════════════════
+   BYPASS / DEV BUTTON (bottom floating)
+══════════════════════════════════════════ */
+.bypass-btn {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); cursor: pointer;
+  transition: all 0.2s; z-index: 60;
+  white-space: nowrap;
+}
+.bypass-btn:active { background: rgba(0,122,255,0.15); border-color: var(--accent); color: var(--accent); }
+.bypass-btn i { font-size: 0.75rem; }
+
+/* ══════════════════════════════════════════
+   BRAND ICON COLOURS (FA)
+══════════════════════════════════════════ */
+.color-instagram { color: #e1306c; }
+.color-twitter   { color: #1da1f2; }
+.color-x-twitter { color: #ffffff; }
+.color-youtube   { color: #ff0000; }
+.color-linkedin  { color: #0077b5; }
+.color-github    { color: #c9d1d9; }
+.color-tiktok    { color: #69c9d0; }
+.color-discord   { color: #5865f2; }
+.color-telegram  { color: #2ca5e0; }
+.color-spotify   { color: #1db954; }
+.color-pinterest { color: #e60023; }
+.color-snapchat  { color: #fffc00; }
+.color-whatsapp  { color: #25d366; }
+.color-reddit    { color: #ff4500; }
+.color-twitch    { color: #9146ff; }
+.color-behance   { color: #1769ff; }
+.color-dribbble  { color: #ea4c89; }
+.color-facebook  { color: #1877f2; }
+.color-globe     { color: var(--accent); }
+
+/* ══════════════════════════════════════════
+   PRIVATE/PUBLIC OVERLAY
+══════════════════════════════════════════ */
+.private-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(20px);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px;
+}
+.private-overlay.active { display: flex; }
+.private-overlay i { font-size: 2.5rem; color: var(--muted2); }
+.private-overlay span { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     AUDIO
+══════════════════════════════════════════ -->
+<audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
+<div id="youtube-player-container" style="display:none;position:absolute;"></div>
+
+<!-- ══════════════════════════════════════════
+     MUSIC PLAYER MODAL
+══════════════════════════════════════════ -->
+<div class="music-modal" id="music-modal" onclick="closeMusicModal()">
+  <div class="music-box" onclick="event.stopPropagation()" style="position:relative">
+    <div class="music-close" onclick="closeMusicModal()"><i class="fa-solid fa-xmark"></i></div>
+    <div class="music-thumb-wrap">
+      <img class="music-thumb" id="music-thumb" src="" alt="">
+      <div class="music-play-big">
+        <div class="music-play-circle" id="music-play-pause">
+          <i class="fa-solid fa-play" id="music-play-icon"></i>
+        </div>
+      </div>
+    </div>
+    <div class="music-title" id="music-title-text">Wait a Minute!</div>
+    <div class="music-artist" id="music-artist-text">Willow
+      <a id="yt-open-link" href="#" target="_blank" style="margin-left:6px;color:#ff0000;font-size:0.8rem" onclick="event.stopPropagation()">
+        <i class="fa-brands fa-youtube"></i>
+      </a>
+    </div>
+    <input type="range" class="music-progress" id="music-progress" value="0" min="0" max="100" step="0.1">
+    <div class="music-times">
+      <span id="music-current">0:00</span>
+      <span id="music-duration">0:00</span>
+    </div>
+    <div class="music-controls">
+      <div class="music-ctrl" id="music-prev"><i class="fa-solid fa-backward"></i></div>
+      <div class="music-ctrl" id="music-next"><i class="fa-solid fa-forward"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     POST VIEWER MODAL
+══════════════════════════════════════════ -->
+<div class="post-modal" id="post-modal" onclick="closePostModal()">
+  <div class="post-modal-inner" onclick="event.stopPropagation()">
+    <div class="post-modal-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
+    <img id="post-modal-img" class="post-modal-media" src="" alt="" style="display:none">
+    <video id="post-modal-video" class="post-modal-media" src="" controls playsinline style="display:none"></video>
+    <div class="post-modal-caption" id="post-modal-caption"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ADD POST UPLOAD MODAL
+══════════════════════════════════════════ -->
+<div class="upload-modal" id="upload-modal" onclick="closeUploadModal()">
+  <div class="upload-sheet" onclick="event.stopPropagation()">
+    <h3>Add Post</h3>
+    <div class="upload-drop" id="upload-drop" onclick="document.getElementById('upload-file').click()">
+      <input type="file" id="upload-file" accept="image/*,video/*" onchange="handleFileSelect(event)">
+      <i class="fa-solid fa-plus"></i>
+      <span>Photo or Video</span>
+    </div>
+    <textarea class="upload-caption" id="upload-caption" placeholder="Caption (optional)" rows="2"></textarea>
+    <div class="upload-status" id="upload-status"></div>
+    <button class="btn-primary" id="upload-submit-btn" onclick="submitPost()">Add to Posts</button>
+    <button class="btn-ghost" onclick="closeUploadModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE
+══════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-brand">x<span>0</span>s.link</div>
+    <div style="position:relative">
+      <div class="menu-btn" id="menu-btn">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </div>
+      <div class="dropdown" id="dropdown">
+        <!-- Dark mode toggle -->
+        <div class="dd-item" onclick="toggleDark()">
+          <span>Dark Mode</span>
+          <div class="pill-track dark-mode-track"><div class="pill-thumb"></div></div>
+        </div>
+        <!-- Private/Public toggle — admin only -->
+        <div class="dd-item" id="view-toggle-item" style="display:none" onclick="toggleViewMode()">
+          <span>Private View <span class="view-tag" id="view-tag">PUBLIC</span></span>
+          <div class="pill-track view-track" id="view-pill-track"><div class="pill-thumb"></div></div>
+        </div>
+        <div class="dd-sep"></div>
+        <!-- Add Post — admin only -->
+        <div class="dd-item" id="dd-add-post" style="display:none" onclick="openUploadModal()">
+          <span>Add Post</span>
+          <i class="fa-solid fa-plus"></i>
+        </div>
+        <div class="dd-sep" id="dd-admin-sep" style="display:none"></div>
+        <div class="dd-item" onclick="shareProfile()">
+          <span>Share</span>
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANNER -->
+  <div class="banner">
+    <img class="banner-img" src="Picsart_26-04-18_23-43-21-546.jpg" alt="banner" onerror="this.style.display='none'">
+    <div class="banner-stripes"></div>
+    <div class="banner-overlay"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <section class="profile-section">
+    <!-- Avatar -->
+    <div class="avatar-wrap">
+      <img class="avatar-img" src="Screenshot_20260418-234611.png" alt="Anush" onerror="this.style.background='#0a0a14'">
+    </div>
+
+    <!-- Name row -->
+    <div class="name-row">
+      <h1 class="name">Anush Decodes</h1>
+      <span class="verified"><i class="fa-solid fa-circle-check"></i></span>
+    </div>
+
+    <div class="handle">anush@x0s</div>
+
+    <p class="bio">Decoding logic at the kernel level.<br>Building the future one commit at a time.</p>
+
+    <!-- Bio music row — compact pill -->
+    <div class="bio-music" id="bio-music-row">
+      <div class="bio-music-play" id="bio-play-btn" onclick="toggleBioMusic(event)">
+        <i class="fa-solid fa-play" id="bio-play-icon"></i>
+      </div>
+      <div class="bio-music-label" onclick="openMusicPlayer()">
+        <span class="song-name">Wait a Minute!</span>
+        <span class="dot">•</span>
+        <span class="artist-name">Willow</span>
+      </div>
+      <div class="bio-music-eq paused" id="bio-eq">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Social links - colourful FA brands -->
+    <div class="links-row" id="links-row">
+      <!-- Populated by JS from PROFILE_DATA -->
+    </div>
+  </section>
+
+  <!-- POSTS -->
+  <section class="posts-section">
+    <div class="section-header">
+      <span class="section-label">Posts</span>
+      <div class="add-post-btn" id="add-post-header-btn" onclick="openUploadModal()">
+        <i class="fa-solid fa-plus"></i>
+      </div>
+    </div>
+    <div class="posts-grid" id="posts-grid">
+      <!-- Posts rendered by JS -->
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<!-- BYPASS DEV BUTTON -->
+<div class="bypass-btn" id="bypass-btn" onclick="bypassToProfile()">
+  <i class="fa-solid fa-bolt"></i>
+  Bypass to Profile
+</div>
+
+<!-- PRIVATE OVERLAY -->
+<div class="private-overlay" id="private-overlay">
+  <i class="fa-solid fa-lock"></i>
+  <span>Private View Active</span>
+  <span style="font-size:0.6rem;color:var(--muted2)">Toggle off in menu to go public</span>
+</div>
+
+<!-- DROPDOWN CLOSE OVERLAY -->
+<div class="dropdown-overlay" id="dropdown-overlay" onclick="closeDropdown()"></div>
+
+<!-- ══════════════════════════════════════════
+     SCRIPT
+══════════════════════════════════════════ -->
+<script>
+
+/* ──────────────────────────────────────────
+   PROFILE DATA — Edit this manually
+────────────────────────────────────────── */
+const PROFILE = {
+  name:   'Anush Decodes',
+  handle: 'anush@x0s',
+  bio:    'Decoding logic at the kernel level.\nBuilding the future one commit at a time.',
+  links: [
+    { icon: 'fa-brands fa-instagram',   label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', colorClass: 'color-instagram' },
+    { icon: 'fa-brands fa-x-twitter',   label: 'X',         url: 'https://x.com/Nikhil_X7',              colorClass: 'color-x-twitter' },
+    { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn',  url: 'https://linkedin.com/in/nikhil-b-b41641363', colorClass: 'color-linkedin' },
+    { icon: 'fa-brands fa-discord',     label: 'Discord',   url: 'https://discord.gg/QyHXBqS3H',         colorClass: 'color-discord' },
+    { icon: 'fa-solid fa-link',         label: 'x0s.link',  url: 'https://unknownxsuperman-prog.github.io/anushdecodes/link.html', colorClass: 'color-globe' },
+  ],
+  music: {
+    ytId:   'h4OAXvDRZTY',
+    title:  'Wait a Minute!',
+    artist: 'Willow',
+  }
+};
+
+/* ──────────────────────────────────────────
+   POSTS DATA — You add posts manually here
+   Format: { type: 'image'|'video', src: 'filename.jpg', caption: 'text' }
+   After admin uploads via the UI, posts are saved to localStorage
+────────────────────────────────────────── */
+const STATIC_POSTS = [
+  // Example — remove or replace:
+  // { type: 'image', src: 'post1.jpg', caption: 'First post caption.' },
+];
+
+/* ──────────────────────────────────────────
+   ADMIN CHECK — only "Anush" gets admin UI
+────────────────────────────────────────── */
+const IS_ADMIN = PROFILE.name.toLowerCase().includes('anush');
+
+/* ──────────────────────────────────────────
+   STATE
+────────────────────────────────────────── */
+let isPrivateView = false;
+let bioPlaying    = false;
+let ytPlayer      = null;
+let ytReady       = false;
+let progressTimer = null;
+const YT_ID       = PROFILE.music.ytId;
+
+/* ──────────────────────────────────────────
+   BOOT
+────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  renderLinks();
+  renderPosts();
+  setupAdminUI();
+  setupDropdown();
+});
+
+/* ──────────────────────────────────────────
+   LINKS
+────────────────────────────────────────── */
+function renderLinks() {
+  const row = document.getElementById('links-row');
+  row.innerHTML = PROFILE.links.map(l => `
+    <a class="link-pill" href="${l.url}" target="_blank" rel="noopener">
+      <i class="${l.icon} ${l.colorClass}"></i>
+      <span>${l.label}</span>
+    </a>
+  `).join('');
+}
+
+/* ──────────────────────────────────────────
+   ADMIN UI
+────────────────────────────────────────── */
+function setupAdminUI() {
+  if (!IS_ADMIN) return;
+  // Show add-post button in header
+  document.getElementById('add-post-header-btn').classList.add('visible');
+  // Show in dropdown
+  document.getElementById('dd-add-post').style.display = 'flex';
+  document.getElementById('dd-admin-sep').style.display = 'block';
+  // Show private/public toggle
+  document.getElementById('view-toggle-item').style.display = 'flex';
+}
+
+/* ──────────────────────────────────────────
+   DARK MODE
+────────────────────────────────────────── */
+function toggleDark() {
+  document.body.classList.toggle('light-mode');
+}
+
+/* ──────────────────────────────────────────
+   PRIVATE / PUBLIC VIEW TOGGLE
+────────────────────────────────────────── */
+function toggleViewMode() {
+  isPrivateView = !isPrivateView;
+  const track   = document.getElementById('view-pill-track');
+  const tag     = document.getElementById('view-tag');
+  const overlay = document.getElementById('private-overlay');
+  const addBtn  = document.getElementById('add-post-header-btn');
+  const ddAdd   = document.getElementById('dd-add-post');
+  const ddSep   = document.getElementById('dd-admin-sep');
+
+  track.classList.toggle('is-private', isPrivateView);
+  tag.textContent = isPrivateView ? 'PRIVATE' : 'PUBLIC';
+  overlay.classList.toggle('active', isPrivateView);
+
+  // Hide + post button in public mode simulation
+  if (IS_ADMIN) {
+    const show = !isPrivateView;
+    addBtn.classList.toggle('visible', show);
+    ddAdd.style.display  = show ? 'flex' : 'none';
+    ddSep.style.display  = show ? 'block' : 'none';
+  }
+
+  closeDropdown();
+}
+
+/* ──────────────────────────────────────────
+   DROPDOWN
+────────────────────────────────────────── */
+function setupDropdown() {
+  document.getElementById('menu-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('dropdown').classList.toggle('active');
+    document.getElementById('dropdown-overlay').classList.toggle('active');
+  });
+}
+function closeDropdown() {
+  document.getElementById('dropdown').classList.remove('active');
+  document.getElementById('dropdown-overlay').classList.remove('active');
+}
+
+/* ──────────────────────────────────────────
+   SHARE
+────────────────────────────────────────── */
+function shareProfile() {
+  closeDropdown();
+  if (navigator.share) {
+    navigator.share({ title: PROFILE.name, url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'));
+  }
+}
+
+/* ──────────────────────────────────────────
+   POSTS
+────────────────────────────────────────── */
+function getAllPosts() {
+  const saved = localStorage.getItem('xos_posts_anush');
+  const localPosts = saved ? JSON.parse(saved) : [];
+  return [...STATIC_POSTS, ...localPosts];
+}
+
+function renderPosts() {
+  const grid = document.getElementById('posts-grid');
+  const posts = getAllPosts();
+
+  if (!posts.length) {
+    grid.innerHTML = `
+      <div class="posts-empty">
+        <i class="fa-regular fa-image"></i>
+        No posts yet
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = posts.map((p, i) => `
+    <div class="post-thumb" onclick="openPost(${i})">
+      ${p.type === 'video'
+        ? `<video src="${p.src}" muted playsinline></video>
+           <div class="post-video-badge"><i class="fa-solid fa-play"></i></div>`
+        : `<img src="${p.src}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=post-thumb-placeholder><i class=fa-solid fa-image></i></div>'">`
+      }
+    </div>
+  `).join('');
+}
+
+function openPost(idx) {
+  const posts = getAllPosts();
+  const post  = posts[idx];
+  if (!post) return;
+
+  const modal = document.getElementById('post-modal');
+  const img   = document.getElementById('post-modal-img');
+  const vid   = document.getElementById('post-modal-video');
+  const cap   = document.getElementById('post-modal-caption');
+
+  // Reset both
+  img.style.display = 'none'; img.src = '';
+  vid.style.display = 'none'; vid.src = '';
+
+  if (post.type === 'video') {
+    vid.src = post.src;
+    vid.style.display = 'block';
+  } else {
+    img.src = post.src;
+    img.style.display = 'block';
+  }
+  cap.textContent = post.caption || '';
+
+  // Show modal
+  modal.style.display = 'flex';
+  modal.style.opacity = '0';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      modal.style.opacity = '1';
+      modal.classList.add('active');
+    });
+  });
+  history.pushState({ modal: 'post' }, '');
+}
+
+function closePostModal() {
+  const modal = document.getElementById('post-modal');
+  modal.classList.remove('active');
+  modal.style.opacity = '0';
+  const vid = document.getElementById('post-modal-video');
+  if (vid) { vid.pause(); vid.src = ''; }
+  setTimeout(() => { modal.style.display = 'none'; modal.style.opacity = ''; }, 320);
+}
+
+/* ──────────────────────────────────────────
+   ADD POST (admin only)
+────────────────────────────────────────── */
+let uploadFileData = null;
+let uploadFileType = null;
+
+function openUploadModal() {
+  closeDropdown();
+  if (!IS_ADMIN) return;
+  resetUploadModal();
+  const modal = document.getElementById('upload-modal');
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('active'), 10);
+}
+function closeUploadModal() {
+  const modal = document.getElementById('upload-modal');
+  modal.classList.remove('active');
+  setTimeout(() => { modal.style.display = 'none'; resetUploadModal(); }, 300);
+}
+function resetUploadModal() {
+  uploadFileData = null; uploadFileType = null;
+  document.getElementById('upload-file').value = '';
+  document.getElementById('upload-caption').value = '';
+  document.getElementById('upload-status').textContent = '';
+  const drop = document.getElementById('upload-drop');
+  drop.querySelector('img')?.remove();
+  drop.querySelector('video')?.remove();
+  // Restore placeholder
+  if (!drop.querySelector('i')) {
+    drop.insertAdjacentHTML('afterbegin', '<i class="fa-solid fa-plus"></i><span>Photo or Video</span>');
+  }
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const drop = document.getElementById('upload-drop');
+  // Remove placeholder text/icon
+  drop.querySelectorAll('i:not(input ~ i), span').forEach(el => el.remove());
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    uploadFileData = ev.target.result;
+    uploadFileType = file.type.startsWith('video') ? 'video' : 'image';
+
+    // Preview
+    drop.querySelectorAll('img, video').forEach(el => el.remove());
+    const el = document.createElement(uploadFileType === 'video' ? 'video' : 'img');
+    el.src = uploadFileData;
+    if (uploadFileType === 'video') { el.muted = true; el.autoplay = true; el.loop = true; el.playsInline = true; }
+    drop.prepend(el);
+    document.getElementById('upload-status').textContent = `${uploadFileType === 'video' ? '🎬' : '🖼️'} Ready to post — add to GitHub repo manually`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function submitPost() {
+  if (!uploadFileData) {
+    document.getElementById('upload-status').textContent = '⚠ Please select a photo or video first.';
+    return;
+  }
+  const caption = document.getElementById('upload-caption').value.trim();
+  const post = { type: uploadFileType, src: uploadFileData, caption, ts: Date.now() };
+
+  const saved = localStorage.getItem('xos_posts_anush');
+  const posts = saved ? JSON.parse(saved) : [];
+  posts.unshift(post);
+  localStorage.setItem('xos_posts_anush', JSON.stringify(posts));
+
+  document.getElementById('upload-status').textContent = '✅ Post added! Showing in your feed.';
+  setTimeout(() => { closeUploadModal(); renderPosts(); }, 900);
+}
+
+/* ──────────────────────────────────────────
+   BIO MUSIC TOGGLE
+────────────────────────────────────────── */
+function toggleBioMusic(e) {
+  if (e) e.stopPropagation();
+  const audio  = document.getElementById('bio-audio');
+  const icon   = document.getElementById('bio-play-icon');
+  const eq     = document.getElementById('bio-eq');
+  const btn    = document.getElementById('bio-play-btn');
+
+  if (audio.paused) {
+    audio.play().then(() => {
+      icon.className = 'fa-solid fa-pause';
+      eq.classList.remove('paused');
+      btn.classList.add('playing');
+    }).catch(() => {});
+  } else {
+    audio.pause();
+    icon.className = 'fa-solid fa-play';
+    eq.classList.add('paused');
+    btn.classList.remove('playing');
+  }
+}
+
+/* ──────────────────────────────────────────
+   MUSIC PLAYER MODAL (YouTube)
+────────────────────────────────────────── */
+function openMusicPlayer() {
+  // Pause bio audio first
+  const bioAudio = document.getElementById('bio-audio');
+  if (!bioAudio.paused) {
+    bioAudio.pause();
+    document.getElementById('bio-play-icon').className = 'fa-solid fa-play';
+    document.getElementById('bio-eq').classList.add('paused');
+    document.getElementById('bio-play-btn').classList.remove('playing');
+  }
+
+  const modal = document.getElementById('music-modal');
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('active'), 10);
+
+  // Set thumb
+  document.getElementById('music-thumb').src = `https://img.youtube.com/vi/${YT_ID}/maxresdefault.jpg`;
+  document.getElementById('yt-open-link').href = `https://youtu.be/${YT_ID}`;
+
+  loadYTAPI().then(() => {
+    if (!ytPlayer) {
+      ytPlayer = new YT.Player('youtube-player-container', {
+        height: '0', width: '0', videoId: YT_ID,
+        playerVars: { playsinline:1, controls:0, autoplay:1, rel:0, modestbranding:1 },
+        events: { onReady: onYTReady, onStateChange: onYTStateChange }
+      });
+    } else {
+      ytPlayer.loadVideoById(YT_ID);
+      ytPlayer.playVideo();
+    }
+  });
+}
+
+function closeMusicModal() {
+  const modal = document.getElementById('music-modal');
+  modal.classList.remove('active');
+  setTimeout(() => { modal.style.display = 'none'; }, 300);
+  if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+  clearInterval(progressTimer);
+}
+
+function loadYTAPI() {
+  return new Promise(resolve => {
+    if (window.YT && window.YT.Player) { resolve(); return; }
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+    window.onYouTubeIframeAPIReady = resolve;
+  });
+}
+
+function onYTReady() {
+  ytReady = true;
+  ytPlayer.playVideo();
+  document.getElementById('music-duration').textContent = formatTime(ytPlayer.getDuration());
+  clearInterval(progressTimer);
+  progressTimer = setInterval(updateYTProgress, 500);
+}
+
+function onYTStateChange(e) {
+  const icon = document.getElementById('music-play-icon');
+  if (e.data === 1) { icon.className = 'fa-solid fa-pause'; }
+  else              { icon.className = 'fa-solid fa-play'; }
+}
+
+function updateYTProgress() {
+  if (!ytPlayer || !ytReady) return;
+  const cur = ytPlayer.getCurrentTime();
+  const dur = ytPlayer.getDuration();
+  if (dur > 0) {
+    document.getElementById('music-progress').value = (cur / dur) * 100;
+    document.getElementById('music-current').textContent = formatTime(cur);
+    document.getElementById('music-duration').textContent = formatTime(dur);
+  }
+}
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+}
+
+// Music player controls
+document.getElementById('music-play-pause').addEventListener('click', e => {
+  e.stopPropagation();
+  if (!ytPlayer) return;
+  ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+});
+document.getElementById('music-progress').addEventListener('input', e => {
+  if (!ytPlayer || !ytReady) return;
+  ytPlayer.seekTo((e.target.value / 100) * ytPlayer.getDuration(), true);
+});
+document.getElementById('music-prev').addEventListener('click', () => ytPlayer?.seekTo(0, true));
+document.getElementById('music-next').addEventListener('click', () => ytPlayer?.seekTo(0, true));
+
+/* ──────────────────────────────────────────
+   BYPASS BUTTON
+────────────────────────────────────────── */
+function bypassToProfile() {
+  // Scrolls directly to profile section (bypasses any future gate/index)
+  document.querySelector('.profile-section').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('bypass-btn').style.display = 'none';
+}
+
+/* ──────────────────────────────────────────
+   POPSTATE (back button closes modals)
+────────────────────────────────────────── */
+window.addEventListener('popstate', () => {
+  closePostModal();
+  closeMusicModal();
+  closeUploadModal();
+});
+</script>
+</body>
+</html>
