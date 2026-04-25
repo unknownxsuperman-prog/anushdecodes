@@ -164,12 +164,24 @@ html, body {
 .post-thumb img, .post-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* MODALS */
-.post-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; }
+.post-modal { 
+  position: fixed; inset: 0; z-index: 200; 
+  background: rgba(0,0,0,0.7); /* Translucent background */
+  backdrop-filter: blur(10px); 
+  display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; 
+}
 .post-modal.active { opacity: 1; display: flex; }
 .post-modal-inner { width: 92vw; max-width: 420px; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden; position: relative; background: #000; border: 1px solid var(--border2); }
 .post-modal-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
 
-.music-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; }
+.modal-dots {
+  position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 15;
+}
+.modal-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: 0.3s; }
+.modal-dot.active { background: #fff; transform: scale(1.2); }
+
+.music-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; }
 .music-modal.active { opacity: 1; display: flex; }
 
 /* COLORS */
@@ -188,7 +200,7 @@ html, body {
        <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
        <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" playsinline></video>
     </div>
-    <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
+    <div id="modal-dots" class="modal-dots"></div> <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
   </div>
 </div>
 
@@ -255,7 +267,7 @@ function toggleDarkMode() { document.body.classList.toggle('light-mode'); docume
 window.onclick = function() { document.getElementById('dropdown-menu').classList.remove('active'); }
 
 /* ──────────────────────────────────────────
-   POSTS DATA (Support for multiple files per post)
+   POSTS DATA
 ────────────────────────────────────────── */
 const GITHUB_POST_FILES = [
   { 
@@ -293,7 +305,7 @@ function toggleFollow() {
 }
 
 /* ──────────────────────────────────────────
-   POSTS RENDERING & AUTO-CYCLE
+   POSTS RENDERING
 ────────────────────────────────────────── */
 let gridIntervals = [];
 
@@ -313,7 +325,6 @@ function renderPosts() {
       </div>`;
   }).join('');
 
-  // Start 2-second cycle for multiple photos
   GITHUB_POST_FILES.forEach((post, i) => {
     if (post.files.length > 1 && post.type === 'image') {
       let currentFileIdx = 0;
@@ -328,7 +339,7 @@ function renderPosts() {
 }
 
 /* ──────────────────────────────────────────
-   MODAL & SLIDER LOGIC
+   MODAL & DOTS LOGIC
 ────────────────────────────────────────── */
 let currentOpenPostIdx = -1;
 let currentFileInModalIdx = 0;
@@ -348,6 +359,7 @@ function showModalContent() {
   const file = post.files[currentFileInModalIdx];
   const img = document.getElementById('post-modal-img');
   const vid = document.getElementById('post-modal-video');
+  const dotsContainer = document.getElementById('modal-dots');
   
   img.style.display = 'none';
   vid.style.display = 'none';
@@ -356,16 +368,26 @@ function showModalContent() {
   if (post.type === 'video' || file.endsWith('.mp4')) {
     vid.src = file;
     vid.style.display = 'block';
-    vid.muted = false; // Voiced in modal
+    vid.muted = false;
     vid.play();
   } else {
     img.src = file;
     img.style.display = 'block';
   }
+
+  // Handle Dots
+  dotsContainer.innerHTML = '';
+  if (post.files.length > 1) {
+    post.files.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = `modal-dot ${i === currentFileInModalIdx ? 'active' : ''}`;
+      dotsContainer.appendChild(dot);
+    });
+  }
+
   document.getElementById('post-modal-caption').innerText = post.caption;
 }
 
-// Swipe detection
 const swipeArea = document.getElementById('modal-swipe-area');
 swipeArea.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
 swipeArea.addEventListener('touchend', e => {
@@ -373,10 +395,10 @@ swipeArea.addEventListener('touchend', e => {
   const post = GITHUB_POST_FILES[currentOpenPostIdx];
   if(!post || post.files.length <= 1) return;
 
-  if (touchStartX - touchEndX > 50) { // Swipe Left (Next)
+  if (touchStartX - touchEndX > 50) { 
     currentFileInModalIdx = (currentFileInModalIdx + 1) % post.files.length;
     showModalContent();
-  } else if (touchEndX - touchStartX > 50) { // Swipe Right (Prev)
+  } else if (touchEndX - touchStartX > 50) { 
     currentFileInModalIdx = (currentFileInModalIdx - 1 + post.files.length) % post.files.length;
     showModalContent();
   }
