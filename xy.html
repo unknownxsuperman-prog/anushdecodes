@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Anush Decodes | x0s.link</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ══════════════════════════════════════════
+   BASE / TOKENS
+══════════════════════════════════════════ */
+:root {
+  --bg:        #000000;
+  --card:      #0a0a0a;
+  --card2:     #111111;
+  --border:    #1a1a1a;
+  --border2:   rgba(255,255,255,0.06);
+  --accent:    #007aff;
+  --text:      #ffffff;
+  --muted:     #666666;
+  --muted2:    #444444;
+  --glass:     rgba(10,10,10,0.75);
+  --radius:    14px;
+  --ease:      cubic-bezier(0.4,0,0.2,1);
+  --font:      'Space Grotesk', sans-serif;
+}
+.light-mode {
+  --bg:     #ffffff;
+  --card:   #f5f5f7;
+  --card2:  #f0f0f2;
+  --border: #e0e0e2;
+  --border2:rgba(0,0,0,0.07);
+  --text:   #000000;
+  --muted:  #888888;
+  --glass:  rgba(255,255,255,0.82);
+}
+
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.35s var(--ease), color 0.35s var(--ease);
+}
+
+::-webkit-scrollbar { display: none; }
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════ */
+@keyframes slideUp   { from { transform:translateY(18px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+@keyframes pulse     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.85)} }
+@keyframes fadeIn    { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ══════════════════════════════════════════
+   TOP BAR & DROPDOWN
+══════════════════════════════════════════ */
+.top-bar {
+  position: sticky; top: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+}
+.light-mode .top-bar { background: rgba(255,255,255,0.72); border-bottom: 1px solid var(--border); }
+
+.top-bar-brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+.top-bar-brand span { color: var(--accent); }
+
+.menu-btn { width: 36px; height: 36px; background: var(--glass); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); position: relative; }
+
+.dropdown-menu {
+  position: absolute; top: 50px; right: 0;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 6px; display: none; z-index: 100;
+  min-width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: fadeIn 0.2s var(--ease);
+}
+.dropdown-menu.active { display: block; }
+.menu-item {
+  padding: 10px 14px; font-size: 0.75rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  border-radius: 10px; transition: 0.2s;
+}
+.menu-item:hover { background: var(--border); }
+.menu-item i { color: var(--accent); font-size: 0.85rem; }
+
+/* ══════════════════════════════════════════
+   BANNER
+══════════════════════════════════════════ */
+.banner { width: 100%; height: 200px; position: relative; overflow: hidden; background: linear-gradient(135deg, #000814 0%, #001d3d 60%, #000000 100%); }
+.banner-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
+.banner-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 30%, var(--bg) 100%); }
+
+/* ══════════════════════════════════════════
+   PROFILE SECTION
+══════════════════════════════════════════ */
+.profile-section { padding: 0 20px; margin-top: -52px; position: relative; animation: slideUp 0.6s var(--ease) both; }
+
+.follow-btn {
+  position: absolute; right: 20px; top: 60px;
+  padding: 8px 24px; background: rgba(255,255,255,0.9);
+  color: #000; border: none; border-radius: 20px;
+  font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.follow-btn.following { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+
+.avatar-wrap { width: 84px; height: 84px; position: relative; margin-bottom: 14px; }
+.avatar-img { width: 100%; height: 100%; border-radius: 20px; object-fit: cover; border: 1px solid var(--border); display: block; }
+
+.name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
+.verified { color: var(--accent); font-size: 0.85rem; animation: pulse 2.5s infinite; }
+
+.handle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.handle { font-size: 0.72rem; font-weight: 500; color: var(--accent); letter-spacing: 0.06em; font-family: 'Space Grotesk', monospace; }
+.follower-stat { font-size: 0.72rem; color: var(--muted); }
+.follower-stat b { color: var(--text); }
+
+.bio { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; margin-bottom: 14px; }
+
+/* ── BIO MUSIC ── */
+.bio-music { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 6px 10px 6px 8px; background: var(--card); border: 1px solid var(--border); border-radius: 99px; width: fit-content; max-width: 100%; cursor: default; overflow: hidden; }
+.bio-music-play { width: 24px; height: 24px; background: rgba(0,122,255,0.13); border: 1px solid rgba(0,122,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.58rem; flex-shrink: 0; cursor: pointer; }
+.bio-music-label { font-size: 0.7rem; font-weight: 500; color: var(--text); white-space: nowrap; cursor: pointer; }
+.bio-music-eq { display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0; }
+.bio-music-eq span { width: 2px; background: var(--accent); border-radius: 1px; animation: eqBar 0.8s infinite alternate; }
+.bio-music-eq.paused span { animation-play-state: paused; opacity: 0.3; }
+@keyframes eqBar { from { opacity: 0.35; } to { opacity: 1; } }
+
+.links-row { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+.link-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 0.72rem; font-weight: 600; white-space: nowrap; transition: all 0.2s; }
+
+/* ══════════════════════════════════════════
+   POSTS SECTION
+══════════════════════════════════════════ */
+.posts-section { padding: 0 20px 100px; }
+.section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin-bottom: 16px; display: block; }
+.posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+.post-thumb { aspect-ratio: 1/1; border-radius: 6px; overflow: hidden; background: var(--card); cursor: pointer; position: relative; }
+.post-thumb img, .post-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* MODALS */
+.post-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; }
+.post-modal.active { opacity: 1; display: flex; }
+.post-modal-inner { width: 92vw; max-width: 420px; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden; position: relative; background: #000; border: 1px solid var(--border2); }
+.post-modal-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
+
+/* COLORS */
+.color-instagram { color: #e1306c; } .color-twitter { color: #ffffff; } .color-linkedin { color: #0077b5; } .color-discord { color: #5865f2; } .color-globe { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
+
+<div class="post-modal" id="post-modal" onclick="closePostModal()">
+  <div class="post-modal-inner" onclick="event.stopPropagation()">
+    <div class="post-modal-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
+    <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
+    <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" controls playsinline></video>
+    <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="top-bar">
+    <div class="top-bar-brand">x<span>0</span>s.link</div>
+    <div style="position: relative;">
+      <div class="menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+      <div class="dropdown-menu" id="dropdown-menu">
+        <div class="menu-item" onclick="shareProfile()"><span>Share</span> <i class="fa-solid fa-share-nodes"></i></div>
+        <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span> <i class="fa-solid fa-circle-half-stroke"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <img class="banner-img" src="Picsart_26-04-18_23-43-21-546.jpg">
+    <div class="banner-overlay"></div>
+  </div>
+
+  <section class="profile-section">
+    <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
+    <div class="avatar-wrap"><img class="avatar-img" src="Screenshot_20260418-234611.png"></div>
+    <div class="name-row"><h1 class="name">Anush Decodes</h1><span class="verified"><i class="fa-solid fa-circle-check"></i></span></div>
+    
+    <div class="handle-row">
+      <div class="handle">anush@x0s</div>
+      <div class="follower-stat"><b id="follower-count">1.2k</b> followers</div>
+    </div>
+
+    <p class="bio">Decoding logic at the kernel level.<br>Building the future one commit at a time.</p>
+
+    <div class="bio-music">
+      <div class="bio-music-play" onclick="toggleBioMusic(event)"><i class="fa-solid fa-play" id="bio-play-icon"></i></div>
+      <div class="bio-music-label">Wait a Minute! • Willow</div>
+      <div class="bio-music-eq paused" id="bio-eq"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="links-row" id="links-row"></div>
+  </section>
+
+  <section class="posts-section">
+    <span class="section-label">Posts</span>
+    <div class="posts-grid" id="posts-grid"></div>
+  </section>
+</div>
+
+<script>
+/* ──────────────────────────────────────────
+   UI & MENU LOGIC
+────────────────────────────────────────── */
+function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('active'); }
+function toggleDarkMode() { document.body.classList.toggle('light-mode'); document.getElementById('dropdown-menu').classList.remove('active'); }
+window.onclick = function() { document.getElementById('dropdown-menu').classList.remove('active'); }
+
+/* ──────────────────────────────────────────
+   GITHUB REPO CONFIG
+────────────────────────────────────────── */
+const GITHUB_USER = "Nikhil-X7"; 
+const GITHUB_REPO = "xos-assets"; 
+const GITHUB_PATH = "posts";      
+
+const GITHUB_POST_FILES = [
+  { name: "post1.jpg", type: "image", caption: "Deep logic." },
+  { name: "post2.jpg", type: "image", caption: "XOS Architecture." },
+  { name: "video1.mp4", type: "video", caption: "The future." }
+];
+
+/* ──────────────────────────────────────────
+   FOLLOW LOGIC (localStorage)
+────────────────────────────────────────── */
+let followerBase = parseInt(localStorage.getItem('anush_followers') || "1200");
+let isFollowing = localStorage.getItem('is_following') === 'true';
+
+function updateFollowUI() {
+  const countEl = document.getElementById('follower-count');
+  const btn = document.getElementById('follow-btn');
+  countEl.innerText = followerBase >= 1000 ? (followerBase/1000).toFixed(1) + 'k' : followerBase;
+  if(isFollowing) { btn.innerText = "Following"; btn.classList.add('following'); } 
+  else { btn.innerText = "Follow"; btn.classList.remove('following'); }
+}
+
+function toggleFollow() {
+  if(!isFollowing) { followerBase++; isFollowing = true; } 
+  else { followerBase--; isFollowing = false; }
+  localStorage.setItem('anush_followers', followerBase);
+  localStorage.setItem('is_following', isFollowing);
+  updateFollowUI();
+}
+
+/* ──────────────────────────────────────────
+   GITHUB POSTS RENDER
+────────────────────────────────────────── */
+function renderPosts() {
+  const grid = document.getElementById('posts-grid');
+  const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_PATH}/`;
+  grid.innerHTML = GITHUB_POST_FILES.map((file, i) => `
+    <div class="post-thumb" onclick="openPost(${i})">
+      ${file.type === 'video' ? `<video src="${rawUrl + file.name}" muted playsinline></video>` : `<img src="${rawUrl + file.name}" loading="lazy">`}
+    </div>`).join('');
+}
+
+function openPost(idx) {
+  const file = GITHUB_POST_FILES[idx];
+  const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_PATH}/${file.name}`;
+  const modal = document.getElementById('post-modal');
+  const img = document.getElementById('post-modal-img');
+  const vid = document.getElementById('post-modal-video');
+  img.style.display = 'none'; vid.style.display = 'none';
+  if(file.type === 'video') { vid.src = url; vid.style.display = 'block'; vid.play(); } else { img.src = url; img.style.display = 'block'; }
+  document.getElementById('post-modal-caption').innerText = file.caption;
+  modal.style.display = 'flex';
+  setTimeout(() => modal.classList.add('active'), 10);
+}
+
+function closePostModal() {
+  const modal = document.getElementById('post-modal');
+  modal.classList.remove('active');
+  document.getElementById('post-modal-video').pause();
+  setTimeout(() => modal.style.display = 'none', 300);
+}
+
+/* ──────────────────────────────────────────
+   LINKS & INIT
+────────────────────────────────────────── */
+const LINKS = [
+  { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
+  { icon: 'fa-brands fa-x-twitter', label: 'X', url: 'https://x.com/Nikhil_X7', color: 'color-twitter' },
+  { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn', url: 'https://linkedin.com/in/nikhil-b-b41641363', color: 'color-linkedin' },
+  { icon: 'fa-brands fa-discord', label: 'Discord', url: 'https://discord.gg/QyHXBqS3H', color: 'color-discord' },
+  { icon: 'fa-solid fa-link', label: 'x0s.link', url: 'personalpage.html', color: 'color-globe' }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const linkRow = document.getElementById('links-row');
+  linkRow.innerHTML = LINKS.map(l => `<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
+  renderPosts();
+  updateFollowUI();
+});
+
+function toggleBioMusic(e) {
+  if (e) e.stopPropagation();
+  const audio = document.getElementById('bio-audio');
+  const icon = document.getElementById('bio-play-icon');
+  const eq = document.getElementById('bio-eq');
+  if (audio.paused) { audio.play(); icon.className = 'fa-solid fa-pause'; eq.classList.remove('paused'); } 
+  else { audio.pause(); icon.className = 'fa-solid fa-play'; eq.classList.add('paused'); }
+}
+
+function shareProfile() {
+  if (navigator.share) navigator.share({ title: 'Anush Decodes', url: window.location.href });
+  else alert('Link copied!');
+}
+</script>
+</body>
+</html>
