@@ -145,6 +145,7 @@ html, body {
 .bio-music { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 6px 10px 6px 8px; background: var(--card); border: 1px solid var(--border); border-radius: 99px; width: fit-content; max-width: 100%; cursor: default; overflow: hidden; }
 .bio-music-play { width: 24px; height: 24px; background: rgba(0,122,255,0.13); border: 1px solid rgba(0,122,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.58rem; flex-shrink: 0; cursor: pointer; }
 .bio-music-label { font-size: 0.7rem; font-weight: 500; color: var(--text); white-space: nowrap; cursor: pointer; }
+.bio-music-label:hover { color: var(--text) !important; text-decoration: none; }
 .bio-music-eq { display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0; }
 .bio-music-eq span { width: 2px; background: var(--accent); border-radius: 1px; animation: eqBar 0.8s infinite alternate; }
 .bio-music-eq.paused span { animation-play-state: paused; opacity: 0.3; }
@@ -168,6 +169,9 @@ html, body {
 .post-modal-inner { width: 92vw; max-width: 420px; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden; position: relative; background: #000; border: 1px solid var(--border2); }
 .post-modal-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
 
+.music-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; }
+.music-modal.active { opacity: 1; display: flex; }
+
 /* COLORS */
 .color-instagram { color: #e1306c; } .color-twitter { color: #ffffff; } .color-linkedin { color: #0077b5; } .color-discord { color: #5865f2; } .color-globe { color: var(--accent); }
 </style>
@@ -175,13 +179,23 @@ html, body {
 <body>
 
 <audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
+<div id="youtube-player-container" style="display:none;position:absolute;"></div>
 
 <div class="post-modal" id="post-modal" onclick="closePostModal()">
-  <div class="post-modal-inner" onclick="event.stopPropagation()">
+  <div class="post-modal-inner" id="modal-swipe-area" onclick="event.stopPropagation()">
     <div class="post-modal-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
-    <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
-    <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" controls playsinline></video>
+    <div id="modal-media-wrap" style="width:100%; height:100%;">
+       <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
+       <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" playsinline></video>
+    </div>
     <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
+  </div>
+</div>
+
+<div class="music-modal" id="music-modal" onclick="closeMusicModal()">
+  <div style="background:var(--card); padding:30px; border-radius:20px; text-align:center;">
+    <p>Music Player Open</p>
+    <button onclick="closeMusicModal()" style="margin-top:10px; background:var(--accent); color:white; border:none; padding:5px 15px; border-radius:5px;">Close</button>
   </div>
 </div>
 
@@ -219,7 +233,7 @@ html, body {
 
     <div class="bio-music">
       <div class="bio-music-play" onclick="toggleBioMusic(event)"><i class="fa-solid fa-play" id="bio-play-icon"></i></div>
-      <div class="bio-music-label">Wait a Minute! • Willow</div>
+      <div class="bio-music-label" onclick="openMusicPlayer()">Wait a Minute! • Willow</div>
       <div class="bio-music-eq paused" id="bio-eq"><span></span><span></span><span></span></div>
     </div>
 
@@ -241,16 +255,23 @@ function toggleDarkMode() { document.body.classList.toggle('light-mode'); docume
 window.onclick = function() { document.getElementById('dropdown-menu').classList.remove('active'); }
 
 /* ──────────────────────────────────────────
-   RELATIVE POST FILES (SAME REPO)
+   POSTS DATA (Support for multiple files per post)
 ────────────────────────────────────────── */
 const GITHUB_POST_FILES = [
-  { name: "file_00000000862871fab1161995ce9f104e.png", type: "image", caption: "Deep logic." },
-  { name: "XOS_STAMP_1776237339190.png", type: "image", caption: "iykyk" },
-  { name: "lv_7587788892909276421_20260417222425.mp4", type: "video", caption: "✨✨" }
+  { 
+    files: ["file_00000000862871fab1161995ce9f104e.png", "XOS_STAMP_1776237339190.png"], 
+    type: "image", 
+    caption: "Deep logic toggle." 
+  },
+  { 
+    files: ["lv_7587788892909276421_20260417222425.mp4"], 
+    type: "video", 
+    caption: "✨✨" 
+  }
 ];
 
 /* ──────────────────────────────────────────
-   FOLLOW LOGIC (localStorage)
+   FOLLOW LOGIC
 ────────────────────────────────────────── */
 let followerBase = parseInt(localStorage.getItem('anush_followers') || "1200");
 let isFollowing = localStorage.getItem('is_following') === 'true';
@@ -272,29 +293,94 @@ function toggleFollow() {
 }
 
 /* ──────────────────────────────────────────
-   RELATIVE POSTS RENDER
+   POSTS RENDERING & AUTO-CYCLE
 ────────────────────────────────────────── */
+let gridIntervals = [];
+
 function renderPosts() {
   const grid = document.getElementById('posts-grid');
-  // Files are in the same folder as index.html
-  grid.innerHTML = GITHUB_POST_FILES.map((file, i) => `
-    <div class="post-thumb" onclick="openPost(${i})">
-      ${file.type === 'video' ? `<video src="${file.name}" muted playsinline></video>` : `<img src="${file.name}" loading="lazy">`}
-    </div>`).join('');
+  gridIntervals.forEach(clearInterval);
+  gridIntervals = [];
+
+  grid.innerHTML = GITHUB_POST_FILES.map((post, i) => {
+    const mainFile = post.files[0];
+    return `
+      <div class="post-thumb" id="thumb-${i}" onclick="openPost(${i})">
+        ${post.type === 'video' 
+          ? `<video src="${mainFile}" muted autoplay loop playsinline></video>` 
+          : `<img src="${mainFile}" id="img-thumb-${i}" loading="lazy">`
+        }
+      </div>`;
+  }).join('');
+
+  // Start 2-second cycle for multiple photos
+  GITHUB_POST_FILES.forEach((post, i) => {
+    if (post.files.length > 1 && post.type === 'image') {
+      let currentFileIdx = 0;
+      const interval = setInterval(() => {
+        currentFileIdx = (currentFileIdx + 1) % post.files.length;
+        const img = document.getElementById(`img-thumb-${i}`);
+        if(img) img.src = post.files[currentFileIdx];
+      }, 2000);
+      gridIntervals.push(interval);
+    }
+  });
 }
 
+/* ──────────────────────────────────────────
+   MODAL & SLIDER LOGIC
+────────────────────────────────────────── */
+let currentOpenPostIdx = -1;
+let currentFileInModalIdx = 0;
+let touchStartX = 0;
+
 function openPost(idx) {
-  const file = GITHUB_POST_FILES[idx];
+  currentOpenPostIdx = idx;
+  currentFileInModalIdx = 0;
+  showModalContent();
   const modal = document.getElementById('post-modal');
-  const img = document.getElementById('post-modal-img');
-  const vid = document.getElementById('post-modal-video');
-  img.style.display = 'none'; vid.style.display = 'none';
-  if(file.type === 'video') { vid.src = file.name; vid.style.display = 'block'; vid.play(); } 
-  else { img.src = file.name; img.style.display = 'block'; }
-  document.getElementById('post-modal-caption').innerText = file.caption;
   modal.style.display = 'flex';
   setTimeout(() => modal.classList.add('active'), 10);
 }
+
+function showModalContent() {
+  const post = GITHUB_POST_FILES[currentOpenPostIdx];
+  const file = post.files[currentFileInModalIdx];
+  const img = document.getElementById('post-modal-img');
+  const vid = document.getElementById('post-modal-video');
+  
+  img.style.display = 'none';
+  vid.style.display = 'none';
+  vid.pause();
+
+  if (post.type === 'video' || file.endsWith('.mp4')) {
+    vid.src = file;
+    vid.style.display = 'block';
+    vid.muted = false; // Voiced in modal
+    vid.play();
+  } else {
+    img.src = file;
+    img.style.display = 'block';
+  }
+  document.getElementById('post-modal-caption').innerText = post.caption;
+}
+
+// Swipe detection
+const swipeArea = document.getElementById('modal-swipe-area');
+swipeArea.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+swipeArea.addEventListener('touchend', e => {
+  const touchEndX = e.changedTouches[0].screenX;
+  const post = GITHUB_POST_FILES[currentOpenPostIdx];
+  if(!post || post.files.length <= 1) return;
+
+  if (touchStartX - touchEndX > 50) { // Swipe Left (Next)
+    currentFileInModalIdx = (currentFileInModalIdx + 1) % post.files.length;
+    showModalContent();
+  } else if (touchEndX - touchStartX > 50) { // Swipe Right (Prev)
+    currentFileInModalIdx = (currentFileInModalIdx - 1 + post.files.length) % post.files.length;
+    showModalContent();
+  }
+});
 
 function closePostModal() {
   const modal = document.getElementById('post-modal');
@@ -304,7 +390,21 @@ function closePostModal() {
 }
 
 /* ──────────────────────────────────────────
-   LINKS & INIT
+   MUSIC PLAYER
+────────────────────────────────────────── */
+function openMusicPlayer() {
+  const m = document.getElementById('music-modal');
+  m.style.display = 'flex';
+  setTimeout(() => m.classList.add('active'), 10);
+}
+function closeMusicModal() {
+  const m = document.getElementById('music-modal');
+  m.classList.remove('active');
+  setTimeout(() => m.style.display = 'none', 300);
+}
+
+/* ──────────────────────────────────────────
+   INIT
 ────────────────────────────────────────── */
 const LINKS = [
   { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
