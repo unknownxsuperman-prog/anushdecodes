@@ -247,7 +247,7 @@ window.onclick = function() { document.getElementById('dropdown-menu').classList
 ────────────────────────────────────────── */
 const GITHUB_USER = "gunknownxsuperman-prog"; 
 const GITHUB_REPO = "anushdecodes"; 
-const GITHUB_PATH = "xy.html";      
+const GITHUB_PATH = "";      
 
 const GITHUB_POST_FILES = [
   { name: "file_00000000862871fab1161995ce9f104e.png", type: "image", caption: "Deep logic." },
@@ -282,7 +282,7 @@ function toggleFollow() {
 ────────────────────────────────────────── */
 function renderPosts() {
   const grid = document.getElementById('posts-grid');
-  const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_PATH}/`;
+  const rawUrl = `https://unknownxsuperman-prog.github.io/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_PATH}/`;
   grid.innerHTML = GITHUB_POST_FILES.map((file, i) => `
     <div class="post-thumb" onclick="openPost(${i})">
       ${file.type === 'video' ? `<video src="${rawUrl + file.name}" muted playsinline></video>` : `<img src="${rawUrl + file.name}" loading="lazy">`}
