@@ -166,7 +166,7 @@ html, body {
 /* MODALS */
 .post-modal { 
   position: fixed; inset: 0; z-index: 200; 
-  background: rgba(0,0,0,0.7); /* Translucent background */
+  background: rgba(0,0,0,0.7); 
   backdrop-filter: blur(10px); 
   display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; 
 }
@@ -198,9 +198,10 @@ html, body {
     <div class="post-modal-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
     <div id="modal-media-wrap" style="width:100%; height:100%;">
        <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
-       <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" playsinline></video>
+       <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" playsinline loop></video>
     </div>
-    <div id="modal-dots" class="modal-dots"></div> <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
+    <div id="modal-dots" class="modal-dots"></div>
+    <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
   </div>
 </div>
 
@@ -305,7 +306,7 @@ function toggleFollow() {
 }
 
 /* ──────────────────────────────────────────
-   POSTS RENDERING
+   POSTS RENDERING & AUTO-CYCLE
 ────────────────────────────────────────── */
 let gridIntervals = [];
 
@@ -369,13 +370,13 @@ function showModalContent() {
     vid.src = file;
     vid.style.display = 'block';
     vid.muted = false;
+    vid.loop = true; // Loop infinitely in modal
     vid.play();
   } else {
     img.src = file;
     img.style.display = 'block';
   }
 
-  // Handle Dots
   dotsContainer.innerHTML = '';
   if (post.files.length > 1) {
     post.files.forEach((_, i) => {
@@ -459,3 +460,4 @@ function shareProfile() {
 </script>
 </body>
 </html>
+
