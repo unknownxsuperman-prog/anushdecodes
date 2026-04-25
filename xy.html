@@ -113,7 +113,6 @@ html, body {
 ══════════════════════════════════════════ */
 .profile-section { padding: 0 20px; margin-top: -52px; position: relative; animation: slideUp 0.6s var(--ease) both; }
 
-/* FOLLOW BUTTON - PILL POSITIONED TO THE RIGHT */
 .follow-btn {
   position: absolute; right: 20px; top: 65px;
   padding: 10px 30px; background: rgba(255,255,255,0.9);
@@ -130,7 +129,6 @@ html, body {
 .name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
 .verified { color: var(--accent); font-size: 0.85rem; animation: pulse 2.5s infinite; }
 
-/* POSITIONED HANDLE LEFT, STATS RIGHT AS PER IMAGE */
 .handle-row { 
   display: flex; 
   align-items: center; 
@@ -243,11 +241,10 @@ function toggleDarkMode() { document.body.classList.toggle('light-mode'); docume
 window.onclick = function() { document.getElementById('dropdown-menu').classList.remove('active'); }
 
 /* ──────────────────────────────────────────
-   GITHUB REPO CONFIG
+   GITHUB REPO CONFIG (Simplified Root Logic)
 ────────────────────────────────────────── */
-const GITHUB_USER = "unknownxsuperman-prog"; 
+const GITHUB_USER = "gunknownxsuperman-prog"; 
 const GITHUB_REPO = "anushdecodes"; 
-const GITHUB_PATH = "";      
 
 const GITHUB_POST_FILES = [
   { name: "file_00000000862871fab1161995ce9f104e.png", type: "image", caption: "Deep logic." },
@@ -282,16 +279,17 @@ function toggleFollow() {
 ────────────────────────────────────────── */
 function renderPosts() {
   const grid = document.getElementById('posts-grid');
-  const rawUrl = `https://unknownxsuperman-prog/${GITHUB_USER}.github.io/${GITHUB_REPO}/${GITHUB_PATH}/`;
+  // Logic simplified: Root directory directly
+  const rawBase = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/`;
   grid.innerHTML = GITHUB_POST_FILES.map((file, i) => `
     <div class="post-thumb" onclick="openPost(${i})">
-      ${file.type === 'video' ? `<video src="${rawUrl + file.name}" muted playsinline></video>` : `<img src="${rawUrl + file.name}" loading="lazy">`}
+      ${file.type === 'video' ? `<video src="${rawBase + file.name}" muted playsinline></video>` : `<img src="${rawBase + file.name}" loading="lazy">`}
     </div>`).join('');
 }
 
 function openPost(idx) {
   const file = GITHUB_POST_FILES[idx];
-  const url = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}/main/${GITHUB_PATH}/${file.name}`;
+  const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${file.name}`;
   const modal = document.getElementById('post-modal');
   const img = document.getElementById('post-modal-img');
   const vid = document.getElementById('post-modal-video');
