@@ -113,12 +113,13 @@ html, body {
 ══════════════════════════════════════════ */
 .profile-section { padding: 0 20px; margin-top: -52px; position: relative; animation: slideUp 0.6s var(--ease) both; }
 
+/* FOLLOW BUTTON - PILL POSITIONED TO THE RIGHT */
 .follow-btn {
-  position: absolute; right: 20px; top: 60px;
-  padding: 8px 24px; background: rgba(255,255,255,0.9);
-  color: #000; border: none; border-radius: 20px;
-  font-size: 0.8rem; font-weight: 700; cursor: pointer;
-  transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  position: absolute; right: 20px; top: 65px;
+  padding: 10px 30px; background: rgba(255,255,255,0.9);
+  color: #000; border: none; border-radius: 30px;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
 .follow-btn.following { background: var(--card); color: var(--text); border: 1px solid var(--border); }
 
@@ -129,9 +130,15 @@ html, body {
 .name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
 .verified { color: var(--accent); font-size: 0.85rem; animation: pulse 2.5s infinite; }
 
-.handle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+/* POSITIONED HANDLE LEFT, STATS RIGHT AS PER IMAGE */
+.handle-row { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  margin-bottom: 12px; 
+}
 .handle { font-size: 0.72rem; font-weight: 500; color: var(--accent); letter-spacing: 0.06em; font-family: 'Space Grotesk', monospace; }
-.follower-stat { font-size: 0.72rem; color: var(--muted); }
+.follower-stat { font-size: 0.72rem; color: var(--muted); display: flex; gap: 12px; }
 .follower-stat b { color: var(--text); }
 
 .bio { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; margin-bottom: 14px; }
@@ -204,7 +211,10 @@ html, body {
     
     <div class="handle-row">
       <div class="handle">anush@x0s</div>
-      <div class="follower-stat"><b id="follower-count">1.2k</b> followers</div>
+      <div class="follower-stat">
+        <span><b>350</b> following</span>
+        <span><b id="follower-count">1.2k</b> followers</span>
+      </div>
     </div>
 
     <p class="bio">Decoding logic at the kernel level.<br>Building the future one commit at a time.</p>
