@@ -57,6 +57,7 @@ html, body {
 @keyframes slideUp   { from { transform:translateY(18px); opacity:0; } to { transform:translateY(0); opacity:1; } }
 @keyframes pulse     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.85)} }
 @keyframes fadeIn    { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideInUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
 
 .page {
   max-width: 480px;
@@ -131,46 +132,172 @@ html, body {
 
 .bio { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; margin-bottom: 14px; }
 
-/* ── BIO MUSIC LABEL ── */
-.bio-music { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 6px 10px 6px 8px; background: var(--card); border: 1px solid var(--border); border-radius: 99px; width: fit-content; max-width: 100%; cursor: default; overflow: hidden; }
-.bio-music-play { width: 24px; height: 24px; background: rgba(0,122,255,0.13); border: 1px solid rgba(0,122,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.58rem; flex-shrink: 0; cursor: pointer; }
-.bio-music-label { font-size: 0.7rem; font-weight: 500; color: var(--text); white-space: nowrap; cursor: pointer; }
-.bio-music-eq { display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0; }
-.bio-music-eq span { width: 2px; background: var(--accent); border-radius: 1px; animation: eqBar 0.8s infinite alternate; }
-.bio-music-eq.paused span { animation-play-state: paused; opacity: 0.3; }
-@keyframes eqBar { from { opacity: 0.35; } to { opacity: 1; } }
+/* ── BIO MUSIC — inline, no pill ── */
+.bio-music-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+.bio-music-inline .bm-toggle {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 0.72rem;
+  flex-shrink: 0;
+}
+.bio-music-inline .bm-label {
+  font-size: 0.75rem; font-weight: 500; color: var(--text);
+  white-space: nowrap;
+}
+.bio-music-inline .bm-eq {
+  display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0;
+}
+.bio-music-inline .bm-eq span {
+  width: 2px; background: var(--accent); border-radius: 1px;
+  animation: eqBar 0.8s infinite alternate;
+}
+.bio-music-inline .bm-eq span:nth-child(2) { animation-delay: 0.2s; }
+.bio-music-inline .bm-eq span:nth-child(3) { animation-delay: 0.4s; }
+.bio-music-inline .bm-eq.paused span { animation-play-state: paused; opacity: 0.3; }
+@keyframes eqBar { from { height: 3px; opacity: 0.4; } to { height: 10px; opacity: 1; } }
 
 .links-row { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
 .link-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 0.72rem; font-weight: 600; white-space: nowrap; transition: all 0.2s; }
 
 /* ══════════════════════════════════════════
-   POSTS
+   POSTS GRID — 3:4 portrait
 ══════════════════════════════════════════ */
 .posts-section { padding: 0 20px 100px; }
 .section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin-bottom: 16px; display: block; }
 .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-.post-thumb { aspect-ratio: 1/1; border-radius: 6px; overflow: hidden; background: var(--card); cursor: pointer; position: relative; }
-.post-thumb video, .post-thumb img { width: 100%; height: 100%; object-fit: cover; }
-
-/* MODALS */
-.post-modal { 
-  position: fixed; inset: 0; z-index: 200; 
-  background: rgba(0,0,0,0.7); 
-  backdrop-filter: blur(10px); 
-  display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.28s ease; 
+.post-thumb {
+  aspect-ratio: 3/4;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+  cursor: pointer;
+  position: relative;
 }
-.post-modal.active { opacity: 1; display: flex; }
-.post-modal-inner { width: 92vw; max-width: 420px; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden; position: relative; background: #000; border: 1px solid var(--border2); }
-.post-modal-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
+.post-thumb video, .post-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.3s var(--ease);
+}
+.post-thumb:active video, .post-thumb:active img { transform: scale(0.96); }
 
-.modal-dots { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 15; }
-.modal-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: 0.3s; }
-.modal-dot.active { background: #fff; transform: scale(1.2); }
+/* video icon badge */
+.post-thumb .vid-badge {
+  position: absolute; top: 6px; right: 6px;
+  color: white; font-size: 0.65rem; opacity: 0.85;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+/* multi-image badge */
+.post-thumb .multi-badge {
+  position: absolute; top: 6px; right: 6px;
+  color: white; font-size: 0.65rem; opacity: 0.85;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
 
 /* ══════════════════════════════════════════
-   MUSIC MODAL (Original Logic Styles)
+   INSTAGRAM-STYLE POST MODAL
 ══════════════════════════════════════════ */
-.music-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.88); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+.post-modal {
+  position: fixed; inset: 0; z-index: 200;
+  background: #000;
+  display: none; flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+.post-modal.active { opacity: 1; display: flex; }
+
+/* Header */
+.pm-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: #000;
+  flex-shrink: 0;
+  z-index: 5;
+}
+.pm-header-left { display: flex; align-items: center; gap: 10px; }
+.pm-avatar {
+  width: 36px; height: 36px; border-radius: 10px; object-fit: cover;
+  border: 1px solid var(--border);
+}
+.pm-name { font-size: 0.88rem; font-weight: 700; line-height: 1.1; }
+.pm-verified { color: var(--accent); font-size: 0.72rem; margin-left: 4px; }
+.pm-more { color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 4px 8px; }
+.pm-close {
+  width: 34px; height: 34px;
+  background: rgba(255,255,255,0.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; cursor: pointer; font-size: 0.85rem;
+}
+
+/* Media area */
+.pm-media-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Slider */
+.pm-slider {
+  display: flex;
+  width: 100%; height: 100%;
+  transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.pm-slide {
+  min-width: 100%; height: 100%;
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.pm-slide img, .pm-slide video {
+  width: 100%; height: 100%; object-fit: contain;
+  display: block;
+}
+
+/* Dots */
+.pm-dots {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 5px; z-index: 10;
+}
+.pm-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transition: background 0.25s, transform 0.25s;
+}
+.pm-dot.active {
+  background: #fff; transform: scale(1.3);
+}
+
+/* Footer */
+.pm-footer {
+  background: #000; padding: 10px 16px 14px; flex-shrink: 0;
+}
+.pm-actions {
+  display: flex; align-items: center; gap: 18px; margin-bottom: 10px;
+}
+.pm-action-btn {
+  color: var(--text); font-size: 1.3rem; cursor: pointer;
+  transition: transform 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pm-action-btn:active { transform: scale(0.85); }
+.pm-action-btn.liked { color: #ed4956; }
+.pm-bookmark { margin-left: auto; }
+.pm-caption {
+  font-size: 0.8rem; color: rgba(255,255,255,0.85); line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════
+   MUSIC MODAL
+══════════════════════════════════════════ */
+.music-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.88); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
 .music-modal.active { display: flex; opacity: 1; }
 .music-box { width: 82vw; max-width: 340px; background: #000; border: 1px solid var(--border); border-radius: 26px; overflow: hidden; padding: 24px 20px 28px; transform: scale(0.9); transition: 0.35s var(--ease); box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; }
 .music-modal.active .music-box { transform: scale(1); }
@@ -195,18 +322,54 @@ html, body {
 <audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
 <div id="youtube-player-container" style="display:none;position:absolute;"></div>
 
-<div class="post-modal" id="post-modal" onclick="closePostModal()">
-  <div class="post-modal-inner" id="modal-swipe-area" onclick="event.stopPropagation()">
-    <div class="post-modal-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
-    <div id="modal-media-wrap" style="width:100%; height:100%;">
-       <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
-       <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" playsinline loop></video>
+<!-- ══════════════════════════════════════════
+     INSTAGRAM-STYLE POST MODAL
+══════════════════════════════════════════ -->
+<div class="post-modal" id="post-modal">
+  <!-- Header -->
+  <div class="pm-header">
+    <div class="pm-header-left">
+      <img class="pm-avatar" src="Screenshot_20260418-234611.png" alt="Anush">
+      <div>
+        <div style="display:flex;align-items:center;">
+          <span class="pm-name">Anush Decodes</span>
+          <span class="pm-verified"><i class="fa-solid fa-circle-check"></i></span>
+        </div>
+      </div>
     </div>
-    <div id="modal-dots" class="modal-dots"></div>
-    <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="pm-more"><i class="fa-solid fa-ellipsis"></i></span>
+      <div class="pm-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+  </div>
+
+  <!-- Media Slider -->
+  <div class="pm-media-wrap" id="pm-media-wrap">
+    <div class="pm-slider" id="pm-slider"></div>
+    <div class="pm-dots" id="pm-dots"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="pm-footer">
+    <div class="pm-actions">
+      <div class="pm-action-btn" id="pm-like-btn" onclick="toggleLike()">
+        <i class="fa-regular fa-heart" id="pm-like-icon"></i>
+      </div>
+      <div class="pm-action-btn">
+        <i class="fa-regular fa-comment"></i>
+      </div>
+      <div class="pm-action-btn">
+        <i class="fa-regular fa-paper-plane"></i>
+      </div>
+      <div class="pm-action-btn pm-bookmark" id="pm-bm-btn" onclick="toggleBookmark()">
+        <i class="fa-regular fa-bookmark" id="pm-bm-icon"></i>
+      </div>
+    </div>
+    <div class="pm-caption" id="pm-caption"></div>
   </div>
 </div>
 
+<!-- Music Modal -->
 <div class="music-modal" id="music-modal" onclick="closeMusicModal()">
   <div class="music-box" onclick="event.stopPropagation()">
     <div class="music-close" onclick="closeMusicModal()"><i class="fa-solid fa-xmark"></i></div>
@@ -257,7 +420,7 @@ html, body {
     <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
     <div class="avatar-wrap"><img class="avatar-img" src="Screenshot_20260418-234611.png"></div>
     <div class="name-row"><h1 class="name">Anush Decodes</h1><span class="verified"><i class="fa-solid fa-circle-check"></i></span></div>
-    
+
     <div class="handle-row">
       <div class="handle">anush@x0s</div>
       <div class="follower-stat">
@@ -268,10 +431,15 @@ html, body {
 
     <p class="bio">Decoding logic at the kernel level.<br>Building the future one commit at a time.</p>
 
-    <div class="bio-music">
-      <div class="bio-music-play" onclick="toggleBioMusic(event)"><i class="fa-solid fa-play" id="bio-play-icon"></i></div>
-      <div class="bio-music-label" onclick="openMusicPlayer()">Wait a Minute! • Willow</div>
-      <div class="bio-music-eq paused" id="bio-eq"><span></span><span></span><span></span></div>
+    <!-- Bio music — inline, no pill -->
+    <div class="bio-music-inline" id="bio-music-inline">
+      <div class="bm-toggle" onclick="toggleBioMusic(event)">
+        <i class="fa-solid fa-play" id="bio-play-icon"></i>
+      </div>
+      <span class="bm-label" onclick="openMusicPlayer()">Wait a Minute! • Willow</span>
+      <div class="bm-eq paused" id="bio-eq">
+        <span></span><span></span><span></span>
+      </div>
     </div>
 
     <div class="links-row" id="links-row"></div>
@@ -285,7 +453,7 @@ html, body {
 
 <script>
 /* ──────────────────────────────────────────
-   UI & MENU LOGIC
+   UI & MENU
 ────────────────────────────────────────── */
 function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('active'); }
 function toggleDarkMode() { document.body.classList.toggle('light-mode'); document.getElementById('dropdown-menu').classList.remove('active'); }
@@ -300,7 +468,7 @@ const GITHUB_POST_FILES = [
 ];
 
 /* ──────────────────────────────────────────
-   FOLLOW LOGIC
+   FOLLOW
 ────────────────────────────────────────── */
 let followerBase = parseInt(localStorage.getItem('anush_followers') || "1200");
 let isFollowing = localStorage.getItem('is_following') === 'true';
@@ -308,7 +476,7 @@ function updateFollowUI() {
   const countEl = document.getElementById('follower-count');
   const btn = document.getElementById('follow-btn');
   countEl.innerText = followerBase >= 1000 ? (followerBase/1000).toFixed(1) + 'k' : followerBase;
-  if(isFollowing) { btn.innerText = "Following"; btn.classList.add('following'); } 
+  if(isFollowing) { btn.innerText = "Following"; btn.classList.add('following'); }
   else { btn.innerText = "Follow"; btn.classList.remove('following'); }
 }
 function toggleFollow() {
@@ -319,71 +487,213 @@ function toggleFollow() {
 }
 
 /* ──────────────────────────────────────────
-   POSTS RENDERING & CYCLE
+   POSTS GRID RENDER — 3:4
 ────────────────────────────────────────── */
 let gridIntervals = [];
 function renderPosts() {
   const grid = document.getElementById('posts-grid');
   gridIntervals.forEach(clearInterval); gridIntervals = [];
-  grid.innerHTML = GITHUB_POST_FILES.map((post, i) => `
+  grid.innerHTML = GITHUB_POST_FILES.map((post, i) => {
+    const isVideo = post.type === 'video';
+    const isMulti = post.files.length > 1;
+    return `
       <div class="post-thumb" onclick="openPost(${i})">
-        ${post.type === 'video' ? `<video src="${post.files[0]}" muted autoplay loop playsinline></video>` : `<img src="${post.files[0]}" id="img-thumb-${i}" loading="lazy">`}
-      </div>`).join('');
+        ${isVideo
+          ? `<video src="${post.files[0]}" muted autoplay loop playsinline></video><span class="vid-badge"><i class="fa-solid fa-video"></i></span>`
+          : `<img src="${post.files[0]}" id="img-thumb-${i}" loading="lazy">
+             ${isMulti ? `<span class="multi-badge"><i class="fa-solid fa-clone"></i></span>` : ''}`
+        }
+      </div>`;
+  }).join('');
+
   GITHUB_POST_FILES.forEach((post, i) => {
     if (post.files.length > 1 && post.type === 'image') {
-      let currentFileIdx = 0;
+      let fi = 0;
       gridIntervals.push(setInterval(() => {
-        currentFileIdx = (currentFileIdx + 1) % post.files.length;
-        document.getElementById(`img-thumb-${i}`).src = post.files[currentFileIdx];
-      }, 2000));
+        fi = (fi + 1) % post.files.length;
+        const el = document.getElementById(`img-thumb-${i}`);
+        if (el) { el.style.opacity = 0; setTimeout(() => { el.src = post.files[fi]; el.style.opacity = 1; }, 150); el.style.transition = 'opacity 0.15s'; }
+      }, 2200));
     }
   });
 }
 
 /* ──────────────────────────────────────────
-   POST MODAL SLIDER & DOTS
+   POST MODAL — Instagram style
 ────────────────────────────────────────── */
-let currentOpenPostIdx = -1, currentFileInModalIdx = 0, touchStartX = 0;
+let currentPostIdx = -1;
+let currentSlide = 0;
+let touchStartX = 0, touchStartY = 0;
+let isDragging = false, dragStartX = 0, dragDelta = 0;
+let likedPosts = {}, bookmarkedPosts = {};
+
 function openPost(idx) {
-  currentOpenPostIdx = idx; currentFileInModalIdx = 0;
-  showModalContent();
+  currentPostIdx = idx;
+  currentSlide = 0;
+  buildSlider();
+  updateDots();
+  updateCaption();
+
   const modal = document.getElementById('post-modal');
-  modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { modal.classList.add('active'); });
+  });
+
+  // prevent body scroll
+  document.body.style.overflow = 'hidden';
+
+  // update like/bookmark state
+  updateLikeUI();
+  updateBookmarkUI();
 }
-function showModalContent() {
-  const post = GITHUB_POST_FILES[currentOpenPostIdx], file = post.files[currentFileInModalIdx];
-  const img = document.getElementById('post-modal-img'), vid = document.getElementById('post-modal-video');
-  const dotsContainer = document.getElementById('modal-dots');
-  img.style.display = 'none'; vid.style.display = 'none'; vid.pause();
-  if (post.type === 'video' || file.endsWith('.mp4')) {
-    vid.src = file; vid.style.display = 'block'; vid.muted = false; vid.loop = true; vid.play();
-  } else { img.src = file; img.style.display = 'block'; }
-  dotsContainer.innerHTML = '';
+
+function buildSlider() {
+  const post = GITHUB_POST_FILES[currentPostIdx];
+  const slider = document.getElementById('pm-slider');
+  slider.innerHTML = '';
+  slider.style.transform = 'translateX(0)';
+
+  post.files.forEach((file, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'pm-slide';
+    const isVid = post.type === 'video' || file.endsWith('.mp4') || file.endsWith('.mov');
+    if (isVid) {
+      const vid = document.createElement('video');
+      vid.src = file;
+      vid.autoplay = true;
+      vid.loop = true;
+      vid.playsinline = true;
+      vid.controls = false;
+      // *** AUDIO ON — user already clicked ***
+      vid.muted = false;
+      slide.appendChild(vid);
+    } else {
+      const img = document.createElement('img');
+      img.src = file;
+      img.alt = '';
+      img.draggable = false;
+      slide.appendChild(img);
+    }
+    slider.appendChild(slide);
+  });
+
+  // Dots
+  const dotsEl = document.getElementById('pm-dots');
+  dotsEl.innerHTML = '';
   if (post.files.length > 1) {
     post.files.forEach((_, i) => {
       const dot = document.createElement('div');
-      dot.className = `modal-dot ${i === currentFileInModalIdx ? 'active' : ''}`;
-      dotsContainer.appendChild(dot);
+      dot.className = 'pm-dot' + (i === 0 ? ' active' : '');
+      dotsEl.appendChild(dot);
     });
   }
-  document.getElementById('post-modal-caption').innerText = post.caption;
-}
-const swipeArea = document.getElementById('modal-swipe-area');
-swipeArea.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-swipeArea.addEventListener('touchend', e => {
-  const post = GITHUB_POST_FILES[currentOpenPostIdx]; if(!post || post.files.length <= 1) return;
-  const touchEndX = e.changedTouches[0].screenX;
-  if (touchStartX - touchEndX > 50) { currentFileInModalIdx = (currentFileInModalIdx + 1) % post.files.length; showModalContent(); }
-  else if (touchEndX - touchStartX > 50) { currentFileInModalIdx = (currentFileInModalIdx - 1 + post.files.length) % post.files.length; showModalContent(); }
-});
-function closePostModal() {
-  const modal = document.getElementById('post-modal'); modal.classList.remove('active');
-  document.getElementById('post-modal-video').pause();
-  setTimeout(() => modal.style.display = 'none', 300);
+
+  // Swipe listeners
+  const wrap = document.getElementById('pm-media-wrap');
+  wrap.ontouchstart = onSwipeStart;
+  wrap.ontouchmove = onSwipeMove;
+  wrap.ontouchend = onSwipeEnd;
 }
 
+function goToSlide(idx) {
+  const post = GITHUB_POST_FILES[currentPostIdx];
+  if (idx < 0 || idx >= post.files.length) return;
+  currentSlide = idx;
+  const slider = document.getElementById('pm-slider');
+  slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+  updateDots();
+
+  // play/pause videos
+  const slides = slider.querySelectorAll('.pm-slide');
+  slides.forEach((slide, i) => {
+    const vid = slide.querySelector('video');
+    if (!vid) return;
+    if (i === currentSlide) { vid.muted = false; vid.play().catch(()=>{}); }
+    else { vid.pause(); }
+  });
+}
+
+function updateDots() {
+  document.querySelectorAll('.pm-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === currentSlide);
+  });
+}
+
+function updateCaption() {
+  document.getElementById('pm-caption').innerText = GITHUB_POST_FILES[currentPostIdx].caption;
+}
+
+function onSwipeStart(e) {
+  touchStartX = e.changedTouches[0].clientX;
+  touchStartY = e.changedTouches[0].clientY;
+  isDragging = true; dragDelta = 0;
+  const slider = document.getElementById('pm-slider');
+  slider.style.transition = 'none';
+}
+function onSwipeMove(e) {
+  if (!isDragging) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dy) > Math.abs(dx) + 8) { isDragging = false; return; }
+  e.preventDefault();
+  dragDelta = dx;
+  const slider = document.getElementById('pm-slider');
+  const baseX = -currentSlide * 100;
+  slider.style.transform = `translateX(calc(${baseX}% + ${dx}px))`;
+}
+function onSwipeEnd(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  const slider = document.getElementById('pm-slider');
+  slider.style.transition = 'transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  const post = GITHUB_POST_FILES[currentPostIdx];
+  if (dragDelta < -50 && currentSlide < post.files.length - 1) goToSlide(currentSlide + 1);
+  else if (dragDelta > 50 && currentSlide > 0) goToSlide(currentSlide - 1);
+  else goToSlide(currentSlide);
+}
+
+function closePostModal() {
+  const modal = document.getElementById('post-modal');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+  // pause all videos
+  modal.querySelectorAll('video').forEach(v => v.pause());
+  setTimeout(() => { modal.style.display = 'none'; }, 280);
+}
+
+// Like & Bookmark
+function toggleLike() {
+  likedPosts[currentPostIdx] = !likedPosts[currentPostIdx];
+  updateLikeUI();
+}
+function updateLikeUI() {
+  const btn = document.getElementById('pm-like-btn');
+  const icon = document.getElementById('pm-like-icon');
+  if (likedPosts[currentPostIdx]) {
+    btn.classList.add('liked');
+    icon.className = 'fa-solid fa-heart';
+  } else {
+    btn.classList.remove('liked');
+    icon.className = 'fa-regular fa-heart';
+  }
+}
+function toggleBookmark() {
+  bookmarkedPosts[currentPostIdx] = !bookmarkedPosts[currentPostIdx];
+  updateBookmarkUI();
+}
+function updateBookmarkUI() {
+  const icon = document.getElementById('pm-bm-icon');
+  icon.className = bookmarkedPosts[currentPostIdx] ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
+}
+
+/* Close modal on backdrop (outside media+footer) */
+document.getElementById('post-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePostModal();
+});
+
 /* ──────────────────────────────────────────
-   ORIGINAL YOUTUBE MUSIC LOGIC
+   YOUTUBE MUSIC
 ────────────────────────────────────────── */
 let ytPlayer, ytReady = false, progressTimer;
 const YT_ID = 'h4OAXvDRZTY';
@@ -391,23 +701,20 @@ const YT_ID = 'h4OAXvDRZTY';
 function openMusicPlayer() {
   const bioAudio = document.getElementById('bio-audio');
   if (!bioAudio.paused) { bioAudio.pause(); document.getElementById('bio-play-icon').className = 'fa-solid fa-play'; document.getElementById('bio-eq').classList.add('paused'); }
-  
   const modal = document.getElementById('music-modal');
   modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
   document.getElementById('music-thumb').src = `https://img.youtube.com/vi/${YT_ID}/maxresdefault.jpg`;
   document.getElementById('yt-open-link').href = `https://youtu.be/${YT_ID}`;
-
   loadYTAPI().then(() => {
     if (!ytPlayer) {
       ytPlayer = new YT.Player('youtube-player-container', {
-        height: '0', width: '0', videoId: YT_ID,
+        height:'0', width:'0', videoId: YT_ID,
         playerVars: { playsinline:1, controls:0, autoplay:1 },
         events: { onReady: onYTReady, onStateChange: onYTStateChange }
       });
     } else { ytPlayer.loadVideoById(YT_ID); ytPlayer.playVideo(); }
   });
 }
-
 function loadYTAPI() {
   return new Promise(resolve => {
     if (window.YT && window.YT.Player) { resolve(); return; }
@@ -417,17 +724,29 @@ function loadYTAPI() {
 }
 function onYTReady() { ytReady = true; ytPlayer.playVideo(); document.getElementById('music-duration').textContent = formatTime(ytPlayer.getDuration()); clearInterval(progressTimer); progressTimer = setInterval(updateYTProgress, 500); }
 function onYTStateChange(e) { const icon = document.getElementById('music-play-icon'); if (e.data === 1) icon.className = 'fa-solid fa-pause'; else icon.className = 'fa-solid fa-play'; }
-function updateYTProgress() { if (!ytPlayer || !ytReady) return; const cur = ytPlayer.getCurrentTime(), dur = ytPlayer.getDuration(); if (dur > 0) { document.getElementById('music-progress').value = (cur / dur) * 100; document.getElementById('music-current').textContent = formatTime(cur); document.getElementById('music-duration').textContent = formatTime(dur); } }
+function updateYTProgress() { if (!ytPlayer || !ytReady) return; const cur = ytPlayer.getCurrentTime(), dur = ytPlayer.getDuration(); if (dur > 0) { document.getElementById('music-progress').value = (cur/dur)*100; document.getElementById('music-current').textContent = formatTime(cur); document.getElementById('music-duration').textContent = formatTime(dur); } }
 function formatTime(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
-function closeMusicModal() { const modal = document.getElementById('music-modal'); modal.classList.remove('active'); setTimeout(() => { modal.style.display = 'none'; }, 300); if (ytPlayer) ytPlayer.pauseVideo(); clearInterval(progressTimer); }
+function closeMusicModal() { const modal = document.getElementById('music-modal'); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); if (ytPlayer) ytPlayer.pauseVideo(); clearInterval(progressTimer); }
 
 document.getElementById('music-play-pause').addEventListener('click', () => { if (!ytPlayer) return; ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); });
-document.getElementById('music-progress').addEventListener('input', e => { if (!ytPlayer || !ytReady) return; ytPlayer.seekTo((e.target.value / 100) * ytPlayer.getDuration(), true); });
+document.getElementById('music-progress').addEventListener('input', e => { if (!ytPlayer || !ytReady) return; ytPlayer.seekTo((e.target.value/100)*ytPlayer.getDuration(), true); });
 document.getElementById('music-prev').addEventListener('click', () => ytPlayer?.seekTo(0, true));
 document.getElementById('music-next').addEventListener('click', () => ytPlayer?.seekTo(0, true));
 
 /* ──────────────────────────────────────────
-   LINKS & BIO MUSIC TOGGLE
+   BIO MUSIC TOGGLE
+────────────────────────────────────────── */
+function toggleBioMusic(e) {
+  if (e) e.stopPropagation();
+  const audio = document.getElementById('bio-audio');
+  const icon = document.getElementById('bio-play-icon');
+  const eq = document.getElementById('bio-eq');
+  if (audio.paused) { audio.play(); icon.className = 'fa-solid fa-pause'; eq.classList.remove('paused'); }
+  else { audio.pause(); icon.className = 'fa-solid fa-play'; eq.classList.add('paused'); }
+}
+
+/* ──────────────────────────────────────────
+   LINKS
 ────────────────────────────────────────── */
 const LINKS = [
   { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
@@ -436,12 +755,19 @@ const LINKS = [
   { icon: 'fa-brands fa-discord', label: 'Discord', url: 'https://discord.gg/QyHXBqS3H', color: 'color-discord' },
   { icon: 'fa-solid fa-link', label: 'x0s.link', url: 'personalpage.html', color: 'color-globe' }
 ];
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('links-row').innerHTML = LINKS.map(l => `<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
-  renderPosts(); updateFollowUI();
+  document.getElementById('links-row').innerHTML = LINKS.map(l =>
+    `<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`
+  ).join('');
+  renderPosts();
+  updateFollowUI();
 });
-function toggleBioMusic(e) { if (e) e.stopPropagation(); const audio = document.getElementById('bio-audio'); const icon = document.getElementById('bio-play-icon'); if (audio.paused) { audio.play(); icon.className = 'fa-solid fa-pause'; document.getElementById('bio-eq').classList.remove('paused'); } else { audio.pause(); icon.className = 'fa-solid fa-play'; document.getElementById('bio-eq').classList.add('paused'); } }
-function shareProfile() { if (navigator.share) navigator.share({ title: 'Anush Decodes', url: window.location.href }); else alert('Link copied!'); }
+
+function shareProfile() {
+  if (navigator.share) navigator.share({ title: 'Anush Decodes', url: window.location.href });
+  else alert('Link copied!');
+}
 </script>
 </body>
 </html>
