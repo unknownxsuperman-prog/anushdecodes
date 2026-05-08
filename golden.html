@@ -4,363 +4,253 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Anush Decodes | x0s.link</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 <style>
 :root {
-  --bg:        #000000;
-  --card:      #0a0a0a;
-  --card2:     #111111;
-  --border:    #1a1a1a;
-  --border2:   rgba(255,255,255,0.06);
-  --accent:    #007aff;
-  --text:      #ffffff;
-  --muted:     #666666;
-  --muted2:    #444444;
-  --glass:     rgba(10,10,10,0.75);
-  --radius:    14px;
-  --ease:      cubic-bezier(0.4,0,0.2,1);
-  --font:      'Space Grotesk', sans-serif;
+  --bg:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--border2:rgba(255,255,255,.06);
+  --accent:#007aff;--text:#fff;--muted:#666;--muted2:#444;--glass:rgba(10,10,10,.75);
+  --ease:cubic-bezier(.4,0,.2,1);--font:'Space Grotesk',sans-serif;
 }
-.light-mode {
-  --bg:     #ffffff;
-  --card:   #f5f5f7;
-  --card2:  #f0f0f2;
-  --border: #e0e0e2;
-  --border2:rgba(0,0,0,0.07);
-  --text:   #000000;
-  --muted:  #888888;
-  --glass:  rgba(255,255,255,0.82);
+.light-mode{--bg:#fff;--card:#f5f5f7;--card2:#f0f0f2;--border:#e0e0e2;--border2:rgba(0,0,0,.07);--text:#000;--muted:#888;--glass:rgba(255,255,255,.82);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;transition:background .35s var(--ease),color .35s var(--ease);}
+::-webkit-scrollbar{display:none;}
+
+/* KEYFRAMES */
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(.95)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{left:-100%}100%{left:100%}}
+@keyframes eqBar{from{height:2px}to{height:10px}}
+@keyframes likeHeartPop{0%{transform:scale(1)}30%{transform:scale(1.55)}60%{transform:scale(.88)}100%{transform:scale(1)}}
+@keyframes heartBurst{0%{opacity:1;transform:translate(-50%,-50%) scale(0)}50%{opacity:1;transform:translate(-50%,-50%) scale(2.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.8)}}
+@keyframes muteFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}30%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+
+/* PAGE */
+.page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
+
+/* TOP BAR */
+.top-bar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);}
+.light-mode .top-bar{background:rgba(255,255,255,.72);border-bottom:1px solid var(--border);}
+.top-bar-brand{font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+.top-bar-brand span{color:var(--accent);}
+.menu-btn{width:36px;height:36px;background:var(--glass);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);position:relative;}
+.dropdown-menu{position:absolute;top:50px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:100;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fadeIn .2s var(--ease);}
+.dropdown-menu.active{display:block;}
+.menu-item{padding:10px 14px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-radius:10px;transition:.2s;}
+.menu-item:hover{background:var(--border);}
+.menu-item i{color:var(--accent);font-size:.85rem;}
+
+/* BANNER */
+.banner{width:100%;height:200px;position:relative;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
+.banner-img{width:100%;height:100%;object-fit:cover;opacity:.35;}
+.banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%);}
+
+/* PROFILE */
+.profile-section{padding:0 20px;margin-top:-52px;position:relative;animation:slideUp .6s var(--ease) both;}
+.follow-btn{position:absolute;right:20px;top:65px;padding:10px 30px;background:rgba(255,255,255,.9);color:#000;border:none;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 4px 15px rgba(0,0,0,.4);}
+.follow-btn.following{background:var(--card);color:var(--text);border:1px solid var(--border);}
+.avatar-wrap{width:84px;height:84px;position:relative;margin-bottom:14px;}
+.avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:1px solid var(--border);display:block;}
+.pfp-badge{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;z-index:5;background:var(--bg);border-radius:50%;border:1.5px solid var(--bg);overflow:hidden;animation:pulse 3s infinite ease-in-out;}
+.pfp-badge .fa-certificate{font-size:18px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.pfp-badge .fa-check{font-size:8px;color:#000;position:relative;z-index:6;font-weight:900;}
+.pfp-badge::after{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);animation:shimmer 2s infinite linear;z-index:7;}
+.name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.name{font-size:1.35rem;font-weight:700;letter-spacing:-.01em;}
+.handle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.handle{font-size:.72rem;font-weight:500;color:var(--accent);letter-spacing:.06em;}
+.follower-stat{font-size:.72rem;color:var(--muted);display:flex;gap:12px;}
+.follower-stat b{color:var(--text);}
+.bio{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;}
+.bio-music{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;padding:6px 10px 6px 8px;background:var(--card);border:1px solid var(--border);border-radius:99px;width:fit-content;max-width:100%;cursor:default;overflow:hidden;}
+.bio-music-play{width:24px;height:24px;background:rgba(0,122,255,.13);border:1px solid rgba(0,122,255,.22);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:.58rem;flex-shrink:0;cursor:pointer;}
+.bio-music-label{font-size:.7rem;font-weight:500;color:var(--text);white-space:nowrap;cursor:pointer;}
+.bio-music-eq{display:flex;align-items:flex-end;gap:2px;height:10px;flex-shrink:0;}
+.bio-music-eq span{width:2px;background:var(--accent);border-radius:1px;animation:eqBar .8s infinite alternate;}
+.bio-music-eq.paused span{animation-play-state:paused;opacity:.3;}
+.links-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.link-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:.72rem;font-weight:600;white-space:nowrap;transition:.2s;}
+
+/* POSTS GRID 3:4 */
+.posts-section{padding:0 16px 100px;}
+.section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);margin-bottom:14px;display:block;}
+.posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.post-thumb{aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--card);cursor:pointer;position:relative;transition:transform .15s var(--ease),opacity .15s;}
+.post-thumb:active{transform:scale(.96);opacity:.85;}
+.post-thumb video,.post-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s var(--ease);}
+.post-thumb:hover video,.post-thumb:hover img{transform:scale(1.04);}
+.post-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 45%);pointer-events:none;border-radius:10px;}
+.vid-badge{position:absolute;top:7px;right:7px;z-index:2;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 6px;font-size:.55rem;font-weight:700;color:#fff;letter-spacing:.06em;}
+.multi-badge{position:absolute;top:7px;left:7px;z-index:2;color:#fff;font-size:.75rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.7));}
+
+/* ════════════════════════════
+   POST MODAL — CINEMATIC SHEET
+════════════════════════════ */
+.post-modal-backdrop{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0);
+  display:none;flex-direction:column;align-items:center;justify-content:flex-end;
+  transition:background .32s var(--ease);
+  overscroll-behavior:contain;
 }
-
-* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; overflow-x: hidden; transition: background 0.35s var(--ease), color 0.35s var(--ease); }
-::-webkit-scrollbar { display: none; }
-
-@keyframes slideUp   { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-@keyframes pulse     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.8;transform:scale(0.95)} }
-@keyframes fadeIn    { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes shimmer   { 0% { left: -100%; } 100% { left: 100%; } }
-@keyframes eqBar     { from { height: 2px; } to { height: 10px; } }
-
-/* Modal entrance animations */
-@keyframes modalBackdropIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes modalCardIn { from { opacity: 0; transform: translateY(60px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes modalCardOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(40px) scale(0.96); } }
-@keyframes likeHeartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
-@keyframes heartBurst { 0%{opacity:1;transform:translate(-50%,-50%) scale(0)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.8)} 100%{opacity:0;transform:translate(-50%,-50%) scale(2.2)} }
-@keyframes swipeHint { 0%,100%{opacity:0;transform:translateX(0)} 30%{opacity:1} 70%{opacity:1} 100%{transform:translateX(-12px)} }
-
-.page { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
-
-/* ── TOP BAR ── */
-.top-bar { position: sticky; top: 0; z-index: 80; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(0,0,0,0.55); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border2); }
-.light-mode .top-bar { background: rgba(255,255,255,0.72); border-bottom: 1px solid var(--border); }
-.top-bar-brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
-.top-bar-brand span { color: var(--accent); }
-.menu-btn { width: 36px; height: 36px; background: var(--glass); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); position: relative; }
-.dropdown-menu { position: absolute; top: 50px; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 6px; display: none; z-index: 100; min-width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: fadeIn 0.2s var(--ease); }
-.dropdown-menu.active { display: block; }
-.menu-item { padding: 10px 14px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-radius: 10px; transition: 0.2s; }
-.menu-item:hover { background: var(--border); }
-.menu-item i { color: var(--accent); font-size: 0.85rem; }
-
-/* ── BANNER ── */
-.banner { width: 100%; height: 200px; position: relative; overflow: hidden; background: linear-gradient(135deg, #000814 0%, #001d3d 60%, #000000 100%); }
-.banner-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
-.banner-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 30%, var(--bg) 100%); }
-
-/* ── PROFILE ── */
-.profile-section { padding: 0 20px; margin-top: -52px; position: relative; animation: slideUp 0.6s var(--ease) both; }
-.follow-btn { position: absolute; right: 20px; top: 65px; padding: 10px 30px; background: rgba(255,255,255,0.9); color: #000; border: none; border-radius: 30px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-.follow-btn.following { background: var(--card); color: var(--text); border: 1px solid var(--border); }
-.avatar-wrap { width: 84px; height: 84px; position: relative; margin-bottom: 14px; }
-.avatar-img { width: 100%; height: 100%; border-radius: 20px; object-fit: cover; border: 1px solid var(--border); display: block; }
-.pfp-badge { position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; z-index: 5; background: var(--bg); border-radius: 50%; border: 1.5px solid var(--bg); overflow: hidden; animation: pulse 3s infinite ease-in-out; }
-.pfp-badge .fa-certificate { font-size: 18px; position: absolute; background: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.pfp-badge .fa-check { font-size: 8px; color: #000000; position: relative; z-index: 6; font-weight: 900; }
-.pfp-badge::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%); animation: shimmer 2s infinite linear; z-index: 7; }
-.name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
-.handle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.handle { font-size: 0.72rem; font-weight: 500; color: var(--accent); letter-spacing: 0.06em; }
-.follower-stat { font-size: 0.72rem; color: var(--muted); display: flex; gap: 12px; }
-.follower-stat b { color: var(--text); }
-.bio { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; margin-bottom: 14px; }
-.bio-music { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 6px 10px 6px 8px; background: var(--card); border: 1px solid var(--border); border-radius: 99px; width: fit-content; max-width: 100%; cursor: default; overflow: hidden; }
-.bio-music-play { width: 24px; height: 24px; background: rgba(0,122,255,0.13); border: 1px solid rgba(0,122,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.58rem; flex-shrink: 0; cursor: pointer; }
-.bio-music-label { font-size: 0.7rem; font-weight: 500; color: var(--text); white-space: nowrap; cursor: pointer; }
-.bio-music-eq { display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0; }
-.bio-music-eq span { width: 2px; background: var(--accent); border-radius: 1px; animation: eqBar 0.8s infinite alternate; }
-.bio-music-eq.paused span { animation-play-state: paused; opacity: 0.3; }
-.links-row { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.link-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 0.72rem; font-weight: 600; white-space: nowrap; transition: 0.2s; }
-
-/* ══════════════════════════════════════════
-   POSTS GRID — 3:4 VERTICAL
-══════════════════════════════════════════ */
-.posts-section { padding: 0 16px 100px; }
-.section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin-bottom: 14px; display: block; }
-
-.posts-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+.post-modal-backdrop.active{
+  background:rgba(0,0,0,.93);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
 }
 
-.post-thumb {
-  aspect-ratio: 3 / 4;
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--card);
-  cursor: pointer;
-  position: relative;
-  /* Subtle press feedback */
-  transition: transform 0.15s var(--ease), opacity 0.15s;
+.post-modal-sheet{
+  width:100%;max-width:480px;
+  background:#090909;
+  border-radius:26px 26px 0 0;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transform:translateY(102%);
+  transition:transform .42s cubic-bezier(.32,.72,0,1);
+  border:1px solid rgba(255,255,255,.07);border-bottom:none;
+  position:relative;
+  will-change:transform;
+  /* allow the sheet to be scrolled but swipe-down is handled manually */
+  touch-action:pan-y;
 }
-.post-thumb:active { transform: scale(0.96); opacity: 0.85; }
+.post-modal-backdrop.active .post-modal-sheet{transform:translateY(0);}
 
-.post-thumb video,
-.post-thumb img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.4s var(--ease);
+.sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:10px auto 0;flex-shrink:0;}
+
+/* MEDIA */
+.sheet-media{
+  width:100%;background:#000;
+  position:relative;overflow:hidden;flex-shrink:0;
 }
-.post-thumb:hover video,
-.post-thumb:hover img { transform: scale(1.04); }
+.sheet-media.ratio-916{aspect-ratio:9/16;}
+.sheet-media.ratio-45 {aspect-ratio:4/5;}
 
-/* Subtle gradient overlay on thumb */
-.post-thumb::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 45%);
-  pointer-events: none;
-  border-radius: 10px;
-}
+.sheet-media img,.sheet-media video{width:100%;height:100%;object-fit:cover;display:block;}
 
-/* Video badge */
-.post-thumb .vid-badge {
-  position: absolute; top: 7px; right: 7px; z-index: 2;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 6px;
-  padding: 3px 6px;
-  font-size: 0.55rem; font-weight: 700; color: #fff; letter-spacing: 0.06em;
+/* invisible tap zone for mute/doubletap-like */
+.mute-tap-zone{
+  position:absolute;inset:0;z-index:6;cursor:pointer;
+  display:none; /* shown only for video */
 }
 
-/* Multi-image indicator */
-.post-thumb .multi-badge {
-  position: absolute; top: 7px; left: 7px; z-index: 2;
-  color: white; font-size: 0.75rem;
-  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.7));
+/* mute flash */
+.mute-indicator{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.6);
+  width:54px;height:54px;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(10px);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.2rem;
+  pointer-events:none;opacity:0;z-index:20;
+  border:1px solid rgba(255,255,255,.18);
+}
+.mute-indicator.flash{animation:muteFlash .7s var(--ease) forwards;}
+
+.sheet-media-toprow{
+  position:absolute;top:0;left:0;right:0;
+  padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent);
+  z-index:10;pointer-events:none;
+}
+.sheet-close-btn{
+  width:32px;height:32px;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(8px);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;cursor:pointer;font-size:.82rem;
+  border:1px solid rgba(255,255,255,.12);transition:background .2s;
+  pointer-events:all;
+}
+.sheet-close-btn:active{background:rgba(255,255,255,.22);}
+.sheet-counter{
+  font-size:.62rem;font-weight:700;letter-spacing:.08em;
+  color:rgba(255,255,255,.75);
+  background:rgba(0,0,0,.45);backdrop-filter:blur(8px);
+  padding:4px 10px;border-radius:99px;
+  border:1px solid rgba(255,255,255,.1);
+  pointer-events:none;
+}
+.sheet-dots{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;z-index:10;pointer-events:none;
+}
+.sheet-dot{height:5px;border-radius:3px;background:rgba(255,255,255,.35);transition:background .25s,width .25s,transform .25s;width:5px;}
+.sheet-dot.active{background:#fff;transform:scale(1.2);width:14px;}
+
+/* heart burst */
+.heart-burst{
+  position:fixed;font-size:2.8rem;color:#ff3b5c;
+  pointer-events:none;z-index:400;
+  animation:heartBurst .65s var(--ease) forwards;line-height:1;
 }
 
-/* ══════════════════════════════════════════
-   CINEMATIC POST MODAL
-══════════════════════════════════════════ */
-.post-modal-backdrop {
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  transition: background 0.35s var(--ease);
+/* INFO PANEL */
+.sheet-info{
+  padding:13px 18px 28px;
+  display:flex;flex-direction:column;gap:10px;
+  overflow-y:auto;flex-shrink:0;
 }
-.post-modal-backdrop.active {
-  background: rgba(0,0,0,0.92);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-}
+.sheet-user-row{display:flex;align-items:center;gap:10px;}
+.sheet-avatar{width:34px;height:34px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.sheet-user-info{flex:1;}
+.sheet-username{font-size:.78rem;font-weight:700;}
+.sheet-handle-tag{font-size:.62rem;color:var(--muted);}
+.sheet-post-time{font-size:.6rem;color:var(--muted2);margin-left:auto;white-space:nowrap;}
+.sheet-caption{font-size:.8rem;color:rgba(255,255,255,.78);line-height:1.6;font-weight:300;}
 
-.post-modal-sheet {
-  width: 100%; max-width: 480px;
-  max-height: 92vh;
-  background: #0a0a0a;
-  border-radius: 28px 28px 0 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transform: translateY(100%);
-  transition: transform 0.42s cubic-bezier(0.32,0.72,0,1);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-bottom: none;
-  position: relative;
+/* ACTIONS */
+.sheet-actions{
+  display:flex;align-items:center;
+  border-top:1px solid var(--border);
+  padding-top:12px;margin-top:2px;gap:2px;
 }
-.post-modal-backdrop.active .post-modal-sheet {
-  transform: translateY(0);
+.sheet-action-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 10px;cursor:pointer;
+  font-size:.72rem;color:var(--muted);font-weight:600;
+  user-select:none;transition:color .2s;
+  border-radius:10px;
 }
+.sheet-action-btn i{font-size:1.05rem;transition:transform .2s,color .2s;}
+.sheet-action-btn:active i{transform:scale(.82);}
+.sheet-action-btn.liked{color:#ff3b5c;}
+.sheet-action-btn.liked i{animation:likeHeartPop .4s var(--ease);}
+.sheet-action-spacer{flex:1;}
 
-/* Drag handle pill */
-.sheet-handle {
-  width: 36px; height: 4px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 2px;
-  margin: 10px auto 0;
-  flex-shrink: 0;
+/* COMMENT INPUT */
+.comment-input-wrap{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:14px;padding:10px 14px;
 }
+.comment-avatar{width:26px;height:26px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.comment-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:.78rem;font-family:var(--font);caret-color:var(--accent);}
+.comment-input::placeholder{color:var(--muted2);}
+.comment-send{color:var(--accent);font-size:.85rem;cursor:pointer;opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;flex-shrink:0;}
+.comment-send.visible{opacity:1;transform:scale(1);}
 
-/* Media area */
-.sheet-media {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  background: #000;
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.sheet-media img,
-.sheet-media video {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-}
+/* MUSIC MODAL */
+.music-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;opacity:0;transition:.3s;}
+.music-modal.active{display:flex;opacity:1;}
+.music-box{width:82vw;max-width:340px;background:#000;border:1px solid var(--border);border-radius:26px;overflow:hidden;padding:24px 20px 28px;transform:scale(.9);transition:.35s var(--ease);box-shadow:0 30px 80px rgba(0,0,0,.9);position:relative;}
+.music-modal.active .music-box{transform:scale(1);}
+.music-thumb-wrap{width:100%;aspect-ratio:1/1;border-radius:18px;overflow:hidden;background:#0a0a14;position:relative;margin-bottom:18px;}
+.music-thumb{width:100%;height:100%;object-fit:cover;}
+.music-play-big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.music-play-circle{width:56px;height:56px;border-radius:50%;background:rgba(0,122,255,.75);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:.2s;}
+.music-title{font-size:.9rem;font-weight:700;text-align:center;margin-bottom:2px;}
+.music-artist{font-size:.68rem;color:var(--muted);text-align:center;margin-bottom:16px;}
+.music-progress{width:100%;height:3px;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none;margin-bottom:6px;accent-color:var(--accent);}
+.music-progress::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:pointer;}
+.music-times{display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-bottom:16px;font-family:monospace;}
+.music-controls{display:flex;align-items:center;justify-content:center;gap:28px;}
+.music-ctrl{color:var(--muted);font-size:.9rem;cursor:pointer;}
+.music-close{position:absolute;top:14px;right:14px;width:32px;height:32px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:10;}
 
-/* Slide indicators (dots) at bottom of media */
-.sheet-dots {
-  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 5px; z-index: 10;
-}
-.sheet-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: rgba(255,255,255,0.35);
-  transition: background 0.25s, transform 0.25s, width 0.25s;
-}
-.sheet-dot.active {
-  background: #fff;
-  transform: scale(1.25);
-  width: 14px;
-  border-radius: 3px;
-}
-
-/* Top action row inside media */
-.sheet-media-toprow {
-  position: absolute; top: 0; left: 0; right: 0;
-  padding: 12px 14px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
-  z-index: 10;
-}
-.sheet-close-btn {
-  width: 32px; height: 32px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(8px);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: white; cursor: pointer; font-size: 0.85rem;
-  border: 1px solid rgba(255,255,255,0.12);
-  transition: background 0.2s;
-}
-.sheet-close-btn:active { background: rgba(255,255,255,0.2); }
-
-.sheet-counter {
-  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.7);
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px);
-  padding: 4px 10px; border-radius: 99px;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* Swipe hint arrow */
-.swipe-hint {
-  position: absolute; right: 14px; top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255,255,255,0.35); font-size: 1.1rem;
-  animation: swipeHint 2s ease-in-out 1.5s 2 forwards;
-  z-index: 10; pointer-events: none;
-}
-
-/* Bottom info panel */
-.sheet-info {
-  padding: 14px 18px 20px;
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* User row */
-.sheet-user-row {
-  display: flex; align-items: center; gap: 10px;
-}
-.sheet-avatar {
-  width: 34px; height: 34px;
-  border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.sheet-user-info { flex: 1; }
-.sheet-username { font-size: 0.78rem; font-weight: 700; }
-.sheet-handle-tag { font-size: 0.62rem; color: var(--muted); font-weight: 400; }
-.sheet-post-time { font-size: 0.6rem; color: var(--muted2); margin-left: auto; white-space: nowrap; }
-
-/* Caption */
-.sheet-caption {
-  font-size: 0.8rem; color: rgba(255,255,255,0.8);
-  line-height: 1.6; font-weight: 300;
-}
-
-/* Action row */
-.sheet-actions {
-  display: flex; align-items: center; gap: 0;
-  border-top: 1px solid var(--border);
-  padding-top: 12px;
-  margin-top: 2px;
-}
-.sheet-action-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px 8px 0;
-  cursor: pointer;
-  font-size: 0.72rem; color: var(--muted);
-  font-weight: 600;
-  user-select: none;
-  transition: color 0.2s;
-  flex: 1;
-}
-.sheet-action-btn i { font-size: 1rem; transition: transform 0.2s, color 0.2s; }
-.sheet-action-btn:active i { transform: scale(0.85); }
-.sheet-action-btn.liked { color: #ff3b5c; }
-.sheet-action-btn.liked i { animation: likeHeartPop 0.4s var(--ease); }
-
-/* Heart burst */
-.heart-burst {
-  position: absolute;
-  font-size: 3rem; color: #ff3b5c;
-  pointer-events: none;
-  z-index: 20;
-  animation: heartBurst 0.6s var(--ease) forwards;
-}
-
-/* Music modal (unchanged) */
-.music-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.88); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
-.music-modal.active { display: flex; opacity: 1; }
-.music-box { width: 82vw; max-width: 340px; background: #000; border: 1px solid var(--border); border-radius: 26px; overflow: hidden; padding: 24px 20px 28px; transform: scale(0.9); transition: 0.35s var(--ease); box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; }
-.music-modal.active .music-box { transform: scale(1); }
-.music-thumb-wrap { width: 100%; aspect-ratio: 1/1; border-radius: 18px; overflow: hidden; background: #0a0a14; position: relative; margin-bottom: 18px; }
-.music-thumb { width: 100%; height: 100%; object-fit: cover; }
-.music-play-big { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-.music-play-circle { width: 56px; height: 56px; border-radius: 50%; background: rgba(0,122,255,0.75); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: 0.2s; }
-.music-title { font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 2px; }
-.music-artist { font-size: 0.68rem; color: var(--muted); text-align: center; margin-bottom: 16px; }
-.music-progress { width: 100%; height: 3px; -webkit-appearance: none; background: var(--border); border-radius: 2px; outline: none; margin-bottom: 6px; accent-color: var(--accent); }
-.music-progress::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid white; cursor: pointer; }
-.music-times { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--muted); margin-bottom: 16px; font-family: monospace; }
-.music-controls { display: flex; align-items: center; justify-content: center; gap: 28px; }
-.music-ctrl { color: var(--muted); font-size: 0.9rem; cursor: pointer; }
-.music-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; background: rgba(255,255,255,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
-
-.color-instagram { color: #e1306c; }
-.color-twitter   { color: #ffffff; }
-.color-linkedin  { color: #0077b5; }
-.color-discord   { color: #5865f2; }
-.color-globe     { color: var(--accent); }
+.color-instagram{color:#e1306c;}.color-twitter{color:#fff;}.color-linkedin{color:#0077b5;}.color-discord{color:#5865f2;}.color-globe{color:var(--accent);}
 </style>
 </head>
 <body>
@@ -368,32 +258,33 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
 <audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
 <div id="youtube-player-container" style="display:none;position:absolute;"></div>
 
-<!-- ══ CINEMATIC POST MODAL ══ -->
-<div class="post-modal-backdrop" id="post-modal" onclick="handleBackdropClick(event)">
+<!-- POST MODAL -->
+<div class="post-modal-backdrop" id="post-modal">
   <div class="post-modal-sheet" id="post-sheet">
     <div class="sheet-handle"></div>
 
-    <!-- Media area -->
-    <div class="sheet-media" id="sheet-media">
-      <!-- Top gradient row -->
+    <div class="sheet-media ratio-45" id="sheet-media">
       <div class="sheet-media-toprow">
-        <div class="sheet-close-btn" onclick="closePostModal()">
-          <i class="fa-solid fa-xmark"></i>
-        </div>
+        <div class="sheet-close-btn" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
         <div class="sheet-counter" id="sheet-counter" style="display:none"></div>
       </div>
 
+      <!-- tap zone: single tap = mute toggle, double tap = like -->
+      <div class="mute-tap-zone" id="mute-tap-zone"></div>
+
       <img   id="sheet-img"   style="display:none" alt="">
-      <video id="sheet-video" style="display:none" playsinline loop muted></video>
+      <video id="sheet-video" style="display:none" playsinline loop></video>
+
+      <div class="mute-indicator" id="mute-indicator">
+        <i id="mute-icon" class="fa-solid fa-volume-xmark"></i>
+      </div>
 
       <div id="sheet-dots" class="sheet-dots"></div>
-      <div class="swipe-hint" id="swipe-hint" style="display:none"><i class="fa-solid fa-chevron-left"></i></div>
     </div>
 
-    <!-- Info panel -->
     <div class="sheet-info">
       <div class="sheet-user-row">
-        <img class="sheet-avatar" id="sheet-avatar" src="Screenshot_20260418-234611.png" alt="">
+        <img class="sheet-avatar" src="Screenshot_20260418-234611.png" alt="">
         <div class="sheet-user-info">
           <div class="sheet-username">Anush Decodes</div>
           <div class="sheet-handle-tag">anush@x0s</div>
@@ -408,15 +299,29 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
           <i class="fa-regular fa-heart" id="like-icon"></i>
           <span id="like-count">0</span>
         </div>
-        <div class="sheet-action-btn" style="flex:none; margin-left:auto;" onclick="sharePost()">
+        <div class="sheet-action-btn" onclick="focusComment()">
+          <i class="fa-regular fa-comment"></i>
+          <span id="comment-count">0</span>
+        </div>
+        <div class="sheet-action-spacer"></div>
+        <div class="sheet-action-btn" onclick="sharePost()">
           <i class="fa-solid fa-arrow-up-from-bracket"></i>
         </div>
+      </div>
+
+      <div class="comment-input-wrap">
+        <img class="comment-avatar" src="Screenshot_20260418-234611.png" alt="">
+        <input class="comment-input" id="comment-input" type="text"
+          placeholder="Add a comment…"
+          oninput="onCommentInput(this)"
+          onkeydown="onCommentKey(event)">
+        <i class="fa-solid fa-paper-plane comment-send" id="comment-send" onclick="sendComment()"></i>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══ MUSIC MODAL ══ -->
+<!-- MUSIC MODAL -->
 <div class="music-modal" id="music-modal" onclick="closeMusicModal()">
   <div class="music-box" onclick="event.stopPropagation()">
     <div class="music-close" onclick="closeMusicModal()"><i class="fa-solid fa-xmark"></i></div>
@@ -430,15 +335,12 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
     </div>
     <div class="music-title">Wait a Minute!</div>
     <div class="music-artist">Willow
-      <a id="yt-open-link" href="#" target="_blank" style="margin-left:6px;color:#ff0000;font-size:0.8rem">
+      <a id="yt-open-link" href="#" target="_blank" style="margin-left:6px;color:#f00;font-size:.8rem">
         <i class="fa-brands fa-youtube"></i>
       </a>
     </div>
     <input type="range" class="music-progress" id="music-progress" value="0" min="0" max="100" step="0.1">
-    <div class="music-times">
-      <span id="music-current">0:00</span>
-      <span id="music-duration">0:00</span>
-    </div>
+    <div class="music-times"><span id="music-current">0:00</span><span id="music-duration">0:00</span></div>
     <div class="music-controls">
       <div class="music-ctrl" id="music-prev"><i class="fa-solid fa-backward"></i></div>
       <div class="music-ctrl" id="music-next"><i class="fa-solid fa-forward"></i></div>
@@ -496,261 +398,338 @@ html, body { background: var(--bg); color: var(--text); font-family: var(--font)
 </div>
 
 <script>
-/* ── MENU ── */
-function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('active'); }
-function toggleDarkMode() { document.body.classList.toggle('light-mode'); document.getElementById('dropdown-menu').classList.remove('active'); }
-window.onclick = () => document.getElementById('dropdown-menu').classList.remove('active');
-
-/* ── DATA ── */
+/* ─── DATA ─── */
 const POSTS = [
-  {
-    files: ["file_00000000862871fab1161995ce9f104e.png", "XOS_STAMP_1776237339190.png"],
-    type: "image",
-    caption: "Deep logic toggle.",
-    time: "2h ago",
-    likes: 42
-  },
-  {
-    files: ["lv_7587788892909276421_20260417222425.mp4"],
-    type: "video",
-    caption: "✨✨",
-    time: "1d ago",
-    likes: 128
-  }
+  { files:["file_00000000862871fab1161995ce9f104e.png","XOS_STAMP_1776237339190.png"], type:"image", caption:"Deep logic toggle.", time:"2h ago", likes:42, comments:5 },
+  { files:["lv_7587788892909276421_20260417222425.mp4"], type:"video", caption:"✨✨", time:"1d ago", likes:128, comments:14 }
 ];
 
-/* ── FOLLOW ── */
-let followerBase = parseInt(localStorage.getItem('anush_followers') || "1200");
-let isFollowing  = localStorage.getItem('is_following') === 'true';
-function updateFollowUI() {
-  const el = document.getElementById('follower-count');
-  const btn = document.getElementById('follow-btn');
-  el.innerText = followerBase >= 1000 ? (followerBase/1000).toFixed(1)+'k' : followerBase;
-  btn.innerText = isFollowing ? "Following" : "Follow";
-  btn.classList.toggle('following', isFollowing);
+/* ─── MENU / THEME ─── */
+function toggleMenu(e){e.stopPropagation();document.getElementById('dropdown-menu').classList.toggle('active');}
+function toggleDarkMode(){document.body.classList.toggle('light-mode');document.getElementById('dropdown-menu').classList.remove('active');}
+window.onclick=()=>document.getElementById('dropdown-menu').classList.remove('active');
+
+/* ─── FOLLOW ─── */
+let followerBase=parseInt(localStorage.getItem('anush_followers')||"1200");
+let isFollowing=localStorage.getItem('is_following')==='true';
+function updateFollowUI(){
+  document.getElementById('follower-count').innerText=followerBase>=1000?(followerBase/1000).toFixed(1)+'k':followerBase;
+  const btn=document.getElementById('follow-btn');
+  btn.innerText=isFollowing?"Following":"Follow";
+  btn.classList.toggle('following',isFollowing);
 }
-function toggleFollow() {
-  isFollowing ? followerBase-- : followerBase++;
-  isFollowing = !isFollowing;
-  localStorage.setItem('anush_followers', followerBase);
-  localStorage.setItem('is_following', isFollowing);
+function toggleFollow(){
+  isFollowing?followerBase--:followerBase++;
+  isFollowing=!isFollowing;
+  localStorage.setItem('anush_followers',followerBase);
+  localStorage.setItem('is_following',isFollowing);
   updateFollowUI();
 }
 
-/* ── RENDER GRID ── */
-let gridIntervals = [];
-function renderPosts() {
-  const grid = document.getElementById('posts-grid');
-  gridIntervals.forEach(clearInterval); gridIntervals = [];
-  grid.innerHTML = POSTS.map((post, i) => {
-    const isVideo = post.type === 'video';
-    const isMulti = post.files.length > 1;
-    return `
-      <div class="post-thumb" onclick="openPost(${i})">
-        ${isVideo
-          ? `<video src="${post.files[0]}" muted autoplay loop playsinline></video>
-             <div class="vid-badge">▶ VIDEO</div>`
-          : `<img src="${post.files[0]}" id="thumb-${i}" loading="lazy">`
-        }
-        ${isMulti ? `<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>` : ''}
-      </div>`;
-  }).join('');
-
-  POSTS.forEach((post, i) => {
-    if (post.files.length > 1 && post.type === 'image') {
-      let idx = 0;
-      gridIntervals.push(setInterval(() => {
-        idx = (idx+1) % post.files.length;
-        const el = document.getElementById(`thumb-${i}`);
-        if (el) el.src = post.files[idx];
-      }, 2200));
+/* ─── GRID ─── */
+let gridIntervals=[];
+function renderPosts(){
+  const grid=document.getElementById('posts-grid');
+  gridIntervals.forEach(clearInterval);gridIntervals=[];
+  grid.innerHTML=POSTS.map((p,i)=>`
+    <div class="post-thumb" onclick="openPost(${i})">
+      ${p.type==='video'
+        ?`<video src="${p.files[0]}" muted autoplay loop playsinline></video><div class="vid-badge">▶ VIDEO</div>`
+        :`<img src="${p.files[0]}" id="thumb-${i}" loading="lazy">`}
+      ${p.files.length>1?`<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>`:''}
+    </div>`).join('');
+  POSTS.forEach((p,i)=>{
+    if(p.files.length>1&&p.type==='image'){
+      let idx=0;
+      gridIntervals.push(setInterval(()=>{
+        idx=(idx+1)%p.files.length;
+        const el=document.getElementById(`thumb-${i}`);
+        if(el) el.src=p.files[idx];
+      },2200));
     }
   });
 }
 
-/* ── POST MODAL ── */
-let currentPost = -1, currentFile = 0;
-let touchStartX = 0, likedPosts = {};
+/* ─── STATE ─── */
+let currentPost=-1, currentFile=0, modalOpen=false;
+let likedPosts={}, videoMuted=false;
 
-function openPost(idx) {
-  currentPost = idx; currentFile = 0;
-  const post = POSTS[idx];
+/* ═══════════════════════════════
+   OPEN / CLOSE  +  HISTORY API
+═══════════════════════════════ */
+function openPost(idx){
+  if(modalOpen) return;
+  currentPost=idx; currentFile=0; modalOpen=true;
+  const p=POSTS[idx];
 
-  // Likes
-  likedPosts[idx] = likedPosts[idx] ?? false;
-  document.getElementById('like-count').textContent = post.likes + (likedPosts[idx] ? 1 : 0);
+  // populate
+  likedPosts[idx]=likedPosts[idx]??false;
+  document.getElementById('like-count').textContent=p.likes+(likedPosts[idx]?1:0);
+  document.getElementById('comment-count').textContent=p.comments;
   updateLikeUI();
+  document.getElementById('sheet-caption').textContent=p.caption;
+  document.getElementById('sheet-time').textContent=p.time;
 
-  // Caption & time
-  document.getElementById('sheet-caption').textContent = post.caption;
-  document.getElementById('sheet-time').textContent = post.time;
+  // reset comment
+  const ci=document.getElementById('comment-input');
+  ci.value='';
+  document.getElementById('comment-send').classList.remove('visible');
 
-  // Swipe hint
-  const hint = document.getElementById('swipe-hint');
-  hint.style.display = post.files.length > 1 ? 'block' : 'none';
+  // ratio
+  const mediaEl=document.getElementById('sheet-media');
+  mediaEl.classList.remove('ratio-916','ratio-45');
+  mediaEl.classList.add(p.type==='video'?'ratio-916':'ratio-45');
 
+  videoMuted=false;
   loadModalMedia();
+  initSwipeToClose();
 
-  const modal = document.getElementById('post-modal');
-  modal.style.display = 'flex';
-  requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('active')));
+  // push state so phone back closes the modal
+  history.pushState({modal:'post',idx},'');
+
+  const backdrop=document.getElementById('post-modal');
+  backdrop.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>backdrop.classList.add('active')));
 }
 
-function loadModalMedia() {
-  const post = POSTS[currentPost];
-  const file = post.files[currentFile];
-  const img = document.getElementById('sheet-img');
-  const vid = document.getElementById('sheet-video');
-  const counterEl = document.getElementById('sheet-counter');
-  const dotsEl = document.getElementById('sheet-dots');
+function closePostModal(fromPopState){
+  if(!modalOpen) return;
+  modalOpen=false;
+  const backdrop=document.getElementById('post-modal');
+  backdrop.classList.remove('active');
+  const vid=document.getElementById('sheet-video');
+  vid.pause(); vid.src='';
+  if(!fromPopState) history.back();
+  setTimeout(()=>{ backdrop.style.display='none'; },420);
+}
 
-  img.style.display = 'none';
-  vid.style.display = 'none';
+// Phone back button / swipe-back gesture
+window.addEventListener('popstate', e=>{
+  if(modalOpen) closePostModal(true);
+});
+
+/* ═══════════════════════════════
+   LOAD MEDIA
+═══════════════════════════════ */
+function loadModalMedia(){
+  const p=POSTS[currentPost], file=p.files[currentFile];
+  const img=document.getElementById('sheet-img');
+  const vid=document.getElementById('sheet-video');
+  const counterEl=document.getElementById('sheet-counter');
+  const dotsEl=document.getElementById('sheet-dots');
+
+  img.style.display='none';
+  vid.style.display='none';
   vid.pause();
 
-  if (post.type === 'video' || file.endsWith('.mp4')) {
-    vid.src = file; vid.style.display = 'block';
-    vid.muted = false; vid.loop = true;
-    vid.play().catch(()=>{ vid.muted=true; vid.play(); });
+  const isVid=p.type==='video'||file.endsWith('.mp4');
+  if(isVid){
+    vid.src=file; vid.muted=videoMuted; vid.style.display='block'; vid.loop=true;
+    vid.play().catch(()=>{ vid.muted=true; videoMuted=true; showMuteIndicator(); vid.play(); });
   } else {
-    img.src = file; img.style.display = 'block';
+    img.src=file; img.style.display='block';
   }
 
-  // Counter
-  if (post.files.length > 1) {
-    counterEl.style.display = 'block';
-    counterEl.textContent = `${currentFile+1} / ${post.files.length}`;
-  } else {
-    counterEl.style.display = 'none';
-  }
+  // tap zone only for video
+  document.getElementById('mute-tap-zone').style.display=isVid?'block':'none';
 
-  // Dots
-  dotsEl.innerHTML = '';
-  if (post.files.length > 1) {
-    post.files.forEach((_, i) => {
-      const d = document.createElement('div');
-      d.className = 'sheet-dot' + (i === currentFile ? ' active' : '');
+  // counter
+  if(p.files.length>1){
+    counterEl.style.display='block';
+    counterEl.textContent=`${currentFile+1} / ${p.files.length}`;
+  } else { counterEl.style.display='none'; }
+
+  // dots
+  dotsEl.innerHTML='';
+  if(p.files.length>1){
+    p.files.forEach((_,i)=>{
+      const d=document.createElement('div');
+      d.className='sheet-dot'+(i===currentFile?' active':'');
       dotsEl.appendChild(d);
     });
   }
 }
 
-/* Swipe on sheet-media */
-const sheetMedia = document.getElementById('sheet-media');
-sheetMedia.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
-sheetMedia.addEventListener('touchend', e => {
-  const post = POSTS[currentPost]; if (!post || post.files.length <= 1) return;
-  const dx = e.changedTouches[0].screenX - touchStartX;
-  if (Math.abs(dx) < 40) return;
-  if (dx < 0) currentFile = (currentFile+1) % post.files.length;
-  else        currentFile = (currentFile-1+post.files.length) % post.files.length;
+/* ═══════════════════════════════
+   SWIPE LEFT/RIGHT  (multi-image)
+═══════════════════════════════ */
+let sxMedia=0, syMedia=0;
+document.getElementById('sheet-media').addEventListener('touchstart',e=>{
+  sxMedia=e.changedTouches[0].screenX;
+  syMedia=e.changedTouches[0].screenY;
+},{passive:true});
+document.getElementById('sheet-media').addEventListener('touchend',e=>{
+  const p=POSTS[currentPost];
+  if(!p||p.files.length<=1) return;
+  const dx=e.changedTouches[0].screenX-sxMedia;
+  const dy=e.changedTouches[0].screenY-syMedia;
+  if(Math.abs(dy)>Math.abs(dx)||Math.abs(dx)<38) return;
+  if(dx<0) currentFile=(currentFile+1)%p.files.length;
+  else     currentFile=(currentFile-1+p.files.length)%p.files.length;
   loadModalMedia();
-}, {passive:true});
+},{passive:true});
 
-function handleBackdropClick(e) {
-  if (e.target === document.getElementById('post-modal')) closePostModal();
+/* ═══════════════════════════════
+   SWIPE DOWN TO CLOSE
+═══════════════════════════════ */
+function initSwipeToClose(){
+  const sheet=document.getElementById('post-sheet');
+  let sy=0, sx=0, dragging=false, raf=null;
+
+  sheet.addEventListener('touchstart',e=>{
+    sy=e.touches[0].clientY; sx=e.touches[0].clientX; dragging=true;
+    sheet.style.transition='none';
+  },{passive:true});
+
+  sheet.addEventListener('touchmove',e=>{
+    if(!dragging) return;
+    const dy=e.touches[0].clientY-sy;
+    const dx=e.touches[0].clientX-sx;
+    if(Math.abs(dx)>Math.abs(dy)) return; // horizontal — ignore
+    if(dy<=0) return; // don't pull up
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(()=>{ sheet.style.transform=`translateY(${dy}px)`; });
+  },{passive:true});
+
+  sheet.addEventListener('touchend',e=>{
+    if(!dragging) return;
+    dragging=false;
+    const dy=e.changedTouches[0].clientY-sy;
+    sheet.style.transition='';
+    if(dy>90){
+      sheet.style.transform='';
+      closePostModal();
+    } else {
+      sheet.style.transform='';
+    }
+  },{passive:true});
 }
 
-function closePostModal() {
-  const modal = document.getElementById('post-modal');
-  modal.classList.remove('active');
-  document.getElementById('sheet-video').pause();
-  setTimeout(() => { modal.style.display = 'none'; }, 400);
-}
+/* ═══════════════════════════════
+   TAP = MUTE TOGGLE
+   DOUBLE TAP = LIKE
+═══════════════════════════════ */
+let lastTap=0, tapTimer=null;
 
-/* Like */
-function toggleLike(e) {
-  if (currentPost < 0) return;
-  likedPosts[currentPost] = !likedPosts[currentPost];
-  const post = POSTS[currentPost];
-  document.getElementById('like-count').textContent = post.likes + (likedPosts[currentPost] ? 1 : 0);
-  updateLikeUI();
-
-  if (likedPosts[currentPost]) {
-    // Heart burst effect
-    const burst = document.createElement('div');
-    burst.className = 'heart-burst';
-    burst.innerHTML = '♥';
-    burst.style.left = e.clientX + 'px';
-    burst.style.top  = e.clientY + 'px';
-    document.body.appendChild(burst);
-    setTimeout(() => burst.remove(), 700);
-  }
-}
-function updateLikeUI() {
-  const btn = document.getElementById('like-btn');
-  const icon = document.getElementById('like-icon');
-  if (likedPosts[currentPost]) {
-    btn.classList.add('liked');
-    icon.className = 'fa-solid fa-heart';
+document.getElementById('mute-tap-zone').addEventListener('click',e=>{
+  const now=Date.now(), gap=now-lastTap;
+  lastTap=now;
+  if(gap<300&&gap>0){
+    // double tap
+    clearTimeout(tapTimer);
+    lastTap=0;
+    triggerDoubleTapLike(e);
   } else {
-    btn.classList.remove('liked');
-    icon.className = 'fa-regular fa-heart';
+    // wait to rule out double tap
+    tapTimer=setTimeout(toggleMute, 260);
   }
+});
+
+function toggleMute(){
+  const vid=document.getElementById('sheet-video');
+  if(!vid||vid.style.display==='none') return;
+  videoMuted=!videoMuted;
+  vid.muted=videoMuted;
+  showMuteIndicator();
 }
 
-function sharePost() {
-  if (navigator.share) navigator.share({ title: 'Anush Decodes', url: window.location.href });
-  else alert('Link copied!');
+function showMuteIndicator(){
+  const ind=document.getElementById('mute-indicator');
+  document.getElementById('mute-icon').className=videoMuted?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';
+  ind.classList.remove('flash');
+  void ind.offsetWidth; // reflow
+  ind.classList.add('flash');
 }
 
-/* ── MUSIC MODAL ── */
-let ytPlayer, ytReady = false, progressTimer;
-const YT_ID = 'h4OAXvDRZTY';
+function triggerDoubleTapLike(e){
+  if(currentPost<0) return;
+  if(!likedPosts[currentPost]){
+    likedPosts[currentPost]=true;
+    document.getElementById('like-count').textContent=POSTS[currentPost].likes+1;
+    updateLikeUI();
+  }
+  spawnHeart(e.clientX, e.clientY);
+}
 
-function openMusicPlayer() {
-  const bioAudio = document.getElementById('bio-audio');
-  if (!bioAudio.paused) { bioAudio.pause(); document.getElementById('bio-play-icon').className='fa-solid fa-play'; document.getElementById('bio-eq').classList.add('paused'); }
-  const modal = document.getElementById('music-modal');
-  modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
-  document.getElementById('music-thumb').src = `https://img.youtube.com/vi/${YT_ID}/maxresdefault.jpg`;
-  document.getElementById('yt-open-link').href = `https://youtu.be/${YT_ID}`;
-  loadYTAPI().then(() => {
-    if (!ytPlayer) {
-      ytPlayer = new YT.Player('youtube-player-container', {
-        height:'0', width:'0', videoId: YT_ID,
-        playerVars: { playsinline:1, controls:0, autoplay:1 },
-        events: { onReady: onYTReady, onStateChange: onYTStateChange }
-      });
-    } else { ytPlayer.loadVideoById(YT_ID); ytPlayer.playVideo(); }
+/* ─── LIKE BUTTON ─── */
+function toggleLike(e){
+  if(currentPost<0) return;
+  likedPosts[currentPost]=!likedPosts[currentPost];
+  document.getElementById('like-count').textContent=POSTS[currentPost].likes+(likedPosts[currentPost]?1:0);
+  updateLikeUI();
+  if(likedPosts[currentPost]) spawnHeart(e.clientX,e.clientY);
+}
+function updateLikeUI(){
+  const liked=likedPosts[currentPost];
+  document.getElementById('like-btn').classList.toggle('liked',liked);
+  document.getElementById('like-icon').className=liked?'fa-solid fa-heart':'fa-regular fa-heart';
+}
+function spawnHeart(x,y){
+  const h=document.createElement('div');
+  h.className='heart-burst';h.innerHTML='♥';
+  h.style.left=x+'px';h.style.top=y+'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),700);
+}
+
+/* ─── COMMENT ─── */
+function focusComment(){document.getElementById('comment-input').focus();}
+function onCommentInput(el){document.getElementById('comment-send').classList.toggle('visible',el.value.trim().length>0);}
+function onCommentKey(e){if(e.key==='Enter') sendComment();}
+function sendComment(){
+  const inp=document.getElementById('comment-input');
+  if(!inp.value.trim()) return;
+  const cc=document.getElementById('comment-count');
+  cc.textContent=parseInt(cc.textContent)+1;
+  inp.value=''; inp.blur();
+  document.getElementById('comment-send').classList.remove('visible');
+}
+function sharePost(){if(navigator.share) navigator.share({title:'Anush Decodes',url:window.location.href}); else alert('Link copied!');}
+
+/* ─── MUSIC ─── */
+let ytPlayer,ytReady=false,progressTimer;
+const YT_ID='h4OAXvDRZTY';
+function openMusicPlayer(){
+  const ba=document.getElementById('bio-audio');
+  if(!ba.paused){ba.pause();document.getElementById('bio-play-icon').className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');}
+  const m=document.getElementById('music-modal');
+  m.style.display='flex';setTimeout(()=>m.classList.add('active'),10);
+  document.getElementById('music-thumb').src=`https://img.youtube.com/vi/${YT_ID}/maxresdefault.jpg`;
+  document.getElementById('yt-open-link').href=`https://youtu.be/${YT_ID}`;
+  loadYTAPI().then(()=>{
+    if(!ytPlayer) ytPlayer=new YT.Player('youtube-player-container',{height:'0',width:'0',videoId:YT_ID,playerVars:{playsinline:1,controls:0,autoplay:1},events:{onReady:onYTReady,onStateChange:onYTStateChange}});
+    else{ytPlayer.loadVideoById(YT_ID);ytPlayer.playVideo();}
   });
 }
-function loadYTAPI() {
-  return new Promise(resolve => {
-    if (window.YT && window.YT.Player) { resolve(); return; }
-    const tag = document.createElement('script'); tag.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(tag); window.onYouTubeIframeAPIReady = resolve;
-  });
-}
-function onYTReady() { ytReady=true; ytPlayer.playVideo(); document.getElementById('music-duration').textContent=formatTime(ytPlayer.getDuration()); clearInterval(progressTimer); progressTimer=setInterval(updateYTProgress,500); }
-function onYTStateChange(e) { document.getElementById('music-play-icon').className = e.data===1?'fa-solid fa-pause':'fa-solid fa-play'; }
-function updateYTProgress() { if(!ytPlayer||!ytReady) return; const c=ytPlayer.getCurrentTime(),d=ytPlayer.getDuration(); if(d>0){document.getElementById('music-progress').value=(c/d)*100; document.getElementById('music-current').textContent=formatTime(c); document.getElementById('music-duration').textContent=formatTime(d);}}
-function formatTime(s) { if(!s||isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
-function closeMusicModal() { const modal=document.getElementById('music-modal'); modal.classList.remove('active'); setTimeout(()=>modal.style.display='none',300); if(ytPlayer) ytPlayer.pauseVideo(); clearInterval(progressTimer); }
-document.getElementById('music-play-pause').addEventListener('click',()=>{ if(!ytPlayer) return; ytPlayer.getPlayerState()===1?ytPlayer.pauseVideo():ytPlayer.playVideo(); });
-document.getElementById('music-progress').addEventListener('input',e=>{ if(!ytPlayer||!ytReady) return; ytPlayer.seekTo((e.target.value/100)*ytPlayer.getDuration(),true); });
+function loadYTAPI(){return new Promise(r=>{if(window.YT&&window.YT.Player){r();return;}const t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';document.head.appendChild(t);window.onYouTubeIframeAPIReady=r;});}
+function onYTReady(){ytReady=true;ytPlayer.playVideo();document.getElementById('music-duration').textContent=fmt(ytPlayer.getDuration());clearInterval(progressTimer);progressTimer=setInterval(updateYTProgress,500);}
+function onYTStateChange(e){document.getElementById('music-play-icon').className=e.data===1?'fa-solid fa-pause':'fa-solid fa-play';}
+function updateYTProgress(){if(!ytPlayer||!ytReady)return;const c=ytPlayer.getCurrentTime(),d=ytPlayer.getDuration();if(d>0){document.getElementById('music-progress').value=(c/d)*100;document.getElementById('music-current').textContent=fmt(c);document.getElementById('music-duration').textContent=fmt(d);}}
+function fmt(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
+function closeMusicModal(){const m=document.getElementById('music-modal');m.classList.remove('active');setTimeout(()=>m.style.display='none',300);if(ytPlayer)ytPlayer.pauseVideo();clearInterval(progressTimer);}
+document.getElementById('music-play-pause').addEventListener('click',()=>{if(!ytPlayer)return;ytPlayer.getPlayerState()===1?ytPlayer.pauseVideo():ytPlayer.playVideo();});
+document.getElementById('music-progress').addEventListener('input',e=>{if(!ytPlayer||!ytReady)return;ytPlayer.seekTo((e.target.value/100)*ytPlayer.getDuration(),true);});
 
-/* ── BIO MUSIC ── */
-function toggleBioMusic(e) {
-  if(e) e.stopPropagation();
-  const audio=document.getElementById('bio-audio'), icon=document.getElementById('bio-play-icon');
-  if(audio.paused){audio.play();icon.className='fa-solid fa-pause';document.getElementById('bio-eq').classList.remove('paused');}
-  else{audio.pause();icon.className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');}
+/* ─── BIO MUSIC ─── */
+function toggleBioMusic(e){
+  if(e)e.stopPropagation();
+  const a=document.getElementById('bio-audio'),ic=document.getElementById('bio-play-icon');
+  if(a.paused){a.play();ic.className='fa-solid fa-pause';document.getElementById('bio-eq').classList.remove('paused');}
+  else{a.pause();ic.className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');}
 }
 
-/* ── LINKS ── */
-const LINKS = [
-  { icon:'fa-brands fa-instagram', label:'Instagram', url:'https://www.instagram.com/x0s.nikh_07', color:'color-instagram' },
-  { icon:'fa-brands fa-x-twitter', label:'X', url:'https://x.com/Nikhil_X7', color:'color-twitter' },
-  { icon:'fa-brands fa-linkedin-in', label:'LinkedIn', url:'https://linkedin.com/in/nikhil-b-b41641363', color:'color-linkedin' },
-  { icon:'fa-brands fa-discord', label:'Discord', url:'https://discord.gg/QyHXBqS3H', color:'color-discord' },
-  { icon:'fa-solid fa-link', label:'x0s.link', url:'personalpage.html', color:'color-globe' }
+/* ─── LINKS + INIT ─── */
+const LINKS=[
+  {icon:'fa-brands fa-instagram',label:'Instagram',url:'https://www.instagram.com/x0s.nikh_07',color:'color-instagram'},
+  {icon:'fa-brands fa-x-twitter',label:'X',url:'https://x.com/Nikhil_X7',color:'color-twitter'},
+  {icon:'fa-brands fa-linkedin-in',label:'LinkedIn',url:'https://linkedin.com/in/nikhil-b-b41641363',color:'color-linkedin'},
+  {icon:'fa-brands fa-discord',label:'Discord',url:'https://discord.gg/QyHXBqS3H',color:'color-discord'},
+  {icon:'fa-solid fa-link',label:'x0s.link',url:'personalpage.html',color:'color-globe'}
 ];
+function shareProfile(){if(navigator.share)navigator.share({title:'Anush Decodes',url:window.location.href});else alert('Link copied!');}
 
-function shareProfile() { if(navigator.share) navigator.share({title:'Anush Decodes',url:window.location.href}); else alert('Link copied!'); }
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('links-row').innerHTML = LINKS.map(l=>`<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('links-row').innerHTML=LINKS.map(l=>`<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
   renderPosts();
   updateFollowUI();
 });
