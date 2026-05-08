@@ -9,9 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-/* ══════════════════════════════════════════
-   BASE / TOKENS
-══════════════════════════════════════════ */
 :root {
   --bg:        #000000;
   --card:      #0a0a0a;
@@ -39,180 +36,310 @@
 }
 
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  min-height: 100vh;
-  overflow-x: hidden;
-  transition: background 0.35s var(--ease), color 0.35s var(--ease);
-}
-
+html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; overflow-x: hidden; transition: background 0.35s var(--ease), color 0.35s var(--ease); }
 ::-webkit-scrollbar { display: none; }
 
-/* ══════════════════════════════════════════
-   ANIMATIONS
-══════════════════════════════════════════ */
 @keyframes slideUp   { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
 @keyframes pulse     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.8;transform:scale(0.95)} }
 @keyframes fadeIn    { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes shimmer   { 0% { left: -100%; } 100% { left: 100%; } }
+@keyframes eqBar     { from { height: 2px; } to { height: 10px; } }
 
-.page {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100vh;
-  position: relative;
-}
+/* Modal entrance animations */
+@keyframes modalBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalCardIn { from { opacity: 0; transform: translateY(60px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes modalCardOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(40px) scale(0.96); } }
+@keyframes likeHeartPop { 0%{transform:scale(1)} 30%{transform:scale(1.5)} 60%{transform:scale(0.9)} 100%{transform:scale(1)} }
+@keyframes heartBurst { 0%{opacity:1;transform:translate(-50%,-50%) scale(0)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.8)} 100%{opacity:0;transform:translate(-50%,-50%) scale(2.2)} }
+@keyframes swipeHint { 0%,100%{opacity:0;transform:translateX(0)} 30%{opacity:1} 70%{opacity:1} 100%{transform:translateX(-12px)} }
 
-/* ══════════════════════════════════════════
-   TOP BAR
-══════════════════════════════════════════ */
-.top-bar {
-  position: sticky; top: 0; z-index: 80;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 20px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border2);
-}
+.page { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+/* ── TOP BAR ── */
+.top-bar { position: sticky; top: 0; z-index: 80; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(0,0,0,0.55); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border2); }
 .light-mode .top-bar { background: rgba(255,255,255,0.72); border-bottom: 1px solid var(--border); }
 .top-bar-brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
 .top-bar-brand span { color: var(--accent); }
 .menu-btn { width: 36px; height: 36px; background: var(--glass); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); position: relative; }
-
-.dropdown-menu {
-  position: absolute; top: 50px; right: 0;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 14px; padding: 6px; display: none; z-index: 100;
-  min-width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  animation: fadeIn 0.2s var(--ease);
-}
+.dropdown-menu { position: absolute; top: 50px; right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 6px; display: none; z-index: 100; min-width: 170px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: fadeIn 0.2s var(--ease); }
 .dropdown-menu.active { display: block; }
-.menu-item {
-  padding: 10px 14px; font-size: 0.75rem; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.05em;
-  cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-  border-radius: 10px; transition: 0.2s;
-}
+.menu-item { padding: 10px 14px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-radius: 10px; transition: 0.2s; }
 .menu-item:hover { background: var(--border); }
 .menu-item i { color: var(--accent); font-size: 0.85rem; }
 
-/* ══════════════════════════════════════════
-   BANNER & PROFILE
-══════════════════════════════════════════ */
+/* ── BANNER ── */
 .banner { width: 100%; height: 200px; position: relative; overflow: hidden; background: linear-gradient(135deg, #000814 0%, #001d3d 60%, #000000 100%); }
 .banner-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.35; }
 .banner-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 30%, var(--bg) 100%); }
 
+/* ── PROFILE ── */
 .profile-section { padding: 0 20px; margin-top: -52px; position: relative; animation: slideUp 0.6s var(--ease) both; }
-
-.follow-btn {
-  position: absolute; right: 20px; top: 65px;
-  padding: 10px 30px; background: rgba(255,255,255,0.9);
-  color: #000; border: none; border-radius: 30px;
-  font-size: 0.85rem; font-weight: 700; cursor: pointer;
-  transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
+.follow-btn { position: absolute; right: 20px; top: 65px; padding: 10px 30px; background: rgba(255,255,255,0.9); color: #000; border: none; border-radius: 30px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
 .follow-btn.following { background: var(--card); color: var(--text); border: 1px solid var(--border); }
-
-/* Avatar & Shiny Golden Badge */
 .avatar-wrap { width: 84px; height: 84px; position: relative; margin-bottom: 14px; }
 .avatar-img { width: 100%; height: 100%; border-radius: 20px; object-fit: cover; border: 1px solid var(--border); display: block; }
-
-.pfp-badge {
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-  background: var(--bg);
-  border-radius: 50%;
-  border: 1.5px solid var(--bg);
-  overflow: hidden;
-  animation: pulse 3s infinite ease-in-out;
-}
-.pfp-badge .fa-certificate {
-  font-size: 18px;
-  position: absolute;
-  background: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.pfp-badge .fa-check {
-  font-size: 8px;
-  color: #000000;
-  position: relative;
-  z-index: 6;
-  font-weight: 900;
-}
-.pfp-badge::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.8) 50%, transparent 70%);
-  animation: shimmer 2s infinite linear;
-  z-index: 7;
-}
-
+.pfp-badge { position: absolute; bottom: -2px; right: -2px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; z-index: 5; background: var(--bg); border-radius: 50%; border: 1.5px solid var(--bg); overflow: hidden; animation: pulse 3s infinite ease-in-out; }
+.pfp-badge .fa-certificate { font-size: 18px; position: absolute; background: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.pfp-badge .fa-check { font-size: 8px; color: #000000; position: relative; z-index: 6; font-weight: 900; }
+.pfp-badge::after { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%); animation: shimmer 2s infinite linear; z-index: 7; }
 .name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; }
-
 .handle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .handle { font-size: 0.72rem; font-weight: 500; color: var(--accent); letter-spacing: 0.06em; }
 .follower-stat { font-size: 0.72rem; color: var(--muted); display: flex; gap: 12px; }
 .follower-stat b { color: var(--text); }
-
 .bio { font-size: 0.82rem; color: var(--muted); font-weight: 300; line-height: 1.6; margin-bottom: 14px; }
-
-/* ── BIO MUSIC LABEL ── */
 .bio-music { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 6px 10px 6px 8px; background: var(--card); border: 1px solid var(--border); border-radius: 99px; width: fit-content; max-width: 100%; cursor: default; overflow: hidden; }
 .bio-music-play { width: 24px; height: 24px; background: rgba(0,122,255,0.13); border: 1px solid rgba(0,122,255,0.22); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.58rem; flex-shrink: 0; cursor: pointer; }
 .bio-music-label { font-size: 0.7rem; font-weight: 500; color: var(--text); white-space: nowrap; cursor: pointer; }
 .bio-music-eq { display: flex; align-items: flex-end; gap: 2px; height: 10px; flex-shrink: 0; }
 .bio-music-eq span { width: 2px; background: var(--accent); border-radius: 1px; animation: eqBar 0.8s infinite alternate; }
 .bio-music-eq.paused span { animation-play-state: paused; opacity: 0.3; }
-@keyframes eqBar { from { height: 2px; } to { height: 10px; } }
-
 .links-row { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
 .link-pill { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--text); font-size: 0.72rem; font-weight: 600; white-space: nowrap; transition: 0.2s; }
 
 /* ══════════════════════════════════════════
-   POSTS
+   POSTS GRID — 3:4 VERTICAL
 ══════════════════════════════════════════ */
-.posts-section { padding: 0 20px 100px; }
-.section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin-bottom: 16px; display: block; }
-.posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
-.post-thumb { aspect-ratio: 1/1; border-radius: 6px; overflow: hidden; background: var(--card); cursor: pointer; position: relative; }
-.post-thumb video, .post-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.posts-section { padding: 0 16px 100px; }
+.section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.22em; color: var(--muted); margin-bottom: 14px; display: block; }
 
-/* MODALS */
-.post-modal { 
-  position: fixed; inset: 0; z-index: 200; 
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); 
-  display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; 
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
 }
-.post-modal.active { opacity: 1; display: flex; }
-.post-modal-inner { width: 92vw; max-width: 420px; aspect-ratio: 4/5; border-radius: 22px; overflow: hidden; position: relative; background: #000; border: 1px solid var(--border2); }
-.post-modal-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
 
-.modal-dots { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 15; }
-.modal-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: 0.3s; }
-.modal-dot.active { background: #fff; transform: scale(1.2); }
+.post-thumb {
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--card);
+  cursor: pointer;
+  position: relative;
+  /* Subtle press feedback */
+  transition: transform 0.15s var(--ease), opacity 0.15s;
+}
+.post-thumb:active { transform: scale(0.96); opacity: 0.85; }
+
+.post-thumb video,
+.post-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s var(--ease);
+}
+.post-thumb:hover video,
+.post-thumb:hover img { transform: scale(1.04); }
+
+/* Subtle gradient overlay on thumb */
+.post-thumb::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 45%);
+  pointer-events: none;
+  border-radius: 10px;
+}
+
+/* Video badge */
+.post-thumb .vid-badge {
+  position: absolute; top: 7px; right: 7px; z-index: 2;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.55rem; font-weight: 700; color: #fff; letter-spacing: 0.06em;
+}
+
+/* Multi-image indicator */
+.post-thumb .multi-badge {
+  position: absolute; top: 7px; left: 7px; z-index: 2;
+  color: white; font-size: 0.75rem;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.7));
+}
 
 /* ══════════════════════════════════════════
-   MUSIC MODAL
+   CINEMATIC POST MODAL
 ══════════════════════════════════════════ */
-.music-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.88); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
+.post-modal-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  transition: background 0.35s var(--ease);
+}
+.post-modal-backdrop.active {
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.post-modal-sheet {
+  width: 100%; max-width: 480px;
+  max-height: 92vh;
+  background: #0a0a0a;
+  border-radius: 28px 28px 0 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.42s cubic-bezier(0.32,0.72,0,1);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-bottom: none;
+  position: relative;
+}
+.post-modal-backdrop.active .post-modal-sheet {
+  transform: translateY(0);
+}
+
+/* Drag handle pill */
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+/* Media area */
+.sheet-media {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sheet-media img,
+.sheet-media video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Slide indicators (dots) at bottom of media */
+.sheet-dots {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 5px; z-index: 10;
+}
+.sheet-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transition: background 0.25s, transform 0.25s, width 0.25s;
+}
+.sheet-dot.active {
+  background: #fff;
+  transform: scale(1.25);
+  width: 14px;
+  border-radius: 3px;
+}
+
+/* Top action row inside media */
+.sheet-media-toprow {
+  position: absolute; top: 0; left: 0; right: 0;
+  padding: 12px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%);
+  z-index: 10;
+}
+.sheet-close-btn {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; cursor: pointer; font-size: 0.85rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: background 0.2s;
+}
+.sheet-close-btn:active { background: rgba(255,255,255,0.2); }
+
+.sheet-counter {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  padding: 4px 10px; border-radius: 99px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Swipe hint arrow */
+.swipe-hint {
+  position: absolute; right: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,0.35); font-size: 1.1rem;
+  animation: swipeHint 2s ease-in-out 1.5s 2 forwards;
+  z-index: 10; pointer-events: none;
+}
+
+/* Bottom info panel */
+.sheet-info {
+  padding: 14px 18px 20px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* User row */
+.sheet-user-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.sheet-avatar {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-user-info { flex: 1; }
+.sheet-username { font-size: 0.78rem; font-weight: 700; }
+.sheet-handle-tag { font-size: 0.62rem; color: var(--muted); font-weight: 400; }
+.sheet-post-time { font-size: 0.6rem; color: var(--muted2); margin-left: auto; white-space: nowrap; }
+
+/* Caption */
+.sheet-caption {
+  font-size: 0.8rem; color: rgba(255,255,255,0.8);
+  line-height: 1.6; font-weight: 300;
+}
+
+/* Action row */
+.sheet-actions {
+  display: flex; align-items: center; gap: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 2px;
+}
+.sheet-action-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px 8px 0;
+  cursor: pointer;
+  font-size: 0.72rem; color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+  transition: color 0.2s;
+  flex: 1;
+}
+.sheet-action-btn i { font-size: 1rem; transition: transform 0.2s, color 0.2s; }
+.sheet-action-btn:active i { transform: scale(0.85); }
+.sheet-action-btn.liked { color: #ff3b5c; }
+.sheet-action-btn.liked i { animation: likeHeartPop 0.4s var(--ease); }
+
+/* Heart burst */
+.heart-burst {
+  position: absolute;
+  font-size: 3rem; color: #ff3b5c;
+  pointer-events: none;
+  z-index: 20;
+  animation: heartBurst 0.6s var(--ease) forwards;
+}
+
+/* Music modal (unchanged) */
+.music-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.88); backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; }
 .music-modal.active { display: flex; opacity: 1; }
 .music-box { width: 82vw; max-width: 340px; background: #000; border: 1px solid var(--border); border-radius: 26px; overflow: hidden; padding: 24px 20px 28px; transform: scale(0.9); transition: 0.35s var(--ease); box-shadow: 0 30px 80px rgba(0,0,0,0.9); position: relative; }
 .music-modal.active .music-box { transform: scale(1); }
@@ -229,7 +356,11 @@ html, body {
 .music-ctrl { color: var(--muted); font-size: 0.9rem; cursor: pointer; }
 .music-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; background: rgba(255,255,255,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 10; }
 
-.color-instagram { color: #e1306c; } .color-twitter { color: #ffffff; } .color-linkedin { color: #0077b5; } .color-discord { color: #5865f2; } .color-globe { color: var(--accent); }
+.color-instagram { color: #e1306c; }
+.color-twitter   { color: #ffffff; }
+.color-linkedin  { color: #0077b5; }
+.color-discord   { color: #5865f2; }
+.color-globe     { color: var(--accent); }
 </style>
 </head>
 <body>
@@ -237,18 +368,55 @@ html, body {
 <audio id="bio-audio" src="2FilesMerged_14032026.mp3" loop preload="auto"></audio>
 <div id="youtube-player-container" style="display:none;position:absolute;"></div>
 
-<div class="post-modal" id="post-modal" onclick="closePostModal()">
-  <div class="post-modal-inner" id="modal-swipe-area" onclick="event.stopPropagation()">
-    <div class="post-modal-close" onclick="closePostModal()"><i class="fa-solid fa-xmark"></i></div>
-    <div id="modal-media-wrap" style="width:100%; height:100%;">
-       <img id="post-modal-img" style="width:100%; height:100%; object-fit:cover; display:none">
-       <video id="post-modal-video" style="width:100%; height:100%; object-fit:cover; display:none" playsinline loop></video>
+<!-- ══ CINEMATIC POST MODAL ══ -->
+<div class="post-modal-backdrop" id="post-modal" onclick="handleBackdropClick(event)">
+  <div class="post-modal-sheet" id="post-sheet">
+    <div class="sheet-handle"></div>
+
+    <!-- Media area -->
+    <div class="sheet-media" id="sheet-media">
+      <!-- Top gradient row -->
+      <div class="sheet-media-toprow">
+        <div class="sheet-close-btn" onclick="closePostModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </div>
+        <div class="sheet-counter" id="sheet-counter" style="display:none"></div>
+      </div>
+
+      <img   id="sheet-img"   style="display:none" alt="">
+      <video id="sheet-video" style="display:none" playsinline loop muted></video>
+
+      <div id="sheet-dots" class="sheet-dots"></div>
+      <div class="swipe-hint" id="swipe-hint" style="display:none"><i class="fa-solid fa-chevron-left"></i></div>
     </div>
-    <div id="modal-dots" class="modal-dots"></div>
-    <div id="post-modal-caption" style="position:absolute; bottom:0; padding:20px; background:linear-gradient(transparent, rgba(0,0,0,0.8)); width:100%; font-size:0.8rem; color:#fff"></div>
+
+    <!-- Info panel -->
+    <div class="sheet-info">
+      <div class="sheet-user-row">
+        <img class="sheet-avatar" id="sheet-avatar" src="Screenshot_20260418-234611.png" alt="">
+        <div class="sheet-user-info">
+          <div class="sheet-username">Anush Decodes</div>
+          <div class="sheet-handle-tag">anush@x0s</div>
+        </div>
+        <div class="sheet-post-time" id="sheet-time">just now</div>
+      </div>
+
+      <div class="sheet-caption" id="sheet-caption"></div>
+
+      <div class="sheet-actions">
+        <div class="sheet-action-btn" id="like-btn" onclick="toggleLike(event)">
+          <i class="fa-regular fa-heart" id="like-icon"></i>
+          <span id="like-count">0</span>
+        </div>
+        <div class="sheet-action-btn" style="flex:none; margin-left:auto;" onclick="sharePost()">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- ══ MUSIC MODAL ══ -->
 <div class="music-modal" id="music-modal" onclick="closeMusicModal()">
   <div class="music-box" onclick="event.stopPropagation()">
     <div class="music-close" onclick="closeMusicModal()"><i class="fa-solid fa-xmark"></i></div>
@@ -281,11 +449,11 @@ html, body {
 <div class="page">
   <div class="top-bar">
     <div class="top-bar-brand">x<span>0</span>s.link</div>
-    <div style="position: relative;">
+    <div style="position:relative;">
       <div class="menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
       <div class="dropdown-menu" id="dropdown-menu">
-        <div class="menu-item" onclick="shareProfile()"><span>Share</span> <i class="fa-solid fa-share-nodes"></i></div>
-        <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span> <i class="fa-solid fa-circle-half-stroke"></i></div>
+        <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
+        <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
       </div>
     </div>
   </div>
@@ -297,7 +465,6 @@ html, body {
 
   <section class="profile-section">
     <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
-    
     <div class="avatar-wrap">
       <img class="avatar-img" src="Screenshot_20260418-234611.png">
       <div class="pfp-badge">
@@ -305,9 +472,7 @@ html, body {
         <i class="fa-solid fa-check"></i>
       </div>
     </div>
-
     <div class="name-row"><h1 class="name">Anush Decodes</h1></div>
-    
     <div class="handle-row">
       <div class="handle">anush@x0s</div>
       <div class="follower-stat">
@@ -315,15 +480,12 @@ html, body {
         <span><b id="follower-count">1.2k</b> followers</span>
       </div>
     </div>
-
     <p class="bio">Decoding logic at the kernel level.<br>Building the future one commit at a time.</p>
-
     <div class="bio-music">
       <div class="bio-music-play" onclick="toggleBioMusic(event)"><i class="fa-solid fa-play" id="bio-play-icon"></i></div>
       <div class="bio-music-label" onclick="openMusicPlayer()">Wait a Minute! • Willow</div>
       <div class="bio-music-eq paused" id="bio-eq"><span></span><span></span><span></span></div>
     </div>
-
     <div class="links-row" id="links-row"></div>
   </section>
 
@@ -334,111 +496,219 @@ html, body {
 </div>
 
 <script>
-/* UI & MENU LOGIC */
+/* ── MENU ── */
 function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('active'); }
 function toggleDarkMode() { document.body.classList.toggle('light-mode'); document.getElementById('dropdown-menu').classList.remove('active'); }
-window.onclick = function() { document.getElementById('dropdown-menu').classList.remove('active'); }
+window.onclick = () => document.getElementById('dropdown-menu').classList.remove('active');
 
-/* POSTS DATA */
-const GITHUB_POST_FILES = [
-  { files: ["file_00000000862871fab1161995ce9f104e.png", "XOS_STAMP_1776237339190.png"], type: "image", caption: "Deep logic toggle." },
-  { files: ["lv_7587788892909276421_20260417222425.mp4"], type: "video", caption: "✨✨" }
+/* ── DATA ── */
+const POSTS = [
+  {
+    files: ["file_00000000862871fab1161995ce9f104e.png", "XOS_STAMP_1776237339190.png"],
+    type: "image",
+    caption: "Deep logic toggle.",
+    time: "2h ago",
+    likes: 42
+  },
+  {
+    files: ["lv_7587788892909276421_20260417222425.mp4"],
+    type: "video",
+    caption: "✨✨",
+    time: "1d ago",
+    likes: 128
+  }
 ];
 
-/* FOLLOW LOGIC */
+/* ── FOLLOW ── */
 let followerBase = parseInt(localStorage.getItem('anush_followers') || "1200");
-let isFollowing = localStorage.getItem('is_following') === 'true';
+let isFollowing  = localStorage.getItem('is_following') === 'true';
 function updateFollowUI() {
-  const countEl = document.getElementById('follower-count');
+  const el = document.getElementById('follower-count');
   const btn = document.getElementById('follow-btn');
-  countEl.innerText = followerBase >= 1000 ? (followerBase/1000).toFixed(1) + 'k' : followerBase;
-  if(isFollowing) { btn.innerText = "Following"; btn.classList.add('following'); } 
-  else { btn.innerText = "Follow"; btn.classList.remove('following'); }
+  el.innerText = followerBase >= 1000 ? (followerBase/1000).toFixed(1)+'k' : followerBase;
+  btn.innerText = isFollowing ? "Following" : "Follow";
+  btn.classList.toggle('following', isFollowing);
 }
 function toggleFollow() {
-  if(!isFollowing) { followerBase++; isFollowing = true; } else { followerBase--; isFollowing = false; }
+  isFollowing ? followerBase-- : followerBase++;
+  isFollowing = !isFollowing;
   localStorage.setItem('anush_followers', followerBase);
   localStorage.setItem('is_following', isFollowing);
   updateFollowUI();
 }
 
-/* POSTS RENDERING */
+/* ── RENDER GRID ── */
 let gridIntervals = [];
 function renderPosts() {
   const grid = document.getElementById('posts-grid');
   gridIntervals.forEach(clearInterval); gridIntervals = [];
-  grid.innerHTML = GITHUB_POST_FILES.map((post, i) => `
+  grid.innerHTML = POSTS.map((post, i) => {
+    const isVideo = post.type === 'video';
+    const isMulti = post.files.length > 1;
+    return `
       <div class="post-thumb" onclick="openPost(${i})">
-        ${post.type === 'video' ? `<video src="${post.files[0]}" muted autoplay loop playsinline></video>` : `<img src="${post.files[0]}" id="img-thumb-${i}" loading="lazy">`}
-      </div>`).join('');
-  GITHUB_POST_FILES.forEach((post, i) => {
+        ${isVideo
+          ? `<video src="${post.files[0]}" muted autoplay loop playsinline></video>
+             <div class="vid-badge">▶ VIDEO</div>`
+          : `<img src="${post.files[0]}" id="thumb-${i}" loading="lazy">`
+        }
+        ${isMulti ? `<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>` : ''}
+      </div>`;
+  }).join('');
+
+  POSTS.forEach((post, i) => {
     if (post.files.length > 1 && post.type === 'image') {
-      let currentFileIdx = 0;
+      let idx = 0;
       gridIntervals.push(setInterval(() => {
-        currentFileIdx = (currentFileIdx + 1) % post.files.length;
-        document.getElementById(`img-thumb-${i}`).src = post.files[currentFileIdx];
-      }, 2000));
+        idx = (idx+1) % post.files.length;
+        const el = document.getElementById(`thumb-${i}`);
+        if (el) el.src = post.files[idx];
+      }, 2200));
     }
   });
 }
 
-/* POST MODAL */
-let currentOpenPostIdx = -1, currentFileInModalIdx = 0, touchStartX = 0;
+/* ── POST MODAL ── */
+let currentPost = -1, currentFile = 0;
+let touchStartX = 0, likedPosts = {};
+
 function openPost(idx) {
-  currentOpenPostIdx = idx; currentFileInModalIdx = 0;
-  showModalContent();
+  currentPost = idx; currentFile = 0;
+  const post = POSTS[idx];
+
+  // Likes
+  likedPosts[idx] = likedPosts[idx] ?? false;
+  document.getElementById('like-count').textContent = post.likes + (likedPosts[idx] ? 1 : 0);
+  updateLikeUI();
+
+  // Caption & time
+  document.getElementById('sheet-caption').textContent = post.caption;
+  document.getElementById('sheet-time').textContent = post.time;
+
+  // Swipe hint
+  const hint = document.getElementById('swipe-hint');
+  hint.style.display = post.files.length > 1 ? 'block' : 'none';
+
+  loadModalMedia();
+
   const modal = document.getElementById('post-modal');
-  modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
-}
-function showModalContent() {
-  const post = GITHUB_POST_FILES[currentOpenOpenPostIdx], file = post.files[currentFileInModalIdx];
-  const img = document.getElementById('post-modal-img'), vid = document.getElementById('post-modal-video');
-  const dotsContainer = document.getElementById('modal-dots');
-  img.style.display = 'none'; vid.style.display = 'none'; vid.pause();
-  if (post.type === 'video' || file.endsWith('.mp4')) {
-    vid.src = file; vid.style.display = 'block'; vid.muted = false; vid.loop = true; vid.play();
-  } else { img.src = file; img.style.display = 'block'; }
-  dotsContainer.innerHTML = '';
-  if (post.files.length > 1) {
-    post.files.forEach((_, i) => {
-      const dot = document.createElement('div');
-      dot.className = `modal-dot ${i === currentFileInModalIdx ? 'active' : ''}`;
-      dotsContainer.appendChild(dot);
-    });
-  }
-  document.getElementById('post-modal-caption').innerText = post.caption;
-}
-const swipeArea = document.getElementById('modal-swipe-area');
-swipeArea.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-swipeArea.addEventListener('touchend', e => {
-  const post = GITHUB_POST_FILES[currentOpenPostIdx]; if(!post || post.files.length <= 1) return;
-  const touchEndX = e.changedTouches[0].screenX;
-  if (touchStartX - touchEndX > 50) { currentFileInModalIdx = (currentFileInModalIdx + 1) % post.files.length; showModalContent(); }
-  else if (touchEndX - touchStartX > 50) { currentFileInModalIdx = (currentFileInModalIdx - 1 + post.files.length) % post.files.length; showModalContent(); }
-});
-function closePostModal() {
-  const modal = document.getElementById('post-modal'); modal.classList.remove('active');
-  document.getElementById('post-modal-video').pause();
-  setTimeout(() => modal.style.display = 'none', 300);
+  modal.style.display = 'flex';
+  requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('active')));
 }
 
-/* YOUTUBE MUSIC LOGIC */
+function loadModalMedia() {
+  const post = POSTS[currentPost];
+  const file = post.files[currentFile];
+  const img = document.getElementById('sheet-img');
+  const vid = document.getElementById('sheet-video');
+  const counterEl = document.getElementById('sheet-counter');
+  const dotsEl = document.getElementById('sheet-dots');
+
+  img.style.display = 'none';
+  vid.style.display = 'none';
+  vid.pause();
+
+  if (post.type === 'video' || file.endsWith('.mp4')) {
+    vid.src = file; vid.style.display = 'block';
+    vid.muted = false; vid.loop = true;
+    vid.play().catch(()=>{ vid.muted=true; vid.play(); });
+  } else {
+    img.src = file; img.style.display = 'block';
+  }
+
+  // Counter
+  if (post.files.length > 1) {
+    counterEl.style.display = 'block';
+    counterEl.textContent = `${currentFile+1} / ${post.files.length}`;
+  } else {
+    counterEl.style.display = 'none';
+  }
+
+  // Dots
+  dotsEl.innerHTML = '';
+  if (post.files.length > 1) {
+    post.files.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'sheet-dot' + (i === currentFile ? ' active' : '');
+      dotsEl.appendChild(d);
+    });
+  }
+}
+
+/* Swipe on sheet-media */
+const sheetMedia = document.getElementById('sheet-media');
+sheetMedia.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+sheetMedia.addEventListener('touchend', e => {
+  const post = POSTS[currentPost]; if (!post || post.files.length <= 1) return;
+  const dx = e.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(dx) < 40) return;
+  if (dx < 0) currentFile = (currentFile+1) % post.files.length;
+  else        currentFile = (currentFile-1+post.files.length) % post.files.length;
+  loadModalMedia();
+}, {passive:true});
+
+function handleBackdropClick(e) {
+  if (e.target === document.getElementById('post-modal')) closePostModal();
+}
+
+function closePostModal() {
+  const modal = document.getElementById('post-modal');
+  modal.classList.remove('active');
+  document.getElementById('sheet-video').pause();
+  setTimeout(() => { modal.style.display = 'none'; }, 400);
+}
+
+/* Like */
+function toggleLike(e) {
+  if (currentPost < 0) return;
+  likedPosts[currentPost] = !likedPosts[currentPost];
+  const post = POSTS[currentPost];
+  document.getElementById('like-count').textContent = post.likes + (likedPosts[currentPost] ? 1 : 0);
+  updateLikeUI();
+
+  if (likedPosts[currentPost]) {
+    // Heart burst effect
+    const burst = document.createElement('div');
+    burst.className = 'heart-burst';
+    burst.innerHTML = '♥';
+    burst.style.left = e.clientX + 'px';
+    burst.style.top  = e.clientY + 'px';
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 700);
+  }
+}
+function updateLikeUI() {
+  const btn = document.getElementById('like-btn');
+  const icon = document.getElementById('like-icon');
+  if (likedPosts[currentPost]) {
+    btn.classList.add('liked');
+    icon.className = 'fa-solid fa-heart';
+  } else {
+    btn.classList.remove('liked');
+    icon.className = 'fa-regular fa-heart';
+  }
+}
+
+function sharePost() {
+  if (navigator.share) navigator.share({ title: 'Anush Decodes', url: window.location.href });
+  else alert('Link copied!');
+}
+
+/* ── MUSIC MODAL ── */
 let ytPlayer, ytReady = false, progressTimer;
 const YT_ID = 'h4OAXvDRZTY';
 
 function openMusicPlayer() {
   const bioAudio = document.getElementById('bio-audio');
-  if (!bioAudio.paused) { bioAudio.pause(); document.getElementById('bio-play-icon').className = 'fa-solid fa-play'; document.getElementById('bio-eq').classList.add('paused'); }
-  
+  if (!bioAudio.paused) { bioAudio.pause(); document.getElementById('bio-play-icon').className='fa-solid fa-play'; document.getElementById('bio-eq').classList.add('paused'); }
   const modal = document.getElementById('music-modal');
   modal.style.display = 'flex'; setTimeout(() => modal.classList.add('active'), 10);
   document.getElementById('music-thumb').src = `https://img.youtube.com/vi/${YT_ID}/maxresdefault.jpg`;
   document.getElementById('yt-open-link').href = `https://youtu.be/${YT_ID}`;
-
   loadYTAPI().then(() => {
     if (!ytPlayer) {
       ytPlayer = new YT.Player('youtube-player-container', {
-        height: '0', width: '0', videoId: YT_ID,
+        height:'0', width:'0', videoId: YT_ID,
         playerVars: { playsinline:1, controls:0, autoplay:1 },
         events: { onReady: onYTReady, onStateChange: onYTStateChange }
       });
@@ -452,29 +722,38 @@ function loadYTAPI() {
     document.head.appendChild(tag); window.onYouTubeIframeAPIReady = resolve;
   });
 }
-function onYTReady() { ytReady = true; ytPlayer.playVideo(); document.getElementById('music-duration').textContent = formatTime(ytPlayer.getDuration()); clearInterval(progressTimer); progressTimer = setInterval(updateYTProgress, 500); }
-function onYTStateChange(e) { const icon = document.getElementById('music-play-icon'); if (e.data === 1) icon.className = 'fa-solid fa-pause'; else icon.className = 'fa-solid fa-play'; }
-function updateYTProgress() { if (!ytPlayer || !ytReady) return; const cur = ytPlayer.getCurrentTime(), dur = ytPlayer.getDuration(); if (dur > 0) { document.getElementById('music-progress').value = (cur / dur) * 100; document.getElementById('music-current').textContent = formatTime(cur); document.getElementById('music-duration').textContent = formatTime(dur); } }
-function formatTime(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
-function closeMusicModal() { const modal = document.getElementById('music-modal'); modal.classList.remove('active'); setTimeout(() => { modal.style.display = 'none'; }, 300); if (ytPlayer) ytPlayer.pauseVideo(); clearInterval(progressTimer); }
+function onYTReady() { ytReady=true; ytPlayer.playVideo(); document.getElementById('music-duration').textContent=formatTime(ytPlayer.getDuration()); clearInterval(progressTimer); progressTimer=setInterval(updateYTProgress,500); }
+function onYTStateChange(e) { document.getElementById('music-play-icon').className = e.data===1?'fa-solid fa-pause':'fa-solid fa-play'; }
+function updateYTProgress() { if(!ytPlayer||!ytReady) return; const c=ytPlayer.getCurrentTime(),d=ytPlayer.getDuration(); if(d>0){document.getElementById('music-progress').value=(c/d)*100; document.getElementById('music-current').textContent=formatTime(c); document.getElementById('music-duration').textContent=formatTime(d);}}
+function formatTime(s) { if(!s||isNaN(s)) return '0:00'; return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`; }
+function closeMusicModal() { const modal=document.getElementById('music-modal'); modal.classList.remove('active'); setTimeout(()=>modal.style.display='none',300); if(ytPlayer) ytPlayer.pauseVideo(); clearInterval(progressTimer); }
+document.getElementById('music-play-pause').addEventListener('click',()=>{ if(!ytPlayer) return; ytPlayer.getPlayerState()===1?ytPlayer.pauseVideo():ytPlayer.playVideo(); });
+document.getElementById('music-progress').addEventListener('input',e=>{ if(!ytPlayer||!ytReady) return; ytPlayer.seekTo((e.target.value/100)*ytPlayer.getDuration(),true); });
 
-document.getElementById('music-play-pause').addEventListener('click', () => { if (!ytPlayer) return; ytPlayer.getPlayerState() === 1 ? ytPlayer.pauseVideo() : ytPlayer.playVideo(); });
-document.getElementById('music-progress').addEventListener('input', e => { if (!ytPlayer || !ytReady) return; ytPlayer.seekTo((e.target.value / 100) * ytPlayer.getDuration(), true); });
+/* ── BIO MUSIC ── */
+function toggleBioMusic(e) {
+  if(e) e.stopPropagation();
+  const audio=document.getElementById('bio-audio'), icon=document.getElementById('bio-play-icon');
+  if(audio.paused){audio.play();icon.className='fa-solid fa-pause';document.getElementById('bio-eq').classList.remove('paused');}
+  else{audio.pause();icon.className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');}
+}
 
-/* INIT */
+/* ── LINKS ── */
 const LINKS = [
-  { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
-  { icon: 'fa-brands fa-x-twitter', label: 'X', url: 'https://x.com/Nikhil_X7', color: 'color-twitter' },
-  { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn', url: 'https://linkedin.com/in/nikhil-b-b41641363', color: 'color-linkedin' },
-  { icon: 'fa-brands fa-discord', label: 'Discord', url: 'https://discord.gg/QyHXBqS3H', color: 'color-discord' },
-  { icon: 'fa-solid fa-link', label: 'x0s.link', url: 'personalpage.html', color: 'color-globe' }
+  { icon:'fa-brands fa-instagram', label:'Instagram', url:'https://www.instagram.com/x0s.nikh_07', color:'color-instagram' },
+  { icon:'fa-brands fa-x-twitter', label:'X', url:'https://x.com/Nikhil_X7', color:'color-twitter' },
+  { icon:'fa-brands fa-linkedin-in', label:'LinkedIn', url:'https://linkedin.com/in/nikhil-b-b41641363', color:'color-linkedin' },
+  { icon:'fa-brands fa-discord', label:'Discord', url:'https://discord.gg/QyHXBqS3H', color:'color-discord' },
+  { icon:'fa-solid fa-link', label:'x0s.link', url:'personalpage.html', color:'color-globe' }
 ];
+
+function shareProfile() { if(navigator.share) navigator.share({title:'Anush Decodes',url:window.location.href}); else alert('Link copied!'); }
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('links-row').innerHTML = LINKS.map(l => `<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
-  renderPosts(); updateFollowUI();
+  document.getElementById('links-row').innerHTML = LINKS.map(l=>`<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
+  renderPosts();
+  updateFollowUI();
 });
-function toggleBioMusic(e) { if (e) e.stopPropagation(); const audio = document.getElementById('bio-audio'); const icon = document.getElementById('bio-play-icon'); if (audio.paused) { audio.play(); icon.className = 'fa-solid fa-pause'; document.getElementById('bio-eq').classList.remove('paused'); } else { audio.pause(); icon.className = 'fa-solid fa-play'; document.getElementById('bio-eq').classList.add('paused'); } }
-function shareProfile() { if (navigator.share) navigator.share({ title: 'Anush Decodes', url: window.location.href }); else alert('Link copied!'); }
 </script>
 </body>
 </html>
