@@ -67,18 +67,19 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .follower-stat{font-size:.72rem;color:var(--muted);display:flex;gap:12px;}
 .follower-stat b{color:var(--text);}
 .bio{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;}
-.bio-music{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px;width:fit-content;max-width:100%;}
-.bio-music-play{width:30px;height:30px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;flex-shrink:0;cursor:pointer;transition:transform .18s var(--ease),opacity .18s;}
-.bio-music-play:active{transform:scale(.88);opacity:.8;}
-.bio-music-text{display:flex;flex-direction:column;gap:1px;cursor:pointer;}
-.bio-music-title{font-size:.78rem;font-weight:600;color:var(--text);letter-spacing:-.01em;}
-.bio-music-artist{font-size:.65rem;color:var(--muted);font-weight:400;}
-.bio-music-dots{display:flex;align-items:center;gap:4px;margin-left:2px;}
-.bio-music-dots span{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:.25;transition:opacity .3s,transform .3s;}
-.bio-music-dots.playing span:nth-child(1){animation:dotPulse 1.1s .0s infinite ease-in-out;}
-.bio-music-dots.playing span:nth-child(2){animation:dotPulse 1.1s .2s infinite ease-in-out;}
-.bio-music-dots.playing span:nth-child(3){animation:dotPulse 1.1s .4s infinite ease-in-out;}
-@keyframes dotPulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.3)}}
+.bio-music{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;width:fit-content;max-width:100%;}
+.bio-music-play{width:26px;height:26px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.62rem;flex-shrink:0;cursor:pointer;transition:opacity .15s;padding:0;}
+.bio-music-play:active{opacity:.5;}
+.bio-music-text{display:flex;flex-direction:column;gap:1px;cursor:pointer;flex:1;min-width:0;}
+.bio-music-title{font-size:.74rem;font-weight:600;color:var(--text);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bio-music-artist{font-size:.62rem;color:var(--muted);font-weight:400;}
+.bio-music-eq{display:flex;align-items:flex-end;gap:2.5px;height:12px;flex-shrink:0;margin-left:2px;}
+.bio-music-eq span{width:2.5px;background:#fff;border-radius:2px;min-height:2px;transition:opacity .3s;}
+.bio-music-eq span:nth-child(1){animation:eqBar .7s .0s infinite alternate ease-in-out;}
+.bio-music-eq span:nth-child(2){animation:eqBar .7s .15s infinite alternate ease-in-out;}
+.bio-music-eq span:nth-child(3){animation:eqBar .7s .3s infinite alternate ease-in-out;}
+.bio-music-eq span:nth-child(4){animation:eqBar .7s .1s infinite alternate ease-in-out;}
+.bio-music-eq.paused span{animation-play-state:paused;opacity:.25;}
 .links-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
 .link-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:.72rem;font-weight:600;white-space:nowrap;transition:.2s;}
 
@@ -496,7 +497,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
         <span class="bio-music-title">Wait a Minute!</span>
         <span class="bio-music-artist">Willow</span>
       </div>
-      <div class="bio-music-dots" id="bio-dots"><span></span><span></span><span></span></div>
+      <div class="bio-music-eq paused" id="bio-eq"><span></span><span></span><span></span><span></span></div>
     </div>
     <div class="links-row" id="links-row"></div>
   </section>
@@ -834,9 +835,9 @@ document.getElementById('music-progress').addEventListener('input',e=>{if(!ytPla
 /* ─── BIO MUSIC ─── */
 function toggleBioMusic(e){
   if(e)e.stopPropagation();
-  const a=document.getElementById('bio-audio'),ic=document.getElementById('bio-play-icon'),dots=document.getElementById('bio-dots');
-  if(a.paused){a.play();ic.className='fa-solid fa-pause';dots.classList.add('playing');}
-  else{a.pause();ic.className='fa-solid fa-play';dots.classList.remove('playing');}
+  const a=document.getElementById('bio-audio'),ic=document.getElementById('bio-play-icon'),eq=document.getElementById('bio-eq');
+  if(a.paused){a.play();ic.className='fa-solid fa-pause';eq.classList.remove('paused');}
+  else{a.pause();ic.className='fa-solid fa-play';eq.classList.add('paused');}
 }
 
 /* ─── LINKS + INIT ─── */
