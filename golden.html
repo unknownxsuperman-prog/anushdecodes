@@ -35,8 +35,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 /* TOP BAR */
 .top-bar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);}
 .light-mode .top-bar{background:rgba(255,255,255,.72);border-bottom:1px solid var(--border);}
-.top-bar-brand{font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
-.top-bar-brand span{color:var(--accent);}
+.top-bar-brand{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:-.03em;color:#fff;line-height:1;}
+.top-bar-brand span{color:#fff;}
+/* FLOATING MENU — top right, below top bar, over banner */
+.floating-menu-wrap{position:absolute;top:0;right:20px;z-index:90;}
+.floating-menu-wrap .menu-btn{background:rgba(0,0,0,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);color:#fff;}
+.floating-menu-wrap .dropdown-menu{top:46px;}
 .menu-btn{width:36px;height:36px;background:var(--glass);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);position:relative;}
 .dropdown-menu{position:absolute;top:50px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:100;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fadeIn .2s var(--ease);}
 .dropdown-menu.active{display:block;}
@@ -132,6 +136,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   position:relative;overflow:hidden;flex-shrink:0;
 }
 .sheet-media img,.sheet-media video{width:100%;height:100%;object-fit:cover;display:block;}
+.sheet-media img{transition:opacity .28s ease;}
 
 .mute-tap-zone{
   position:absolute;inset:0;z-index:6;cursor:pointer;
@@ -454,12 +459,14 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 <div class="page">
   <div class="top-bar">
     <div class="top-bar-brand">x<span>0</span>s.link</div>
-    <div style="position:relative;">
-      <div class="menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
-      <div class="dropdown-menu" id="dropdown-menu">
-        <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
-        <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
-      </div>
+  </div>
+
+  <!-- FLOATING MENU — transparent, top right, over banner -->
+  <div class="floating-menu-wrap" style="position:absolute;top:56px;right:20px;">
+    <div class="menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+    <div class="dropdown-menu" id="dropdown-menu">
+      <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
+      <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
     </div>
   </div>
 
@@ -559,7 +566,7 @@ function renderPosts(){
 
 /* ─── STATE ─── */
 let currentPost=-1, currentFile=0, modalOpen=false;
-let likedPosts={}, videoMuted=false;
+let likedPosts={}, videoMuted=false, suppressMuteFlash=false;
 
 /* ═══════════════════════════════
    OPEN / CLOSE  +  HISTORY API
@@ -581,6 +588,7 @@ function openPost(idx){
   document.getElementById('comment-send').classList.remove('visible');
 
   videoMuted=false;
+  suppressMuteFlash=true; // don't flash on autoplay-mute during open animation
   loadModalMedia();
   initSwipeToClose();
 
@@ -588,7 +596,10 @@ function openPost(idx){
 
   const backdrop=document.getElementById('post-modal');
   backdrop.style.display='flex';
-  requestAnimationFrame(()=>requestAnimationFrame(()=>backdrop.classList.add('active')));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    backdrop.classList.add('active');
+    setTimeout(()=>{ suppressMuteFlash=false; }, 500); // allow flash after sheet settles
+  }));
 }
 
 function closePostModal(fromPopState){
@@ -654,7 +665,15 @@ function loadModalMedia(){
     vid.src=file; vid.muted=videoMuted; vid.style.display='block'; vid.loop=true;
     vid.play().catch(()=>{ vid.muted=true; videoMuted=true; showMuteIndicator(); vid.play(); });
   } else {
-    img.src=file; img.style.display='block';
+    img.style.opacity='0';
+    img.style.display='block';
+    const newSrc=file;
+    if(img.src.endsWith(newSrc)||img.src===newSrc){
+      img.style.opacity='1';
+    } else {
+      img.src=newSrc;
+      img.onload=()=>{ img.style.opacity='1'; };
+    }
   }
 
   document.getElementById('mute-tap-zone').style.display=isVid?'block':'none';
@@ -756,6 +775,7 @@ function toggleMute(){
 }
 
 function showMuteIndicator(){
+  if(suppressMuteFlash) return;
   const ind=document.getElementById('mute-indicator');
   document.getElementById('mute-icon').className=videoMuted?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';
   ind.classList.remove('flash');
