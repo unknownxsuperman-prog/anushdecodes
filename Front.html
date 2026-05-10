@@ -35,21 +35,42 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .top-pfp:active{opacity:.7;}
 .top-brand{font-size:1.38rem;font-weight:700;letter-spacing:-.03em;color:var(--text);position:absolute;left:50%;transform:translateX(-50%);}
 .top-right{display:flex;align-items:center;gap:6px;}
-.get-badge-btn{
-  padding:6px 13px;border-radius:6px;
-  background:transparent;color:var(--text);
-  font-size:.7rem;font-weight:600;letter-spacing:.02em;
-  border:1px solid rgba(255,255,255,.18);cursor:pointer;font-family:var(--font);
-  transition:background .18s,border-color .18s;
-}
-.light .get-badge-btn{border-color:rgba(0,0,0,.18);color:var(--text);}
-.get-badge-btn:active{background:rgba(255,255,255,.08);}
 .top-dots{
   width:32px;height:32px;display:flex;align-items:center;justify-content:center;
   color:var(--muted);font-size:.9rem;cursor:pointer;border-radius:8px;
-  transition:background .15s;
+  transition:background .15s;position:relative;
 }
 .top-dots:active{background:rgba(255,255,255,.08);}
+
+/* floating dropdown from three dot */
+.top-dropdown{
+  position:absolute;top:42px;right:0;
+  background:rgba(15,15,15,.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  padding:6px;
+  min-width:180px;
+  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  display:none;z-index:300;
+  animation:fadeInDrop .18s var(--ease);
+}
+.light .top-dropdown{background:rgba(245,245,247,.95);border-color:rgba(0,0,0,.1);}
+.top-dropdown.open{display:block;}
+@keyframes fadeInDrop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.top-dd-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  font-size:.78rem;font-weight:600;color:var(--text);
+  cursor:pointer;transition:background .15s;
+  white-space:nowrap;
+}
+.top-dd-item:active{background:rgba(255,255,255,.08);}
+.light .top-dd-item:active{background:rgba(0,0,0,.06);}
+.top-dd-item i{font-size:.85rem;width:16px;text-align:center;color:var(--muted);}
+.top-dd-badge i.fa-certificate{background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-dd-divider{height:1px;background:rgba(255,255,255,.07);margin:4px 0;}
+.light .top-dd-divider{background:rgba(0,0,0,.07);}
 
 /* ── TABS ── */
 .tabs{
@@ -80,14 +101,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .post-avatar-wrap{position:relative;flex-shrink:0;}
 .post-avatar{width:40px;height:40px;border-radius:10px;object-fit:cover;border:1px solid var(--border);}
+/* verified badge — same as profile page */
+@keyframes shimmer{0%{left:-100%}100%{left:100%}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(.95)}}
 .post-verified{
   position:absolute;bottom:-2px;right:-2px;
-  width:14px;height:14px;
+  width:16px;height:16px;
   display:flex;align-items:center;justify-content:center;
-  background:var(--bg);border-radius:50%;overflow:hidden;
+  background:var(--bg);border-radius:50%;
+  overflow:hidden;
+  animation:pulse 3s infinite ease-in-out;
 }
-.post-verified .fa-certificate{font-size:14px;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.post-verified .fa-check{font-size:6px;color:#000;position:absolute;font-weight:900;}
+.post-verified .fa-certificate{
+  font-size:16px;position:absolute;
+  background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.post-verified .fa-check{font-size:7px;color:#000;position:relative;z-index:6;font-weight:900;}
+.post-verified::after{
+  content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);
+  animation:shimmer 2s infinite linear;z-index:7;
+}
 .post-meta{flex:1;}
 .post-name{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:5px;}
 .post-handle{font-size:.72rem;color:var(--muted);}
@@ -180,13 +215,19 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .drawer-pfp{width:100%;height:100%;border-radius:14px;object-fit:cover;border:1.5px solid var(--border);}
 .drawer-pfp-badge{
   position:absolute;bottom:-2px;right:-2px;
-  width:18px;height:18px;
+  width:20px;height:20px;
   background:var(--bg);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;border:2px solid var(--bg);
+  animation:pulse 3s infinite ease-in-out;
 }
-.drawer-pfp-badge .fa-certificate{font-size:18px;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.drawer-pfp-badge .fa-check{font-size:7px;color:#000;position:absolute;font-weight:900;}
+.drawer-pfp-badge .fa-certificate{font-size:20px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.drawer-pfp-badge .fa-check{font-size:8px;color:#000;position:relative;z-index:6;font-weight:900;}
+.drawer-pfp-badge::after{
+  content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);
+  animation:shimmer 2s infinite linear;z-index:7;
+}
 .drawer-name{font-size:.92rem;font-weight:700;margin-bottom:2px;cursor:pointer;}
 .drawer-handle{font-size:.68rem;color:var(--muted);margin-bottom:10px;cursor:pointer;}
 .drawer-stats{display:flex;gap:14px;font-size:.68rem;color:var(--muted);margin-bottom:14px;}
@@ -209,12 +250,17 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .drawer-spacer{flex:1;}
 .drawer-bottom{padding:16px 20px;border-top:1px solid var(--border);}
 
-/* dark mode toggle pill */
-.dm-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 16px;}
-.dm-toggle-label{font-size:.8rem;font-weight:600;color:var(--muted);}
+/* dark mode toggle */
+.dm-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 6px;
+  border-top:1px solid var(--border);
+  margin-top:8px;
+}
+.dm-toggle-label{font-size:.8rem;font-weight:600;color:var(--text);}
 .dm-pill{
   width:46px;height:26px;border-radius:13px;
-  background:var(--accent);
+  background:var(--muted2);
   position:relative;cursor:pointer;
   transition:background .25s;border:none;
   flex-shrink:0;
@@ -226,9 +272,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   transition:transform .25s cubic-bezier(.32,.72,0,1);
   box-shadow:0 1px 4px rgba(0,0,0,.3);
 }
-.dm-pill.off{background:var(--muted2);}
-.dm-pill.off::after{transform:translateX(20px);}
-/* pill ON = dark mode active, OFF = light */
+.dm-pill.on{background:var(--accent);}
+.dm-pill.on::after{transform:translateX(20px);}
+.drawer-footer-brand{
+  padding:6px 16px 20px;
+  font-size:.62rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
 
 @keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .post{animation:slideUp .4s var(--ease) both;}
@@ -272,8 +322,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 
     <div class="dm-toggle-row">
       <span class="dm-toggle-label">Dark Mode</span>
-      <button class="dm-pill" id="dm-pill" onclick="toggleDM()"></button>
+      <button class="dm-pill on" id="dm-pill" onclick="toggleDM()"></button>
     </div>
+    <div class="drawer-footer-brand">x0s India</div>
 
   </div>
 </div>
@@ -285,8 +336,21 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   </div>
   <div class="top-brand">x0s.link</div>
   <div class="top-right">
-    <button class="get-badge-btn" onclick="goGolden()">Get Badge</button>
-    <div class="top-dots" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+    <div class="top-dots" id="top-dots" onclick="toggleTopDropdown(event)">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+      <div class="top-dropdown" id="top-dropdown">
+        <div class="top-dd-item top-dd-badge" onclick="goGolden()">
+          <i class="fa-solid fa-certificate"></i> Get Badge
+        </div>
+        <div class="top-dd-divider"></div>
+        <div class="top-dd-item" onclick="sharePost()">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i> Share
+        </div>
+        <div class="top-dd-item" onclick="toggleDM();closeTopDropdown()">
+          <i class="fa-solid fa-circle-half-stroke"></i> Appearance
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -428,6 +492,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 </div>
 
 <script>
+/* ── TOP DROPDOWN ── */
+function toggleTopDropdown(e){
+  e.stopPropagation();
+  document.getElementById('top-dropdown').classList.toggle('open');
+}
+function closeTopDropdown(){
+  document.getElementById('top-dropdown').classList.remove('open');
+}
+document.addEventListener('click', ()=> closeTopDropdown());
+
 /* ── NAVIGATION ── */
 function goGolden(){ window.location.href='golden.html'; }
 function setTab(el){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
@@ -464,7 +538,7 @@ document.addEventListener('touchend',e=>{
 let darkOn=true;
 function toggleDM(){
   darkOn=!darkOn;
-  document.getElementById('dm-pill').classList.toggle('off',!darkOn);
+  document.getElementById('dm-pill').classList.toggle('on',darkOn);
   document.body.classList.toggle('light',!darkOn);
 }
 // pill ON by default (dark mode)
@@ -499,4 +573,3 @@ function sharePost(){
 </script>
 </body>
 </html>
-
