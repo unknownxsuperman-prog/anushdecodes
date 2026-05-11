@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Profile · x0s.link</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#000;--card:#0a0a0a;--border:#1a1a1a;--border2:rgba(255,255,255,.06);
+  --accent:#007aff;--text:#fff;--muted:#666;
+  --ease:cubic-bezier(.4,0,.2,1);--font:'Space Grotesk',sans-serif;
+  --top-h:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--font);min-height:100vh;
+}
+::-webkit-scrollbar{display:none;}
+
+/* full page */
+.page{
+  padding:calc(var(--top-h) + 24px) 20px 40px;
+  display:flex;flex-direction:column;
+  align-items:center;
+}
+
+/* top bar same as anush-decodes */
+.top-bar{
+  position:fixed;top:0;left:0;right:0;z-index:80;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+}
+.top-bar-brand{
+  font-size:1.38rem;font-weight:700;
+  letter-spacing:-.03em;color:var(--text);
+}
+.top-back{
+  width:36px;height:36px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:.82rem;cursor:pointer;
+  transition:background .18s;
+}
+.top-back:active{background:rgba(255,255,255,.1);}
+
+/* ── GLASS PILL ── */
+.pill{
+  width:100%;max-width:360px;
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(36px);-webkit-backdrop-filter:blur(36px);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px;
+  padding:28px 22px 24px;
+  position:relative;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.07) inset,
+    0 40px 80px rgba(0,0,0,.6);
+  animation:pillIn .38s cubic-bezier(.32,.72,0,1) both;
+}
+@keyframes pillIn{
+  from{opacity:0;transform:translateY(24px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* guest tag — top right */
+.guest-tag{
+  position:absolute;top:15px;right:16px;
+  font-size:.58rem;font-weight:700;
+  letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* pfp row */
+.pfp-row{
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:22px;
+}
+.pfp{
+  width:60px;height:60px;border-radius:50%;
+  object-fit:cover;flex-shrink:0;
+  border:1px solid var(--border);
+  background:var(--card);
+}
+.pfp-name{font-size:.98rem;font-weight:700;margin-bottom:3px;}
+.pfp-sub{font-size:.7rem;color:var(--muted);font-weight:300;}
+
+/* divider */
+.divider{
+  height:1px;background:var(--border);
+  margin-bottom:20px;
+}
+
+/* CTA */
+.cta{
+  width:100%;padding:13px 0;
+  background:rgba(255,255,255,.9);
+  color:#000;border:none;border-radius:30px;
+  font-size:.88rem;font-weight:700;
+  font-family:var(--font);cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+  transition:opacity .18s,transform .14s;
+  margin-bottom:10px;
+  letter-spacing:.01em;
+}
+.cta:active{opacity:.8;transform:scale(.98);}
+
+/* sign in */
+.signin{
+  text-align:center;font-size:.72rem;
+  color:var(--muted);
+}
+.signin span{
+  color:var(--accent);font-weight:600;cursor:pointer;
+}
+.signin span:active{opacity:.7;}
+
+/* maybe later */
+.later{
+  margin-top:20px;text-align:center;
+  font-size:.68rem;color:var(--muted);
+  cursor:pointer;letter-spacing:.04em;
+  transition:color .18s;
+}
+.later:active{color:var(--text);}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-back" onclick="history.back()">
+    <i class="fa-solid fa-chevron-left"></i>
+  </div>
+  <div class="top-bar-brand">x0s.link</div>
+  <div style="width:36px;"></div>
+</div>
+
+<div class="page">
+  <div class="pill">
+
+    <div class="guest-tag">Guest</div>
+
+    <div class="pfp-row">
+      <img class="pfp" src="1000046129.png" alt="">
+      <div>
+        <div class="pfp-name">Guest User</div>
+        <div class="pfp-sub">Guest</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="cta" onclick="window.location.href='golden.html'">
+      Create Account
+    </button>
+
+  </div>
+
+  <div class="later" onclick="history.back()">Maybe later</div>
+</div>
+
+</body>
+</html>
