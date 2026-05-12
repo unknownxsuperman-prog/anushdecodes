@@ -40,20 +40,36 @@ input { flex: 1; background: transparent; border: none; outline: none; color: #f
   transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .viewer.open { display: flex; transform: translateY(0); }
-.viewer-nav { padding: 15px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.viewer-nav { padding: 15px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10; }
 .btn-close { width: 40px; height: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; }
 .v-title { font-size: 0.8rem; font-weight: 600; color: var(--muted); text-align: center; flex: 1; margin: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* ── ZOOM CONTROLS (FLOATING) ── */
+.zoom-bar {
+  position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: rgba(10,10,10,0.8); backdrop-filter: blur(20px);
+  border: 1px solid var(--border); border-radius: 20px;
+  display: flex; align-items: center; gap: 5px; padding: 6px; z-index: 20;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+}
+.zoom-btn {
+  width: 40px; height: 40px; border-radius: 15px; border: none;
+  background: transparent; color: #fff; cursor: pointer; transition: 0.2s;
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+.zoom-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.9); }
+.zoom-level { font-size: 0.7rem; font-weight: 700; width: 45px; text-align: center; color: var(--accent); }
+
 /* ── PDF RENDERER ── */
-.pdf-container { flex: 1; overflow: auto; background: #111; display: flex; flex-direction: column; align-items: center; }
-canvas { max-width: 100%; height: auto; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 10px; }
+.pdf-container { flex: 1; overflow: auto; background: #050505; display: flex; flex-direction: column; align-items: center; padding-bottom: 100px; -webkit-overflow-scrolling: touch; }
+canvas { max-width: none; height: auto; background: #fff; margin: 20px 0; border-radius: 4px; transition: transform 0.1s linear; }
 
 /* ── LOADER ── */
 #loader { 
-  position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1100; 
+  position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1100; 
   display: none; flex-direction: column; align-items: center; justify-content: center; 
 }
-.spinner { width: 30px; height: 30px; border: 3px solid rgba(0,122,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+.spinner { width: 30px; height: 30px; border: 3px solid rgba(0,122,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -63,7 +79,7 @@ canvas { max-width: 100%; height: auto; background: #fff; box-shadow: 0 10px 30p
 
 <div id="loader">
   <div class="spinner"></div>
-  <div style="font-size: 0.8rem; color: var(--accent); letter-spacing: 0.1em; font-weight: 700;">SCANNING PDF ENGINE</div>
+  <div style="font-size: 0.7rem; color: var(--accent); letter-spacing: 0.2em; font-weight: 700; text-transform: uppercase;">x0s Neural Scan</div>
 </div>
 
 <div class="header">
@@ -81,27 +97,34 @@ canvas { max-width: 100%; height: auto; background: #fff; box-shadow: 0 10px 30p
     <div class="v-title" id="vTitle">...</div>
     <div style="width:40px"></div>
   </div>
-  <div class="pdf-container" id="pdfArea">
-    <!-- PDF Canvas will render here -->
+
+  <div class="zoom-bar">
+    <button class="zoom-btn" onclick="changeZoom(-0.25)"><i class="fa-solid fa-minus"></i></button>
+    <div class="zoom-level" id="zoomVal">100%</div>
+    <button class="zoom-btn" onclick="changeZoom(0.25)"><i class="fa-solid fa-plus"></i></button>
+    <div style="width:1px; height:20px; background:var(--border); margin:0 5px;"></div>
+    <button class="zoom-btn" onclick="resetZoom()"><i class="fa-solid fa-rotate-left"></i></button>
   </div>
+
+  <div class="pdf-container" id="pdfArea"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script>
-const PDF_URL = 'Cutoff.pdf'; // Matches your GitHub link
+const PDF_URL = 'Cutoff.pdf';
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let currentPdf = null;
+let currentPageNum = 1;
+let currentScale = 1.5;
 
 function runSearch(val) {
   const q = val.toLowerCase().trim();
   const area = document.getElementById('resArea');
   if(!q) { area.innerHTML = ''; return; }
-
-  const matches = (window.XOS_COLLEGES || []).filter(c => 
-    c.name.toLowerCase().includes(q) || q === '#college'
-  );
-
+  const matches = (window.XOS_COLLEGES || []).filter(c => c.name.toLowerCase().includes(q) || q === '#college');
   area.innerHTML = matches.map(c => `
     <div class="college-card" onclick="processPDF('${c.name.split(',')[0].trim()}')">
       <div class="c-id">${c.id}</div>
@@ -113,58 +136,75 @@ function runSearch(val) {
 async function processPDF(name) {
   const loader = document.getElementById('loader');
   const viewer = document.getElementById('viewer');
-  const area = document.getElementById('pdfArea');
   const title = document.getElementById('vTitle');
-
+  
   loader.style.display = 'flex';
   title.textContent = name;
-  area.innerHTML = ''; // Clear previous
 
   try {
     const pdf = await pdfjsLib.getDocument(PDF_URL).promise;
+    currentPdf = pdf;
     let foundPageNum = 1;
 
-    // Scan PDF logic (The "Drive" feel)
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const text = textContent.items.map(item => item.str).join(' ');
-      
       if (text.toLowerCase().includes(name.toLowerCase())) {
         foundPageNum = i;
         break;
       }
     }
 
-    // Render the specific page directly (Works on mobile!)
-    const page = await pdf.getPage(foundPageNum);
-    const viewport = page.getViewport({ scale: 2.0 }); // High quality
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
+    currentPageNum = foundPageNum;
+    await renderCurrentPage();
 
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    area.appendChild(canvas);
-
-    // Show Viewer
     viewer.style.display = 'flex';
-    requestAnimationFrame(() => viewer.classList.add('open'));
-    
+    setTimeout(() => viewer.classList.add('open'), 10);
   } catch (e) {
-    alert("PDF Engine Error: Check if Cutoff.pdf exists in root.");
-    console.error(e);
+    alert("Engine Error: Check PDF file path.");
   } finally {
     loader.style.display = 'none';
   }
-  
   history.pushState({view: 'pdf'}, '');
+}
+
+async function renderCurrentPage() {
+  if (!currentPdf) return;
+  const area = document.getElementById('pdfArea');
+  area.innerHTML = ''; 
+  
+  const page = await currentPdf.getPage(currentPageNum);
+  const viewport = page.getViewport({ scale: currentScale });
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+
+  await page.render({ canvasContext: context, viewport: viewport }).promise;
+  area.appendChild(canvas);
+  
+  document.getElementById('zoomVal').textContent = Math.round(currentScale * 100 / 1.5) + "%";
+}
+
+function changeZoom(delta) {
+  currentScale = Math.min(Math.max(currentScale + delta, 0.5), 4.0);
+  renderCurrentPage();
+}
+
+function resetZoom() {
+  currentScale = 1.5;
+  renderCurrentPage();
 }
 
 function closeViewer() {
   const v = document.getElementById('viewer');
   v.classList.remove('open');
-  setTimeout(() => v.style.display = 'none', 450);
+  setTimeout(() => {
+    v.style.display = 'none';
+    currentPdf = null;
+  }, 450);
 }
 
 window.addEventListener('popstate', closeViewer);
