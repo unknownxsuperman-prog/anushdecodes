@@ -2,207 +2,152 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>x0s | Search</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>x0s | Cutoff Search</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root {
-  --bg: #000000;
-  --accent: #007aff;
-  --card: #0a0a0a;
-  --border: #1a1a1a;
-  --text: #ffffff;
-  --muted: #666666;
-  --font: 'Space Grotesk', sans-serif;
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --bg: #000000; --accent: #007aff; --card: #0a0a0a; --border: #1a1a1a;
+  --text: #ffffff; --muted: #666666; --font: 'Space Grotesk', sans-serif;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { 
-  background: var(--bg); 
-  color: var(--text); 
-  font-family: var(--font); 
-  height: 100vh; 
-  overflow: hidden; 
-  display: flex; 
-  flex-direction: column; 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+/* ── SEARCH BAR ── */
+.header { padding: 20px 16px; background: rgba(0,0,0,0.9); z-index: 10; border-bottom: 1px solid var(--border); }
+.search-box {
+  display: flex; align-items: center; gap: 12px; background: var(--card);
+  border: 1px solid var(--border); padding: 12px 16px; border-radius: 14px;
 }
+.search-box:focus-within { border-color: var(--accent); }
+.search-input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-family: var(--font); font-size: 1rem; }
 
-/* ── SEARCH UI ── */
-.search-container {
-  padding: 20px 16px;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  z-index: 10;
-}
-
-.search-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 12px 16px;
-  border-radius: 14px;
-  transition: border-color 0.2s;
-}
-
-.search-wrapper:focus-within { border-color: var(--accent); }
-
-.search-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 1rem;
-}
-
-.search-input::placeholder { color: var(--muted); }
-
-/* ── RESULTS ── */
-.results-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px 16px;
-}
-
-.college-item {
-  padding: 16px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  animation: slideUp 0.4s var(--ease) both;
-}
-
-.college-item:active { background: rgba(255,255,255,0.05); }
-
-.college-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-.college-id { font-size: 0.7rem; color: var(--accent); letter-spacing: 0.05em; font-weight: 700; }
+/* ── LIST ── */
+.results { flex: 1; overflow-y: auto; padding: 10px 16px; }
+.item { padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+.item:active { background: #111; }
+.item-name { font-size: 0.95rem; font-weight: 600; }
+.item-id { font-size: 0.7rem; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
 
 /* ── PDF OVERLAY ── */
-.pdf-overlay {
-  position: fixed; inset: 0; z-index: 100;
-  background: #000;
-  display: none;
-  flex-direction: column;
-  transform: translateY(100%);
-  transition: transform 0.4s var(--ease);
+.viewer {
+  position: fixed; inset: 0; z-index: 100; background: #000;
+  display: none; flex-direction: column; transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
-
-.pdf-overlay.open { display: flex; transform: translateY(0); }
-
-.pdf-header {
-  padding: 14px 16px;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.pdf-close {
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text); cursor: pointer;
-}
-
-.pdf-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-
-.pdf-frame-wrap { flex: 1; background: #fff; }
+.viewer.open { display: flex; transform: translateY(0); }
+.viewer-top { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.close-btn { width: 36px; height: 36px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; }
+.title { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.frame-wrap { flex: 1; background: #fff; position: relative; }
 #pdf-iframe { width: 100%; height: 100%; border: none; }
 
-@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Status Loader */
+#status { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 0.8rem; pointer-events: none; }
 </style>
 </head>
 <body>
 
-<div class="search-container">
-  <div class="search-wrapper">
+<div class="header">
+  <div class="search-box">
     <i class="fa-solid fa-magnifying-glass" style="color: var(--muted);"></i>
-    <input type="text" class="search-input" id="main-search" placeholder="Search Colleges..." oninput="filterColleges(this.value)">
+    <input type="text" class="search-input" placeholder="Search College Name..." oninput="doSearch(this.value)">
   </div>
 </div>
 
-<div class="results-area" id="results-list">
-  <!-- Dynamic Results -->
+<div class="results" id="list"></div>
+
+<div class="viewer" id="viewer">
+  <div class="viewer-top">
+    <div class="close-btn" onclick="closeViewer()"><i class="fa-solid fa-xmark"></i></div>
+    <div class="title" id="v-title">Scanning PDF...</div>
+    <div style="width:36px"></div>
+  </div>
+  <div class="frame-wrap">
+    <div id="status">x0s Engine: Locating Data...</div>
+    <iframe id="pdf-iframe"></iframe>
+  </div>
 </div>
 
-<div class="pdf-overlay" id="pdf-overlay">
-  <div class="pdf-header">
-    <div class="pdf-close" onclick="closePdf()"><i class="fa-solid fa-xmark"></i></div>
-    <div class="pdf-title" id="pdf-title">Cutoff 2025</div>
-    <div style="width:36px;"></div>
-  </div>
-  <div class="pdf-frame-wrap">
-    <iframe id="pdf-iframe" src=""></iframe>
-  </div>
-</div>
+<!-- Load PDF.js library to handle the mobile search bug -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script>
-const MASTER_PDF_URL = "Cutoff.pdf";
+const PDF_FILE = 'Cutoff.pdf';
+const pdfjsLib = window['pdfjs-dist/build/pdf'];
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-function filterColleges(query) {
-  const list = document.getElementById('results-list');
-  const q = query.toLowerCase().trim();
-  
-  if (!q) {
-    list.innerHTML = `<div style="text-align:center; margin-top:40px; color:var(--muted); font-size:0.8rem;">Type college name or #college</div>`;
-    return;
-  }
+function doSearch(q) {
+  const container = document.getElementById('list');
+  const query = q.toLowerCase().trim();
+  if(!query) { container.innerHTML = ''; return; }
 
-  const colleges = window.XOS_COLLEGES || [];
-  const matches = colleges.filter(c => 
-    c.name.toLowerCase().includes(q) || q === '#college'
+  const matches = (window.XOS_COLLEGES || []).filter(c => 
+    c.name.toLowerCase().includes(query) || query === '#college'
   );
 
-  list.innerHTML = matches.map(c => `
-    <div class="college-item" onclick="openPdf('${c.name.split(',')[0].trim()}')">
-      <div class="college-id">${c.id}</div>
-      <div class="college-name">${c.name}</div>
+  container.innerHTML = matches.map(c => `
+    <div class="item" onclick="smartOpen('${c.name.split(',')[0].trim()}')">
+      <div class="item-id">${c.id}</div>
+      <div class="item-name">${c.name}</div>
     </div>
   `).join('');
 }
 
-function openPdf(collegeName) {
-  const overlay = document.getElementById('pdf-overlay');
+// THE CORE LOGIC: Find page number manually because mobile #search is broken
+async function smartOpen(collegeName) {
+  const viewer = document.getElementById('viewer');
   const iframe = document.getElementById('pdf-iframe');
+  const title = document.getElementById('v-title');
+  const status = document.getElementById('status');
   
-  // Highlighting fragment
-  const searchParam = `#search="${encodeURIComponent(collegeName)}"`;
-  iframe.src = MASTER_PDF_URL + searchParam;
+  title.textContent = "Scanning: " + collegeName;
+  status.style.display = 'block';
+  viewer.style.display = 'flex';
+  setTimeout(() => viewer.classList.add('open'), 10);
+
+  try {
+    const loadingTask = pdfjsLib.getDocument(PDF_FILE);
+    const pdf = await loadingTask.promise;
+    let targetPage = 1;
+
+    // Scan the PDF text to find the college
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const strings = content.items.map(item => item.str).join(' ');
+      
+      if (strings.includes(collegeName)) {
+        targetPage = i;
+        break;
+      }
+    }
+
+    // Now use #page=X which mobile browsers DO support
+    iframe.src = `${PDF_FILE}#page=${targetPage}`;
+    status.style.display = 'none';
+    title.textContent = collegeName;
+    
+  } catch (err) {
+    console.error(err);
+    iframe.src = PDF_FILE; // Fallback
+  }
   
-  document.getElementById('pdf-title').textContent = collegeName;
-  overlay.style.display = 'flex';
-  
-  requestAnimationFrame(() => {
-    overlay.classList.add('open');
-  });
-  
-  history.pushState({modal:'pdf'}, '');
+  history.pushState({view: 'pdf'}, '');
 }
 
-function closePdf() {
-  const overlay = document.getElementById('pdf-overlay');
-  overlay.classList.remove('open');
-  setTimeout(() => { 
-    overlay.style.display = 'none'; 
-    document.getElementById('pdf-iframe').src = ''; 
+function closeViewer() {
+  const viewer = document.getElementById('viewer');
+  viewer.classList.remove('open');
+  setTimeout(() => {
+    viewer.style.display = 'none';
+    document.getElementById('pdf-iframe').src = '';
   }, 400);
 }
 
-// Handle Back Button
-window.addEventListener('popstate', () => {
-  closePdf();
-});
-
-// Init
-filterColleges('');
+window.addEventListener('popstate', closeViewer);
 </script>
 
 <script src="colleges.js"></script>
