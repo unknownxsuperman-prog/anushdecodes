@@ -1497,7 +1497,10 @@ function onSearchInput(val){
     return;
   }
 
-  list.innerHTML=matches.map((c,i)=>buildCollegeCard(c,i)).join('');
+  list.innerHTML=matches.map((c)=>{
+    const originalIdx=colleges.indexOf(c);
+    return buildCollegeCard(c, originalIdx);
+  }).join('');
 
   // check marquee need
   requestAnimationFrame(()=>{
