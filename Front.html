@@ -1551,7 +1551,7 @@ function openCollegeProfile(idx){
 
   document.getElementById('cp-pfp').src=c.pfp||'1000046129.png';
   document.getElementById('cp-pfp').onerror=function(){this.src='1000046129.png';};
-  document.getElementById('cp-name').textContent=displayName;
+  document.getElementById('cp-name').innerHTML=`${displayName} <span style="font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.06em;">${c.id}</span>`;
   document.getElementById('cp-caption').textContent=caption||'Engineering College';
   document.getElementById('cp-tag').textContent='College';
 
