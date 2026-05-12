@@ -1513,8 +1513,6 @@ function onSearchInput(val){
 }
 
 function buildCollegeCard(c, i){
-  const pills=(c.pill1?`<span class="college-mini-pill">${c.pill1}</span>`:'')
-             +(c.pill2?`<span class="college-mini-pill">${c.pill2}</span>`:'');
   const nameParts=c.name.split(',');
   const displayName=nameParts[0].trim();
   const caption=nameParts.slice(1).join(',').trim();
@@ -1526,8 +1524,6 @@ function buildCollegeCard(c, i){
       <div class="college-card-name-wrap">
         <div class="college-card-name" id="ccn-${i}">${displayName}</div>
       </div>
-      <div class="college-card-sub">${caption||'Engineering College'}</div>
-      <div class="college-card-pills">${pills}</div>
     </div>
     <i class="fa-solid fa-chevron-right college-card-arrow"></i>
   </div>`;
