@@ -281,6 +281,221 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 }
 
 /* ══════════════════════════
+   GUEST PROFILE MODAL
+══════════════════════════ */
+@keyframes guestUp{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes guestDown{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(24px) scale(.97)}}
+
+.guest-backdrop{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.guest-backdrop.open{display:flex;}
+.guest-pill{
+  width:100%;max-width:360px;
+  background:rgba(18,18,20,.82);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:28px;
+  padding:28px 24px 24px;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,.7);
+  animation:guestUp .32s cubic-bezier(.32,.72,0,1) forwards;
+}
+.guest-pill.closing{animation:guestDown .24s var(--ease) forwards;}
+.guest-tag{
+  position:absolute;top:14px;right:16px;
+  font-size:.6rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
+.guest-pfp-wrap{
+  width:78px;height:78px;border-radius:50%;
+  overflow:hidden;border:1.5px solid rgba(255,255,255,.12);
+  margin-bottom:14px;background:rgba(255,255,255,.07);flex-shrink:0;
+}
+.guest-pfp-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.guest-name{font-size:1rem;font-weight:700;color:#fff;margin-bottom:4px;text-align:center;}
+.guest-sub{font-size:.72rem;color:var(--muted);margin-bottom:22px;text-align:center;line-height:1.5;}
+.guest-cta{
+  width:100%;padding:13px 0;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:14px;
+  font-size:.88rem;font-weight:700;font-family:var(--font);
+  cursor:pointer;letter-spacing:.01em;
+  transition:opacity .18s;margin-bottom:10px;
+}
+.guest-cta:active{opacity:.82;}
+.guest-skip{font-size:.72rem;color:var(--muted);cursor:pointer;padding:6px 0;transition:color .18s;}
+.guest-skip:active{color:#fff;}
+
+/* ══════════════════════════
+   SEARCH OVERLAY
+══════════════════════════ */
+.search-overlay{
+  position:fixed;inset:0;z-index:58;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .38s cubic-bezier(.32,.72,0,1);
+}
+.search-overlay.open{
+  display:flex;transform:translateY(0);
+}
+
+.search-top{
+  padding:14px 16px 10px;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+}
+.search-bar-wrap{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--border2);
+  border-radius:14px;padding:11px 14px;
+}
+.search-icon{font-size:.82rem;color:var(--muted);flex-shrink:0;}
+.search-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-size:.88rem;font-family:var(--font);
+  caret-color:var(--accent);
+}
+.search-input::placeholder{color:var(--muted);}
+.search-clear{
+  color:var(--muted);font-size:.75rem;cursor:pointer;
+  opacity:0;transition:opacity .18s;flex-shrink:0;
+}
+.search-clear.visible{opacity:1;}
+
+.search-body{
+  flex:1;overflow-y:auto;padding:18px 16px 100px;
+}
+
+.explore-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:14px;
+}
+
+/* pill toggle */
+.search-pill-nav{
+  display:flex;gap:8px;margin-bottom:6px;
+}
+.spill{
+  padding:8px 22px;border-radius:99px;
+  font-size:.78rem;font-weight:600;cursor:pointer;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--muted);transition:all .2s;
+}
+.spill.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+
+.search-tab-hint{
+  font-size:.62rem;color:var(--muted);
+  margin-bottom:18px;padding-left:2px;min-height:16px;
+  transition:opacity .2s;
+}
+
+/* no results */
+.no-results-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 0 20px;
+}
+.no-results-txt{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px;}
+.no-results-sub{font-size:.72rem;color:var(--muted2, #444);}
+
+/* college result card */
+.college-card{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 4px;border-bottom:1px solid var(--border2);
+  cursor:pointer;transition:background .15s;
+  border-radius:12px;
+}
+.college-card:active{background:rgba(255,255,255,.04);}
+.college-pfp-wrap{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--card);border:1px solid var(--border);}
+.college-pfp-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.college-info{flex:1;min-width:0;overflow:hidden;}
+.college-card-name{
+  font-size:.84rem;font-weight:600;
+  white-space:nowrap;overflow:hidden;
+  /* marquee only when overflowing — handled via JS class */
+}
+.college-card-name.marquee{
+  animation:marquee 6s linear infinite;
+  display:inline-block;
+  padding-right:32px;
+}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.college-card-name-wrap{overflow:hidden;max-width:100%;}
+.college-card-sub{font-size:.66rem;color:var(--muted);margin-top:2px;}
+.college-card-pills{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.college-mini-pill{
+  padding:2px 8px;border-radius:99px;
+  font-size:.58rem;font-weight:600;
+  background:rgba(0,122,255,.12);
+  border:1px solid rgba(0,122,255,.2);
+  color:var(--accent);white-space:nowrap;
+}
+.college-card-arrow{color:var(--muted2, #444);font-size:.72rem;flex-shrink:0;}
+
+/* ══════════════════════════
+   COLLEGE PROFILE
+══════════════════════════ */
+.college-profile{
+  position:fixed;inset:0;z-index:59;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .36s cubic-bezier(.32,.72,0,1);
+  overflow-y:auto;
+}
+.college-profile.open{display:flex;transform:translateX(0);}
+.top-back-btn{
+  width:36px;height:36px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:.82rem;cursor:pointer;
+}
+.cp-pill{
+  width:100%;max-width:360px;
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(36px);-webkit-backdrop-filter:blur(36px);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px;padding:28px 22px 24px;
+  position:relative;
+  box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 40px 80px rgba(0,0,0,.6);
+}
+.cp-pfp{width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border);background:var(--card);}
+.cp-name{font-size:.98rem;font-weight:700;margin-bottom:3px;}
+.cp-caption{font-size:.7rem;color:var(--muted);font-weight:300;margin-bottom:8px;}
+.cp-pills-row{display:flex;gap:6px;flex-wrap:wrap;}
+.cp-pill-tag{
+  padding:3px 10px;border-radius:99px;
+  font-size:.62rem;font-weight:600;
+  background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);
+  color:var(--accent);
+}
+.pfp-row{display:flex;align-items:center;gap:14px;}
+.divider{height:1px;background:var(--border);margin-bottom:20px;}
+.cta-btn{
+  width:100%;padding:13px 0;
+  background:rgba(255,255,255,.9);color:#000;
+  border:none;border-radius:30px;
+  font-size:.88rem;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:opacity .18s;
+}
+.cta-btn:active{opacity:.8;}
+.guest-tag{
+  position:absolute;top:15px;right:16px;
+  font-size:.58rem;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* ══════════════════════════
    ZYNX — full screen reel
 ══════════════════════════ */
 @keyframes zynxUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -491,10 +706,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
     <div class="drawer-divider"></div>
 
     <div class="drawer-nav-item" onclick="goGolden()"><i class="fa-regular fa-user"></i> Profile</div>
-    <div class="drawer-nav-item" onclick="window.location.href='Guest.html'">
-    <i class="fa-regular fa-bookmark"></i> Bookmarks
-</div>
-
+    <div class="drawer-nav-item"><i class="fa-regular fa-bookmark"></i> Bookmarks</div>
     <div class="drawer-nav-item"><i class="fa-regular fa-list-alt"></i> Lists</div>
     <div class="drawer-nav-item"><i class="fa-solid fa-certificate" style="background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i> Get Badge</div>
     <div class="drawer-nav-item"><i class="fa-regular fa-circle-question"></i> Help & Support</div>
@@ -663,12 +875,91 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="nav-item active" id="nav-home" onclick="if(zynxOpen){closeZynx();}else{setNav('home');}"><i class="fa-solid fa-house"></i></div>
-  <div class="nav-item" id="nav-search" onclick="setNav('search')"><i class="fa-solid fa-magnifying-glass"></i></div>
+  <div class="nav-item" id="nav-search" onclick="openSearch()"><i class="fa-solid fa-magnifying-glass"></i></div>
   <div class="nav-item" id="nav-zynx" onclick="openZynx()"><i class="fa-solid fa-play-circle"></i></div>
-  <div class="nav-item" id="nav-rocket" onclick="setNav('rocket')"><i class="fa-solid fa-paper-plane"></i></div>
+  <div class="nav-item" id="nav-rocket" onclick="openGuestProfile()"><i class="fa-solid fa-paper-plane"></i></div>
   <div class="nav-item" id="nav-notif" onclick="setNav('notif')">
     <i class="fa-regular fa-bell"></i>
     <div class="nav-notif-dot"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SEARCH OVERLAY
+══════════════════════════ -->
+<div class="search-overlay" id="search-overlay">
+
+  <div class="search-top">
+    <div class="search-bar-wrap">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input class="search-input" id="search-input" type="text" placeholder="Search people, colleges…" autocomplete="off" oninput="onSearchInput(this.value)">
+      <div class="search-clear" id="search-clear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+  </div>
+
+  <div class="search-body" id="search-body">
+
+    <!-- default state -->
+    <div id="search-default">
+      <div class="explore-label">Explore</div>
+      <!-- pill toggle -->
+      <div class="search-pill-nav">
+        <div class="spill active" id="spill-people" onclick="setSearchTab('people')">People</div>
+        <div class="spill" id="spill-colleges" onclick="setSearchTab('colleges')">Colleges</div>
+      </div>
+      <!-- hover label -->
+      <div class="search-tab-hint" id="search-tab-hint"></div>
+
+      <!-- PEOPLE section -->
+      <div id="stab-people">
+        <div class="no-results-wrap">
+          <i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+          <div class="no-results-txt">No profiles yet</div>
+          <div class="no-results-sub">People will show up here</div>
+        </div>
+      </div>
+
+      <!-- COLLEGES section -->
+      <div id="stab-colleges" style="display:none;">
+        <div class="no-results-wrap">
+          <i class="fa-solid fa-building-columns" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+          <div class="no-results-txt">Type a college name</div>
+          <div class="no-results-sub">or type #college to see all</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- results state -->
+    <div id="search-results" style="display:none;">
+      <div id="results-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     COLLEGE PROFILE
+══════════════════════════ -->
+<div class="college-profile" id="college-profile">
+  <div class="top-bar" style="position:sticky;">
+    <div class="top-back-btn" onclick="closeCollegeProfile()"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="top-bar-brand" style="font-size:1.1rem;font-weight:700;letter-spacing:-.02em;">College</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div style="padding:28px 20px 40px;display:flex;flex-direction:column;align-items:center;">
+    <div class="cp-pill">
+      <div class="guest-tag" id="cp-tag">College</div>
+      <div class="pfp-row" style="margin-bottom:14px;">
+        <img class="cp-pfp" id="cp-pfp" src="" alt="">
+        <div>
+          <div class="cp-name" id="cp-name"></div>
+          <div class="cp-caption" id="cp-caption"></div>
+          <div class="cp-pills-row" id="cp-pills-row"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <button class="cta-btn">Follow College</button>
+    </div>
   </div>
 </div>
 
@@ -1101,10 +1392,189 @@ function toggleSave(i){
   btn.classList.toggle('saved',saved[i]);
 }
 
-function sharePost(){
-  if(navigator.share) navigator.share({title:'x0s.link',url:window.location.href});
-  else navigator.clipboard?.writeText(window.location.href);
+/* ══════════════════════════
+   SEARCH
+══════════════════════════ */
+let searchOpen=false, searchTab='people';
+
+function openSearch(){
+  if(searchOpen) return;
+  searchOpen=true;
+  setNav('search');
+  document.querySelector('.top-bar').style.display='none';
+  document.querySelector('.tabs').style.display='none';
+  const el=document.getElementById('search-overlay');
+  el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  history.pushState({modal:'search'},'');
+  setTimeout(()=>document.getElementById('search-input').focus(),400);
+}
+
+function closeSearch(fromPop){
+  if(!searchOpen) return;
+  searchOpen=false;
+  setNav('home');
+  document.querySelector('.top-bar').style.display='';
+  document.querySelector('.tabs').style.display='';
+  const el=document.getElementById('search-overlay');
+  el.classList.remove('open');
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; },400);
+  clearSearch();
+}
+
+// extend popstate
+const _origPopstate=window.onpopstate;
+window.addEventListener('popstate',e=>{
+  if(collegeProfileOpen){ closeCollegeProfile(true); return; }
+  if(searchOpen){ closeSearch(true); return; }
+  if(zynxOpen){ closeZynx(true); return; }
+});
+
+function clearSearch(){
+  const inp=document.getElementById('search-input');
+  inp.value='';
+  document.getElementById('search-clear').classList.remove('visible');
+  showDefaultSearch();
+}
+
+function setSearchTab(tab){
+  searchTab=tab;
+  document.getElementById('spill-people').classList.toggle('active', tab==='people');
+  document.getElementById('spill-colleges').classList.toggle('active', tab==='colleges');
+  document.getElementById('stab-people').style.display=tab==='people'?'':'none';
+  document.getElementById('stab-colleges').style.display=tab==='colleges'?'':'none';
+  document.getElementById('search-tab-hint').textContent=
+    tab==='colleges' ? 'Type #college to see all colleges' : '';
+  // re-run search if there's a query
+  const q=document.getElementById('search-input').value.trim();
+  if(q) onSearchInput(q);
+}
+
+function showDefaultSearch(){
+  document.getElementById('search-default').style.display='';
+  document.getElementById('search-results').style.display='none';
+}
+
+function onSearchInput(val){
+  const clear=document.getElementById('search-clear');
+  clear.classList.toggle('visible', val.length>0);
+  if(!val.trim()){ showDefaultSearch(); return; }
+
+  const q=val.trim().toLowerCase().replace(/\s/g,'');
+
+  // #college = show all
+  const showAll = q==='#college' || q==='#colleges';
+
+  document.getElementById('search-default').style.display='none';
+  document.getElementById('search-results').style.display='';
+  const list=document.getElementById('results-list');
+
+  if(searchTab==='people'){
+    list.innerHTML=`<div class="no-results-wrap">
+      <i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+      <div class="no-results-txt">No profiles yet</div></div>`;
+    return;
+  }
+
+  // colleges search
+  const colleges = window.XOS_COLLEGES || [];
+  let matches;
+  if(showAll){
+    matches = colleges;
+  } else {
+    matches = colleges.filter(c=>{
+      const name=c.name.toLowerCase().replace(/\s/g,'');
+      return name.includes(q);
+    });
+    if(!showAll) matches=matches.slice(0,4);
+  }
+
+  if(matches.length===0){
+    list.innerHTML=`<div class="no-results-wrap">
+      <i class="fa-solid fa-building-columns" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+      <div class="no-results-txt">No colleges found</div></div>`;
+    return;
+  }
+
+  list.innerHTML=matches.map((c,i)=>buildCollegeCard(c,i)).join('');
+
+  // check marquee need
+  requestAnimationFrame(()=>{
+    list.querySelectorAll('.college-card-name').forEach(el=>{
+      const wrap=el.closest('.college-card-name-wrap');
+      if(wrap && el.scrollWidth > wrap.offsetWidth){
+        // duplicate text for seamless loop
+        el.textContent=el.textContent+' · '+el.textContent;
+        el.classList.add('marquee');
+      }
+    });
+  });
+}
+
+function buildCollegeCard(c, i){
+  const pills=(c.pill1?`<span class="college-mini-pill">${c.pill1}</span>`:'')
+             +(c.pill2?`<span class="college-mini-pill">${c.pill2}</span>`:'');
+  const nameParts=c.name.split(',');
+  const displayName=nameParts[0].trim();
+  const caption=nameParts.slice(1).join(',').trim();
+  return `<div class="college-card" onclick="openCollegeProfile(${i})">
+    <div class="college-pfp-wrap">
+      <img src="${c.pfp||'1000046129.png'}" alt="" onerror="this.src='1000046129.png'">
+    </div>
+    <div class="college-info">
+      <div class="college-card-name-wrap">
+        <div class="college-card-name" id="ccn-${i}">${displayName}</div>
+      </div>
+      <div class="college-card-sub">${caption||'Engineering College'}</div>
+      <div class="college-card-pills">${pills}</div>
+    </div>
+    <i class="fa-solid fa-chevron-right college-card-arrow"></i>
+  </div>`;
+}
+
+/* ══════════════════════════
+   COLLEGE PROFILE
+══════════════════════════ */
+let collegeProfileOpen=false;
+let currentCollege=null;
+
+function openCollegeProfile(idx){
+  const colleges=window.XOS_COLLEGES||[];
+  const c=colleges[idx];
+  if(!c) return;
+  currentCollege=c;
+  collegeProfileOpen=true;
+
+  const nameParts=c.name.split(',');
+  const displayName=nameParts[0].trim();
+  const caption=nameParts.slice(1).join(',').trim();
+
+  document.getElementById('cp-pfp').src=c.pfp||'1000046129.png';
+  document.getElementById('cp-pfp').onerror=function(){this.src='1000046129.png';};
+  document.getElementById('cp-name').textContent=displayName;
+  document.getElementById('cp-caption').textContent=caption||'Engineering College';
+  document.getElementById('cp-tag').textContent='College';
+
+  const pillsRow=document.getElementById('cp-pills-row');
+  pillsRow.innerHTML=(c.pill1?`<span class="cp-pill-tag">${c.pill1}</span>`:'')+
+                     (c.pill2?`<span class="cp-pill-tag">${c.pill2}</span>`:'');
+
+  const el=document.getElementById('college-profile');
+  el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  history.pushState({modal:'college'},'');
+}
+
+function closeCollegeProfile(fromPop){
+  if(!collegeProfileOpen) return;
+  collegeProfileOpen=false;
+  const el=document.getElementById('college-profile');
+  el.classList.remove('open');
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; },380);
 }
 </script>
+<script src="colleges.js"></script>
 </body>
 </html>
