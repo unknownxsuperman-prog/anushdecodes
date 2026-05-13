@@ -1205,7 +1205,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   <div class="top-bar" style="position:sticky;">
     <div class="top-back-btn" onclick="closeCollegeProfile()"><i class="fa-solid fa-chevron-left"></i></div>
     <div class="top-bar-brand" style="font-size:1.1rem;font-weight:700;letter-spacing:-.02em;">College</div>
-    <div style="width:36px;"></div>
+    <!-- three dot -->
+    <div style="position:relative;">
+      <div class="top-back-btn" id="cp-dots-btn" onclick="toggleCpMenu(event)" style="background:transparent;border-color:transparent;">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </div>
+      <div id="cp-dots-menu" style="display:none;position:absolute;top:42px;right:0;background:#0a0a0a;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:6px;min-width:160px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:10;animation:fadeIn .18s ease;">
+        <div id="cp-link-item" onclick="toggleCollegeLink()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:.78rem;font-weight:600;cursor:pointer;border-radius:10px;transition:background .15s;">
+          <span id="cp-link-label">Link College</span>
+          <i id="cp-link-icon" class="fa-solid fa-link" style="color:#007aff;font-size:.82rem;"></i>
+        </div>
+      </div>
+    </div>
   </div>
   <div style="padding:28px 20px 40px;display:flex;flex-direction:column;align-items:center;">
     <div class="cp-pill">
@@ -2123,6 +2134,8 @@ function openCollegeProfile(idx){
   pillsRow.innerHTML=(c.pill1?`<span class="cp-pill-tag">${c.pill1}</span>`:'')+
                      (c.pill2?`<span class="cp-pill-tag">${c.pill2}</span>`:'');
 
+  updateCpLinkLabel();
+
   const el=document.getElementById('college-profile');
   el.style.display='flex';
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
@@ -2132,11 +2145,53 @@ function openCollegeProfile(idx){
 function closeCollegeProfile(fromPop){
   if(!collegeProfileOpen) return;
   collegeProfileOpen=false;
+  document.getElementById('cp-dots-menu').style.display='none';
   const el=document.getElementById('college-profile');
   el.classList.remove('open');
   if(!fromPop) history.back();
   setTimeout(()=>{ el.style.display='none'; },380);
 }
+
+function toggleCpMenu(e){
+  e.stopPropagation();
+  const menu=document.getElementById('cp-dots-menu');
+  menu.style.display=menu.style.display==='block'?'none':'block';
+  updateCpLinkLabel();
+}
+
+function updateCpLinkLabel(){
+  if(!currentCollege) return;
+  const stored=localStorage.getItem('xos_linked_college');
+  const isLinked=stored&&JSON.parse(stored).id===currentCollege.id;
+  document.getElementById('cp-link-label').textContent=isLinked?'Unlink College':'Link College';
+  const icon=document.getElementById('cp-link-icon');
+  icon.className=isLinked?'fa-solid fa-link-slash':'fa-solid fa-link';
+  icon.style.color=isLinked?'#ff3b5c':'#007aff';
+}
+
+function toggleCollegeLink(){
+  document.getElementById('cp-dots-menu').style.display='none';
+  if(!currentCollege) return;
+  const stored=localStorage.getItem('xos_linked_college');
+  const isLinked=stored&&JSON.parse(stored).id===currentCollege.id;
+  if(isLinked){
+    localStorage.removeItem('xos_linked_college');
+  } else {
+    const displayName=currentCollege.name.split(',')[0].trim();
+    localStorage.setItem('xos_linked_college',JSON.stringify({
+      id:currentCollege.id,
+      name:displayName,
+      pfp:currentCollege.pfp||''
+    }));
+  }
+  updateCpLinkLabel();
+  initFeedCollegeRows();
+}
+
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('cp-dots-menu');
+  if(menu&&!menu.contains(e.target)) menu.style.display='none';
+});
 </script>
 <script src="colleges.js"></script>
 </body>
