@@ -165,7 +165,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:60;
+  position:fixed;bottom:0;left:0;right:0;z-index:70;
   height:var(--nav-h);
   display:flex;align-items:center;justify-content:space-around;
   background:rgba(0,0,0,.75);
@@ -1069,13 +1069,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 </div><!-- /feed -->
 
 <!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div class="nav-item active" id="nav-home" onclick="if(zynxOpen){closeZynx();}else{setNav('home');}"><i class="fa-solid fa-house"></i></div>
-  <div class="nav-item" id="nav-search" onclick="handleSearchTap()">
+<div class="bottom-nav" style="z-index:70;">
+  <div class="nav-item active" id="nav-home" onclick="handleHomeNav()"><i class="fa-solid fa-house"></i></div>
+  <div class="nav-item" id="nav-search" onclick="handleSearchTap()" style="position:relative;">
     <i class="fa-solid fa-magnifying-glass" id="nav-search-icon"></i>
-    <i class="fa-solid fa-sparkles" id="nav-es-icon" style="display:none;"></i>
+    <i class="fa-solid fa-sparkles" id="nav-es-icon" style="position:absolute;display:none;color:var(--accent);"></i>
   </div>
-  <div class="nav-item" id="nav-zynx" onclick="openZynx()"><i class="fa-solid fa-play-circle"></i></div>
+  <div class="nav-item" id="nav-zynx" onclick="handleZynxNav()"><i class="fa-solid fa-play-circle"></i></div>
   <div class="nav-item" id="nav-rocket" onclick="openGuestProfile()"><i class="fa-solid fa-paper-plane"></i></div>
   <div class="nav-item" id="nav-notif" onclick="setNav('notif')">
     <i class="fa-regular fa-bell"></i>
@@ -1660,7 +1660,22 @@ let esOpen=false, esMode=false; // esMode = sparkles/essential active
 let esTapTimer=null, esTapCount=0;
 
 /* nav double-tap detection */
-function handleSearchTap(){
+function handleHomeNav(){
+  if(esOpen){ closeEssential(); return; }
+  if(searchOpen){ closeSearch(); return; }
+  if(zynxOpen){ closeZynx(); return; }
+  setNav('home');
+}
+
+function handleZynxNav(){
+  if(zynxOpen){ return; } // already open
+  const doOpen=()=> openZynx();
+  if(esOpen){ closeEssential(); setTimeout(doOpen,420); return; }
+  if(searchOpen){ closeSearch(); setTimeout(doOpen,420); return; }
+  doOpen();
+}
+
+
   esTapCount++;
   if(esTapCount===1){
     esTapTimer=setTimeout(()=>{
