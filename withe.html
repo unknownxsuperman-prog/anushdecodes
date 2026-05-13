@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual">
 <title>x0s.link</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -172,8 +172,22 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-top:1px solid var(--border2);
   padding-bottom:env(safe-area-inset-bottom);
+  /* stay at bottom of visual viewport (above keyboard) */
+  transform:translateY(0);
+  transition:transform .0s;
 }
 .light .bottom-nav{background:rgba(255,255,255,.85);}
+
+/* input anchored above nav */
+.es-input-wrap{
+  padding:10px 16px 10px;
+  background:rgba(0,0,0,.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border2);
+  flex-shrink:0;
+  position:relative;
+  z-index:10;
+}
 .nav-item{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:6px 14px;cursor:pointer;
@@ -1094,7 +1108,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   <div class="es-suggestions" id="es-suggestions" style="display:none;"></div>
 
   <!-- input bar -->
-  <div class="es-input-wrap">
+  <div class="es-input-wrap" id="es-input-wrap-el">
     <div class="es-input-bar">
       <i class="fa-solid fa-magnifying-glass" style="color:var(--muted);font-size:.82rem;flex-shrink:0;"></i>
       <input class="es-input" id="es-input" type="text"
@@ -1618,9 +1632,23 @@ function toggleSave(i){
   btn.classList.toggle('saved',saved[i]);
 }
 
-/* ══════════════════════════
-   ESSENTIAL SEARCH JS
-══════════════════════════ */
+/* ── KEYBOARD / VISUAL VIEWPORT ── */
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>{
+    if(!esOpen) return;
+    const vv=window.visualViewport;
+    const keyboardH=window.innerHeight - vv.height;
+    const inputWrap=document.getElementById('es-input-wrap-el');
+    if(inputWrap){
+      // lift input bar above keyboard, keep nav untouched
+      inputWrap.style.transform=keyboardH>50
+        ?`translateY(-${keyboardH}px)`
+        :'translateY(0)';
+    }
+  });
+}
+
+
 let esOpen=false, esMode=false; // esMode = sparkles/essential active
 let esTapTimer=null, esTapCount=0;
 
@@ -1669,8 +1697,10 @@ function closeEssential(fromPop){
   if(!esOpen) return;
   esOpen=false;
   setNav('home');
-  // revert icon back to magnifying glass
   toggleEsMode(false);
+  // reset keyboard lift
+  const iw=document.getElementById('es-input-wrap-el');
+  if(iw) iw.style.transform='translateY(0)';
   document.querySelector('.top-bar').style.display='';
   document.querySelector('.tabs').style.display='';
   const el=document.getElementById('es-overlay');
