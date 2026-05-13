@@ -89,6 +89,16 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   position:fixed;top:calc(var(--top-h) + 44px);bottom:var(--nav-h);
   left:0;right:0;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  z-index:1;
+}
+
+/* closed overlays must not block touches */
+.es-overlay:not(.open):not(.closing),
+.search-overlay:not(.open),
+.zynx-overlay:not(.open):not(.closing),
+.college-profile:not(.open),
+.drawer-backdrop:not(.open){
+  pointer-events:none !important;
 }
 
 /* ── POST ── */
@@ -127,6 +137,13 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .post-name{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:5px;}
 .post-handle{font-size:.72rem;color:var(--muted);}
 .post-time{font-size:.68rem;color:var(--muted);}
+.post-college-row{
+  display:flex;align-items:center;gap:5px;
+  font-size:.64rem;color:var(--accent);font-weight:500;
+  overflow:hidden;max-width:180px;margin-top:1px;
+  white-space:nowrap;
+}
+.post-college-row i{font-size:.6rem;flex-shrink:0;}
 .post-menu{color:var(--muted);font-size:.78rem;padding:4px 6px;letter-spacing:.05em;}
 
 /* 3:4 image */
@@ -965,6 +982,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
       <div class="post-meta">
         <div class="post-name">Anush Decodes</div>
         <div class="post-handle">anush@x0s · 2h</div>
+        <div class="post-college-row" id="feed-college-row-0"></div>
       </div>
       <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
     </div>
@@ -1248,6 +1266,17 @@ const ZYNX_POSTS = [
     likes:42, comments:5,
   },
 ];
+
+/* ── FEED COLLEGE ROW ── */
+function initFeedCollegeRows(){
+  const stored=localStorage.getItem('xos_linked_college');
+  if(!stored) return;
+  const c=JSON.parse(stored);
+  document.querySelectorAll('[id^="feed-college-row-"]').forEach(el=>{
+    el.innerHTML=`<i class="fa-solid fa-building-columns"></i><span style="overflow:hidden;text-overflow:ellipsis;">${c.name}</span>`;
+  });
+}
+document.addEventListener('DOMContentLoaded', initFeedCollegeRows);
 
 /* ── state ── */
 let zynxOpen=false;
@@ -1676,21 +1705,24 @@ function handleZynxNav(){
 }
 
 
+function handleSearchTap(){
   esTapCount++;
   if(esTapCount===1){
     esTapTimer=setTimeout(()=>{
       esTapCount=0;
-      // single tap
       if(esMode) openEssential();
       else openSearch();
     },300);
   } else if(esTapCount===2){
     clearTimeout(esTapTimer);
     esTapCount=0;
-    // double tap — toggle mode and open essential
     toggleEsMode(true);
     openEssential();
   }
+}
+
+function openGuestProfile(){
+  window.location.href='guest-profile.html';
 }
 
 function toggleEsMode(forceOn){
