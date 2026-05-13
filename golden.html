@@ -356,7 +356,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   font-size:.76rem;font-weight:500;color:var(--muted);
   white-space:nowrap;display:inline-block;
 }
-.college-link-name.linked{color:var(--accent);}
+.college-link-name.linked{color:rgba(255,255,255,.75);}
+.college-link-icon.linked{color:rgba(255,255,255,.75);}
 .college-link-name.marquee-anim{
   animation:clgMarquee 7s linear infinite;
   padding-right:40px;
@@ -573,7 +574,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     </div>
 
     <!-- college link row -->
-    <div class="college-link-row" id="college-link-row" onclick="openCollegeLinkSearch()">
+    <div class="college-link-row" id="college-link-row" onclick="handleCollegeLinkClick()">
       <i class="fa-solid fa-building-columns college-link-icon" id="college-link-icon"></i>
       <div class="college-link-name-wrap">
         <span class="college-link-name" id="college-link-name">+ Link College</span>
@@ -1043,8 +1044,54 @@ const LINKS=[
 ];
 function shareProfile(){if(navigator.share)navigator.share({title:'Anush Decodes',url:window.location.href});else alert('Link copied!');}
 
+/* ─── COLLEGE PROFILE OVERLAY ─── */
+let clgProfileOpen=false;
+
+function openCollegeProfile(idx){
+  const colleges=window.XOS_COLLEGES||[];
+  const c=colleges[idx];
+  if(!c) return;
+  const nameParts=c.name.split(',');
+  const displayName=nameParts[0].trim();
+  const caption=nameParts.slice(1).join(',').trim();
+  document.getElementById('acp-pfp').src=c.pfp||'1000046129.png';
+  document.getElementById('acp-name').textContent=displayName+' '+c.id;
+  document.getElementById('acp-caption').textContent=caption||'Engineering College';
+  document.getElementById('acp-pills').innerHTML=
+    (c.pill1?`<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill1}</span>`:'')+
+    (c.pill2?`<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill2}</span>`:'');
+  clgProfileOpen=true;
+  const el=document.getElementById('clg-profile-overlay');
+  el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.transform='translateX(0)'));
+  history.pushState({modal:'clg-profile'},'');
+}
+
+function closeCollegeProfile(fromPop){
+  if(!clgProfileOpen) return;
+  clgProfileOpen=false;
+  const el=document.getElementById('clg-profile-overlay');
+  el.style.transform='translateX(100%)';
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; },380);
+}
+
 /* ─── COLLEGE LINK ─── */
 let clgSearchOpen=false;
+
+let linkedCollegeIdx = null;
+
+function handleCollegeLinkClick(){
+  const stored = localStorage.getItem('xos_linked_college');
+  if(stored){
+    // already linked — open the college profile directly
+    const c = JSON.parse(stored);
+    const colleges = window.XOS_COLLEGES || [];
+    const idx = colleges.findIndex(col => col.id === c.id);
+    if(idx >= 0){ openCollegeProfile(idx); return; }
+  }
+  openCollegeLinkSearch();
+}
 
 function initCollegeLink(){
   const stored=localStorage.getItem('xos_linked_college');
@@ -1059,8 +1106,7 @@ function setCollegeLinkUI(name, linked){
   const icon=document.getElementById('college-link-icon');
   const wrap=document.querySelector('.college-link-name-wrap');
   el.classList.toggle('linked', linked);
-  icon.style.color = linked ? 'var(--accent)' : 'var(--muted)';
-  // check if name overflows
+  icon.classList.toggle('linked', linked);
   el.classList.remove('marquee-anim');
   el.textContent = linked ? name : '+ Link College';
   requestAnimationFrame(()=>{
@@ -1139,10 +1185,35 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 window.addEventListener('popstate', e=>{
+  if(clgProfileOpen){ closeCollegeProfile(true); return; }
   if(clgSearchOpen){ closeCollegeLinkSearch(true); }
 });
 </script>
 <script src="colleges.js"></script>
+<!-- COLLEGE PROFILE (for linked college view) -->
+<div id="clg-profile-overlay" style="position:fixed;inset:0;z-index:700;background:var(--bg);display:none;flex-direction:column;transform:translateX(100%);transition:transform .36s cubic-bezier(.32,.72,0,1);overflow-y:auto;">
+  <div style="position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(0,0,0,.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);">
+    <div class="clg-back" onclick="closeCollegeProfile()" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid #1a1a1a;display:flex;align-items:center;justify-content:center;cursor:pointer;"><i class="fa-solid fa-chevron-left"></i></div>
+    <div style="font-size:1.1rem;font-weight:700;letter-spacing:-.02em;">College</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div style="padding:28px 20px 40px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:100%;max-width:360px;background:rgba(255,255,255,.045);backdrop-filter:blur(36px);border:1px solid rgba(255,255,255,.09);border-radius:28px;padding:28px 22px 24px;position:relative;box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 40px 80px rgba(0,0,0,.6);">
+      <div style="position:absolute;top:15px;right:16px;font-size:.58rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#666;">College</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+        <img id="acp-pfp" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:1px solid #1a1a1a;background:#0a0a0a;flex-shrink:0;" src="" alt="">
+        <div>
+          <div id="acp-name" style="font-size:.98rem;font-weight:700;margin-bottom:3px;"></div>
+          <div id="acp-caption" style="font-size:.7rem;color:#666;font-weight:300;margin-bottom:8px;"></div>
+          <div id="acp-pills" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        </div>
+      </div>
+      <div style="height:1px;background:#1a1a1a;margin-bottom:20px;"></div>
+      <button onclick="closeCollegeProfile()" style="width:100%;padding:13px 0;background:rgba(255,255,255,.9);color:#000;border:none;border-radius:30px;font-size:.88rem;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:pointer;">Follow College</button>
+    </div>
+  </div>
+</div>
+
 <!-- COLLEGE LINK SEARCH -->
 <div class="clg-search-overlay" id="clg-search-overlay">
   <div class="clg-top">
