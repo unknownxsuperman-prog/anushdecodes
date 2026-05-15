@@ -3,62 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>x0s Link Hub</title>
-    <!-- Font Awesome 6 CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>xos1 // Link Hub</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
+        :root {
+            --bg: #000000;
+            --accent: #007aff;
+            --card: #0a0a0a;
+            --border: #1a1a1a;
+            --font-main: 'Space Grotesk', sans-serif;
+        }
+
+        /* Basic Reset */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: #000000;
+            background-color: var(--bg);
+            color: #ffffff;
+            font-family: var(--font-main);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Slide-up Animation */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .interface-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         .pill-container {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
-            max-width: 800px;
             justify-content: center;
+            max-width: 600px;
         }
 
-        /* Premium Pill Base Styling */
+        /* xos1 Pill Design (Glassmorphism) */
         .pill {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 22px;
+            gap: 12px;
+            padding: 10px 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
             border-radius: 50px;
+            color: #a0a0a0;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 14px;
             font-weight: 500;
-            letter-spacing: -0.02em;
-            color: #888888;
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
-        /* The CSS Mask Magic for the PNG Icon */
-        .png-stroke-icon {
-            width: 1.1em;
-            height: 1.1em;
-            background-color: currentColor; /* Forces the PNG shape to take the text color */
+        /* Utility Card: Scale-down Active State */
+        .pill:active {
+            transform: scale(0.94);
+        }
+
+        .pill:hover {
+            border-color: #333;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Custom PNG Mask Logic (Stroke Only) */
+        .custom-png-icon {
+            width: 18px;
+            height: 18px;
+            background-color: currentColor; /* Paints the PNG strokes with the current text color */
             
-            /* REPLACE 'your-icon.png' WITH YOUR ACTUAL FILE PATH */
-            -webkit-mask-image: url('your-icon.png');
-            mask-image: url('your-icon.png');
+            /* The image path - Ensure it matches your file name exactly */
+            -webkit-mask-image: url('arattai logo white.png');
+            mask-image: url('arattai logo white.png');
             
             -webkit-mask-size: contain;
             mask-size: contain;
@@ -67,57 +108,64 @@
             display: inline-block;
         }
 
-        /* Global Hover State */
-        .pill:hover {
-            transform: translateY(-1px);
-            color: #ffffff;
-            border-color: #333333;
+        /* Font Awesome Sizing */
+        .pill i {
+            font-size: 16px;
         }
 
-        /* Brand Specific Accent Interactions */
-        .pill-github:hover { border-color: #24292e; color: #ffffff; }
-        .pill-instagram:hover { border-color: #e1306c; color: #e1306c; }
-        .pill-x:hover { border-color: #ffffff; color: #ffffff; }
-        .pill-linkedin:hover { border-color: #0077b5; color: #0077b5; }
+        /* Hover Accents */
+        .pill-instagram:hover { color: #e1306c; border-color: #e1306c; }
+        .pill-x:hover { color: #ffffff; border-color: #ffffff; }
+        .pill-github:hover { color: #ffffff; border-color: #404448; background: #24292e; }
+        .pill-linkedin:hover { color: #0077b5; border-color: #0077b5; }
         
-        /* Your Custom PNG Pill Accent */
-        .pill-custom:hover { 
-            border-color: #007aff; 
-            color: #007aff; 
+        /* Arattai Custom Accent */
+        .pill-arattai:hover { 
+            color: var(--accent); 
+            border-color: var(--accent); 
+        }
+
+        /* xos1 Developer Badge */
+        .badge {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--accent);
+            opacity: 0.5;
+            margin-top: 20px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
-    <div class="pill-container">
-        
-        <!-- GitHub -->
-        <a href="https://github.com/" target="_blank" class="pill pill-github">
-            <i class="fa-brands fa-github"></i> GitHub
-        </a>
+    <div class="interface-wrapper">
+        <div class="pill-container">
+            
+            <a href="https://instagram.com/" target="_blank" class="pill pill-instagram">
+                <i class="fa-brands fa-instagram"></i> Instagram
+            </a>
 
-        <!-- Instagram -->
-        <a href="https://instagram.com/" target="_blank" class="pill pill-instagram">
-            <i class="fa-brands fa-instagram"></i> Instagram
-        </a>
+            <a href="https://x.com/" target="_blank" class="pill pill-x">
+                <i class="fa-brands fa-x-twitter"></i> X
+            </a>
 
-        <!-- X -->
-        <a href="https://x.com/" target="_blank" class="pill pill-x">
-            <i class="fa-brands fa-x-twitter"></i> X
-        </a>
+            <a href="https://github.com/" target="_blank" class="pill pill-github">
+                <i class="fa-brands fa-github"></i> GitHub
+            </a>
 
-        <!-- LinkedIn -->
-        <a href="https://linkedin.com/" target="_blank" class="pill pill-linkedin">
-            <i class="fa-brands fa-linkedin-in"></i> LinkedIn
-        </a>
+            <a href="https://linkedin.com/" target="_blank" class="pill pill-linkedin">
+                <i class="fa-brands fa-linkedin-in"></i> LinkedIn
+            </a>
 
-        <!-- Custom Transparent PNG Stroke Pill -->
-        <a href="arattai logo white.png" class="pill pill-custom">
-            <span class="png-stroke-icon"></span> Arattai
-        </a>
+            <a href="#" class="pill pill-arattai">
+                <span class="custom-png-icon"></span> Arattai
+            </a>
 
+        </div>
+
+        <div class="badge">SYSTEM.XOS1.STABLE</div>
     </div>
 
 </body>
 </html>
-
