@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>x0s Link Hub</title>
+    <!-- Font Awesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 800px;
+            justify-content: center;
+        }
+
+        /* Premium Pill Base Styling */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: #888888;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        /* The CSS Mask Magic for the PNG Icon */
+        .png-stroke-icon {
+            width: 1.1em;
+            height: 1.1em;
+            background-color: currentColor; /* Forces the PNG shape to take the text color */
+            
+            /* REPLACE 'your-icon.png' WITH YOUR ACTUAL FILE PATH */
+            -webkit-mask-image: url('your-icon.png');
+            mask-image: url('your-icon.png');
+            
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            display: inline-block;
+        }
+
+        /* Global Hover State */
+        .pill:hover {
+            transform: translateY(-1px);
+            color: #ffffff;
+            border-color: #333333;
+        }
+
+        /* Brand Specific Accent Interactions */
+        .pill-github:hover { border-color: #24292e; color: #ffffff; }
+        .pill-instagram:hover { border-color: #e1306c; color: #e1306c; }
+        .pill-x:hover { border-color: #ffffff; color: #ffffff; }
+        .pill-linkedin:hover { border-color: #0077b5; color: #0077b5; }
+        
+        /* Your Custom PNG Pill Accent */
+        .pill-custom:hover { 
+            border-color: #007aff; 
+            color: #007aff; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pill-container">
+        
+        <!-- GitHub -->
+        <a href="https://github.com/" target="_blank" class="pill pill-github">
+            <i class="fa-brands fa-github"></i> GitHub
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://instagram.com/" target="_blank" class="pill pill-instagram">
+            <i class="fa-brands fa-instagram"></i> Instagram
+        </a>
+
+        <!-- X -->
+        <a href="https://x.com/" target="_blank" class="pill pill-x">
+            <i class="fa-brands fa-x-twitter"></i> X
+        </a>
+
+        <!-- LinkedIn -->
+        <a href="https://linkedin.com/" target="_blank" class="pill pill-linkedin">
+            <i class="fa-brands fa-linkedin-in"></i> LinkedIn
+        </a>
+
+        <!-- Custom Transparent PNG Stroke Pill -->
+        <a href="arattai logo white.png" class="pill pill-custom">
+            <span class="png-stroke-icon"></span> Arattai
+        </a>
+
+    </div>
+
+</body>
+</html>
 
