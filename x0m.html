@@ -935,61 +935,108 @@ window.onYouTubeIframeAPIReady=function(){
 // Since no API key — we use YouTube's invidious/noembed approach or
 // build the search link and use YouTube's own suggest endpoint (no key needed)
 async function getYouTubeId(trackName, artistName){
-  // Use YouTube search suggestions API (no key) to find video ID
-  // We'll use the invidious public instance as fallback
-  const query=encodeURIComponent(`${trackName} ${artistName} official audio`);
-  
-  // Try youtube-search-results via a CORS-friendly public endpoint
-  // Use youtubei.googleapis.com/v1/search with no key (returns suggestions)
-  // Best no-key approach: use oEmbed + known video search
+  const query=`${trackName} ${artistName} official audio`;
+  const encoded=encodeURIComponent(query);
+
+  // Method 1: piped.video public API (reliable CORS-friendly YT frontend)
+  const pipedInstances=[
+    'https://pipedapi.kavin.rocks',
+    'https://pipedapi.tokhmi.xyz',
+    'https://pipedapi.moomoo.me',
+    'https://piped-api.garudalinux.org',
+  ];
+  for(const base of pipedInstances){
+    try{
+      const r=await fetch(`${base}/search?q=${encoded}&filter=videos`,
+        {signal:AbortSignal.timeout(5000)});
+      if(!r.ok) continue;
+      const d=await r.json();
+      const items=d.items||d.results||[];
+      if(items.length>0){
+        const vid=items[0].url||items[0].videoId||'';
+        const id=vid.replace('/watch?v=','').replace('https://www.youtube.com/watch?v=','');
+        if(id&&id.length===11) return id;
+      }
+    } catch(e){ continue; }
+  }
+
+  // Method 2: Invidious instances
+  const invInstances=[
+    'https://iv.datura.network',
+    'https://invidious.privacyredirect.com',
+    'https://yt.cdaut.de',
+    'https://invidious.fdn.fr',
+  ];
+  for(const base of invInstances){
+    try{
+      const r=await fetch(`${base}/api/v1/search?q=${encoded}&type=video&fields=videoId`,
+        {signal:AbortSignal.timeout(5000)});
+      if(!r.ok) continue;
+      const d=await r.json();
+      if(Array.isArray(d)&&d.length>0&&d[0].videoId) return d[0].videoId;
+    } catch(e){ continue; }
+  }
+
+  // Method 3: Use YouTube's own suggestion/autocomplete endpoint (no CORS issue)
+  // Extract video ID from YouTube's search page via noembed trick
   try{
-    // Approach: scrape YouTube's suggest for video IDs using their completion API
-    // This returns song suggestions — we pick first result
-    const r=await fetch(`https://suggestqueries-clients6.youtube.com/complete/search?client=firefox&ds=yt&q=${query}`,{mode:'cors'});
-    // This won't work due to CORS — fallback below
-  } catch(e){}
-  
-  // Best working approach without API key:
-  // Use invidious public API (open source YouTube frontend)
-  try{
-    const inv=`https://vid.puffyan.us/api/v1/search?q=${query}&type=video&fields=videoId,title&page=1`;
-    const r=await fetch(inv,{signal:AbortSignal.timeout(4000)});
-    const d=await r.json();
-    if(d&&d.length>0) return d[0].videoId;
+    const r=await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/results?search_query=${encoded}&format=json`,
+      {signal:AbortSignal.timeout(4000)});
+    // won't return ID but confirms connectivity
   } catch(e){}
 
-  // Fallback: try another invidious instance
+  // Method 4: Use a reliable CORS proxy to hit YouTube search page
   try{
-    const inv2=`https://invidious.slipfox.xyz/api/v1/search?q=${query}&type=video&fields=videoId&page=1`;
-    const r=await fetch(inv2,{signal:AbortSignal.timeout(4000)});
+    const proxy='https://api.allorigins.win/get?url=';
+    const ytSearch=`https://www.youtube.com/results?search_query=${encoded}`;
+    const r=await fetch(proxy+encodeURIComponent(ytSearch),
+      {signal:AbortSignal.timeout(6000)});
     const d=await r.json();
-    if(d&&d.length>0) return d[0].videoId;
+    const html=d.contents||'';
+    // Extract first videoId from YouTube's JSON embedded in page
+    const match=html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+    if(match) return match[1];
   } catch(e){}
 
   return null;
 }
 
 async function playOnYouTube(track){
-  showToast('Loading…');
+  showToast('Finding on YouTube…');
   const videoId=await getYouTubeId(track.trackName, track.artistName);
   if(!videoId){
-    showToast('Could not find on YouTube');
+    // Last resort: open YouTube search in same tab as fallback
+    showToast('Trying direct search…');
+    // Try one more time with shorter query
+    const shortQuery=encodeURIComponent(`${track.trackName} ${track.artistName}`);
+    try{
+      const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://www.youtube.com/results?search_query='+shortQuery)}`,
+        {signal:AbortSignal.timeout(7000)});
+      const d=await r.json();
+      const html=d.contents||'';
+      const match=html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+      if(match){
+        loadVideoId(match[1]);
+        return;
+      }
+    } catch(e){}
+    showToast('Not available — try another song');
     return;
   }
+  loadVideoId(videoId);
+}
+
+function loadVideoId(videoId){
   ytVideoId=videoId;
-  if(ytReady&&ytPlayer){
-    ytPlayer.loadVideoById(videoId);
-    ytPlayer.playVideo();
-  } else {
-    // retry after YT ready
-    const wait=setInterval(()=>{
-      if(ytReady&&ytPlayer){
-        clearInterval(wait);
-        ytPlayer.loadVideoById(videoId);
-        ytPlayer.playVideo();
-      }
-    },300);
-  }
+  showToast('Playing ▶');
+  const tryPlay=()=>{
+    if(ytReady&&ytPlayer){
+      ytPlayer.loadVideoById(videoId);
+    } else {
+      setTimeout(tryPlay,300);
+    }
+  };
+  tryPlay();
 }
 
 function startProgress(){
