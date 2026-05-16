@@ -6,6 +6,7 @@
 <title>Anush Decodes | x0s.link</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/xbit-proton/fa-arattai@latest/arattai.css">
 <style>
 :root {
   --bg:#000;--card:#0a0a0a;--card2:#111;--border:#1a1a1a;--border2:rgba(255,255,255,.06);
@@ -417,7 +418,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .clg-no-results{text-align:center;padding:48px 0;color:var(--muted);font-size:.82rem;}
 .clg-hint{font-size:.68rem;color:var(--muted);margin-bottom:14px;padding:0 2px;}
 
-.color-twitter{color:#fff;}.color-linkedin{color:#0077b5;}.color-discord{color:#5865f2;}.color-globe{color:var(--accent);}
+.color-twitter{color:#fff;}.color-linkedin{color:#0077b5;}.color-discord{color:#5865f2;}.color-globe{color:var(--accent);}.color-instagram{color:#e1306c;}.color-github{color:#fff;}.color-arattai{color:#007aff;}
 </style>
 </head>
 <body>
@@ -1036,6 +1037,8 @@ function toggleBioMusic(e){
 
 /* ─── LINKS + INIT ─── */
 const LINKS=[
+  {icon:'fa-arattai',label:'Arattai',url:'https://aratt.ai/user/@nikhilb',color:'color-arattai',arattai:true},
+  {icon:'fa-brands fa-github',label:'GitHub',url:'https://github.com/xbit-proton',color:'color-github'},
   {icon:'fa-brands fa-instagram',label:'Instagram',url:'https://www.instagram.com/x0s.nikh_07',color:'color-instagram'},
   {icon:'fa-brands fa-x-twitter',label:'X',url:'https://x.com/Nikhil_X7',color:'color-twitter'},
   {icon:'fa-brands fa-linkedin-in',label:'LinkedIn',url:'https://linkedin.com/in/nikhil-b-b41641363',color:'color-linkedin'},
@@ -1178,7 +1181,7 @@ function linkCollege(idx){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('links-row').innerHTML=LINKS.map(l=>`<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.icon} ${l.color}"></i>${l.label}</a>`).join('');
+  document.getElementById('links-row').innerHTML=LINKS.map(l=>`<a href="${l.url}" class="link-pill" target="_blank"><i class="${l.arattai?'fa-arattai':l.icon} ${l.color}"></i>${l.label}</a>`).join('');
   renderPosts();
   updateFollowUI();
   initCollegeLink();
