@@ -388,6 +388,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.2);
   display:flex;align-items:center;justify-content:center;
   font-size:1.6rem;color:var(--accent);
+  overflow:hidden;flex-shrink:0;
 }
 .es-greeting-icon i{animation:sparkSpin 4s linear infinite;}
 .es-greeting-text{text-align:center;}
@@ -891,31 +892,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .post:nth-child(1){animation-delay:.04s}
 .post:nth-child(2){animation-delay:.1s}
 .post:nth-child(3){animation-delay:.16s}
-
-  /* Styling for the square block container */
-.es-greeting-icon {
-  width: 48px; /* Adjust size as needed */
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden; /* Keeps the image constrained to the block */
-  border-radius: 8px; /* Optional: gives slight rounded corners to the square */
-}
-
-/* Styling for the image inside the block */
-.es-greeting-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Prevents the image from stretching or distorting */
-  display: block;
-}
-
-/* Automatically hides the font icon if an image source is active */
-.es-greeting-img + i {
-  display: none;
-}
-  
 </style>
 </head>
 <body>
@@ -1134,18 +1110,25 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
   <!-- top bar -->
   <div class="es-topbar">
     <div class="es-back" onclick="closeEssential()"><i class="fa-solid fa-chevron-left"></i></div>
-    <div class="es-brand"><i class="fa-solid fa-sparkles" style="color:var(--accent);font-size:.9rem;"></i>Disha</div>
+    <div class="es-brand">
+      <img src="Disha.png" alt="" id="disha-brand-img"
+        onload="this.style.display='inline-block';"
+        onerror="this.style.display='none';"
+        style="display:none;width:22px;height:22px;object-fit:cover;border-radius:6px;flex-shrink:0;">
+      Disha
+    </div>
     <div style="width:36px;"></div>
   </div>
 
   <!-- chat messages area -->
   <div class="es-messages" id="es-messages">
     <div class="es-greeting" id="es-greeting">
-      <!-- Square block with image option -->
-      <div class="es-greeting-icon">
-        <img src="Dishalogo.png" alt="Disha Avatar" class="es-greeting-img">
-        <!-- Fallback icon (optional: remove if you only want the image) -->
-        <!-- <i class="fa-solid fa-sparkles"></i> -->
+      <div class="es-greeting-icon" id="es-greeting-icon">
+        <img src="Disha.png" alt="" id="disha-img"
+          onload="this.style.display='block';document.getElementById('disha-fb-icon').style.display='none';"
+          onerror="this.style.display='none';"
+          style="display:none;width:100%;height:100%;object-fit:cover;border-radius:20px;">
+        <i class="fa-solid fa-sparkles" id="disha-fb-icon"></i>
       </div>
       <div class="es-greeting-text">
         <div class="es-hey">Hey, Guest 👋</div>
@@ -1154,7 +1137,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
       </div>
     </div>
   </div>
-</div>
 
   <!-- suggestions strip -->
   <div class="es-suggestions" id="es-suggestions" style="display:none;"></div>
