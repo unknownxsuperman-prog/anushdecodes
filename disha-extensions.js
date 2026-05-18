@@ -1,25 +1,17 @@
 /**
- * x0s.link – Disha Intelligence Extensions Module (LOCAL AI EDITION)
- * Zero API dependency – all intelligence runs on-device.
+ * x0s.link – Disha Intelligence Extensions Module (Local AI + Live Weather)
  */
 (function () {
   // ========== LOCAL AI ENGINE ==========
   const LocalAI = {
-    // Conversation memory (simple state)
     lastIntent: null,
-    lastEntities: {},
     greetCount: 0,
 
-    /**
-     * Main dispatcher: analyse query & return a plain text response.
-     */
     async respond(query) {
       const q = query.trim();
       if (!q) return "I didn't catch that. Could you repeat?";
-
       const lower = q.toLowerCase();
 
-      // ---- Pre-defined intents ----
       const intents = [
         { name: 'greeting', patterns: [/^(hi|hello|hey|yo|good\s(morning|afternoon|evening))/i, /\b(hi|hello|hey)\b/i] },
         { name: 'farewell', patterns: [/\b(bye|goodbye|see\syou|tata)\b/i] },
@@ -45,63 +37,38 @@
           break;
         }
       }
-
-      // Store intent for context
       this.lastIntent = matchedIntent;
 
-      // Respond according to intent
       switch (matchedIntent) {
-        case 'greeting':
-          this.greetCount++;
-          return this.respondGreeting();
-        case 'farewell':
-          return this.respondFarewell();
-        case 'who_are_you':
-          return "I'm **x0s.link Disha**, your on‑device AI assistant. I live inside this search engine and can solve math, fetch news, answer questions, and keep you company.";
-        case 'what_can_you_do':
-          return "I can:\n- 🧮 **Calculate** math expressions\n- 📰 **Summarise current affairs**\n- 🤖 **Answer general knowledge**\n- 🕒 Tell the **time/date**\n- 😄 Crack **jokes** & share **quotes**\n- 📘 Give **definitions** of common terms\nJust type something like _'calc 5*3'_, _'latest tech news'_ or _'what is photosynthesis'_.";
-        case 'creator':
-          return "I was crafted by the developers at **x0s.link** as a lightweight, privacy‑first AI that runs entirely in your browser.";
-        case 'thanks':
-          return "You're welcome! 😊 If you need anything else, just ask.";
-        case 'time':
-          return `The current time is **${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}**.`;
-        case 'date':
-          return `Today is **${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}**.`;
-        case 'joke':
-          return this.getRandomJoke();
-        case 'quote':
-          return this.getRandomQuote();
-        case 'fact':
-          return this.getRandomFact();
-        case 'definition':
-          return this.respondDefinition(lower);
-        case 'weather':
-          return "I can't access live weather data, but you can check **[OpenWeatherMap](https://openweathermap.org)** or just peek outside! ☀️";
-        case 'how_are_you':
-          return "I'm running on all cores and feeling fantastic! Thanks for asking. How can I help you?";
-        case 'age':
-          return "I was born in the cloud of code, so I'm timeless. But my current version is fresh out of the compiler.";
-        default:
-          return this.respondGeneralKnowledge(lower);
+        case 'greeting': this.greetCount++; return this.respondGreeting();
+        case 'farewell': return this.respondFarewell();
+        case 'who_are_you': return "I'm **x0s.link Disha**, your on‑device AI assistant. I live inside this search engine and can solve math, fetch news, answer questions, and keep you company.";
+        case 'what_can_you_do': return "I can:\n- 🧮 **Calculate** math expressions\n- 📰 **Summarise current affairs**\n- 🤖 **Answer general knowledge**\n- 🕒 Tell the **time/date**\n- 😄 Crack **jokes** & share **quotes**\n- 📘 Give **definitions** of common terms\n- 🌤️ Show **live weather** (just ask 'weather in London')\nJust type something like _'calc 5*3'_, _'latest tech news'_ or _'what is photosynthesis'_.";
+        case 'creator': return "I was crafted by the developers at **x0s.link** as a lightweight, privacy‑first AI that runs entirely in your browser.";
+        case 'thanks': return "You're welcome! 😊 If you need anything else, just ask.";
+        case 'time': return `The current time is **${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}**.`;
+        case 'date': return `Today is **${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}**.`;
+        case 'joke': return this.getRandomJoke();
+        case 'quote': return this.getRandomQuote();
+        case 'fact': return this.getRandomFact();
+        case 'definition': return this.respondDefinition(lower);
+        case 'weather': return await this.getWeatherReport(lower);
+        case 'how_are_you': return "I'm running on all cores and feeling fantastic! Thanks for asking. How can I help you?";
+        case 'age': return "I was born in the cloud of code, so I'm timeless. But my current version is fresh out of the compiler.";
+        default: return this.respondGeneralKnowledge(lower);
       }
     },
 
-    // ----- INTENT HANDLERS -----
     respondGreeting() {
-      const greetings = [
+      const g = [
         "Hey there! 👋 How can I help you today?",
         "Hi! Ready to explore something new?",
         "Hello! I'm all ears (well, virtual ones).",
         `Welcome back${this.greetCount > 1 ? ' again' : ''}! What's on your mind?`
       ];
-      return greetings[Math.floor(Math.random() * greetings.length)];
+      return g[Math.floor(Math.random() * g.length)];
     },
-
-    respondFarewell() {
-      return "Goodbye! Remember, I’m just a keystroke away. Stay curious! 👋";
-    },
-
+    respondFarewell() { return "Goodbye! Remember, I’m just a keystroke away. Stay curious! 👋"; },
     getRandomJoke() {
       const jokes = [
         "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
@@ -112,7 +79,6 @@
       ];
       return jokes[Math.floor(Math.random() * jokes.length)];
     },
-
     getRandomQuote() {
       const quotes = [
         "\"The only way to do great work is to love what you do.\" – Steve Jobs",
@@ -123,94 +89,99 @@
       ];
       return quotes[Math.floor(Math.random() * quotes.length)];
     },
-
     getRandomFact() {
       const facts = [
         "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still edible!",
-        "A day on Venus is longer than a year on Venus. It takes 243 Earth days to rotate once but only 225 Earth days to orbit the Sun.",
+        "A day on Venus is longer than a year on Venus.",
         "Octopuses have three hearts, and two of them stop beating when they swim.",
         "Bananas are berries, but strawberries aren't.",
         "There are more stars in the universe than grains of sand on all the Earth's beaches."
       ];
       return `**Did you know?** ${facts[Math.floor(Math.random() * facts.length)]}`;
     },
-
     respondDefinition(lower) {
-      // Simple definition lookup
       const defs = {
         photosynthesis: "The process by which green plants use sunlight to synthesise nutrients from carbon dioxide and water.",
-        gravity: "A natural phenomenon by which all things with mass are brought toward one another. On Earth, gravity gives weight to physical objects.",
+        gravity: "A natural phenomenon by which all things with mass are brought toward one another.",
         algorithm: "A set of rules or steps for solving a problem, especially by a computer.",
-        ai: "Artificial Intelligence – the simulation of human intelligence in machines that are programmed to think and learn.",
-        bitcoin: "A decentralised digital currency, without a central bank, that can be sent from user to user on the peer-to-peer bitcoin network.",
+        ai: "Artificial Intelligence – the simulation of human intelligence in machines.",
+        bitcoin: "A decentralised digital currency, without a central bank.",
         blockchain: "A distributed ledger technology that maintains a secure and immutable record of transactions.",
         dna: "Deoxyribonucleic acid – the molecule that carries genetic information in living organisms.",
-        cloud: "A network of remote servers hosted on the Internet to store, manage, and process data, rather than a local server.",
-        javascript: "A high-level, interpreted programming language that conforms to the ECMAScript specification. It is the language of the web."
+        cloud: "A network of remote servers hosted on the Internet to store, manage, and process data.",
+        javascript: "A high-level, interpreted programming language that is the language of the web."
       };
-      // Extract the term (simple – everything after "what is" or "define")
-      let term = lower.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+)/i, '')
-                      .replace(/\?/g, '')
-                      .trim();
-      if (defs[term]) {
-        return `**${term}**: ${defs[term]}`;
-      } else if (term) {
-        return `I don't have a definition for "${term}" in my local memory, but you can search the web for a detailed explanation.`;
-      }
+      let term = lower.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+)/i, '').replace(/\?/g, '').trim();
+      if (defs[term]) return `**${term}**: ${defs[term]}`;
+      else if (term) return `I don't have a definition for "${term}" in my local memory.`;
       return "What would you like me to define?";
     },
-
     respondGeneralKnowledge(lower) {
-      // Additional keyword-based facts / templates
       const kb = [
         { keys: ['capital', 'india'], answer: "The capital of India is **New Delhi**." },
         { keys: ['capital', 'france'], answer: "The capital of France is **Paris**." },
         { keys: ['capital', 'japan'], answer: "The capital of Japan is **Tokyo**." },
-        { keys: ['president', 'usa'], answer: "The President of the United States is the head of state and government." },
-        { keys: ['largest', 'ocean'], answer: "The largest ocean on Earth is the **Pacific Ocean**." },
-        { keys: ['fastest', 'animal'], answer: "The fastest land animal is the **cheetah**, capable of reaching speeds up to 120 km/h." },
-        { keys: ['tallest', 'mountain'], answer: "Mount Everest, at 8,848 metres, is the tallest mountain above sea level." },
-        { keys: ['pi'], answer: "Pi (π) is approximately 3.14159, the ratio of a circle's circumference to its diameter." },
-        { keys: ['e=mc2', 'einstein'], answer: "E=mc² is Albert Einstein's mass-energy equivalence formula, stating that energy equals mass times the speed of light squared." },
-        { keys: ['light', 'speed'], answer: "The speed of light in a vacuum is approximately 299,792,458 metres per second." },
-        { keys: ['mars', 'planet'], answer: "Mars is the fourth planet from the Sun, often called the Red Planet due to its iron oxide surface." },
-        { keys: ['elephant', 'weight'], answer: "An adult African elephant can weigh up to 6,000 kg." },
-        { keys: ['human', 'bones'], answer: "The adult human body has 206 bones." },
-        { keys: ['water', 'boil'], answer: "Water boils at 100°C (212°F) at sea level." },
-        { keys: ['longest', 'river'], answer: "The Nile is often considered the longest river in the world, flowing for about 6,650 km." }
+        { keys: ['pi'], answer: "Pi (π) is approximately 3.14159." },
+        { keys: ['light', 'speed'], answer: "The speed of light in a vacuum is approximately 299,792,458 m/s." },
+        { keys: ['mars', 'planet'], answer: "Mars is the fourth planet from the Sun, often called the Red Planet." }
       ];
-
-      // Check knowledge base
       for (const item of kb) {
-        if (item.keys.every(k => lower.includes(k))) {
-          return item.answer;
-        }
+        if (item.keys.every(k => lower.includes(k))) return item.answer;
       }
-
-      // If no match, give a helpful fallback
       const fallbacks = [
         "I'm not sure about that, but I'm constantly learning. Could you rephrase?",
         "Hmm, that's beyond my local brain right now. Try asking about math, news, or a definition.",
-        "I don't have an answer for that, but you can use the web search for more details.",
-        "That's a great question! I'm still expanding my knowledge – maybe you can teach me?"
+        "I don't have an answer for that, but you can use the web search for more details."
       ];
       return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    },
+
+    // 🌤️ LIVE WEATHER (requires API key)
+    async getWeatherReport(query) {
+      const cityMatch = query.match(/weather\s+(?:in|for|at)?\s*([a-zA-Z\s]+)/i);
+      let city = cityMatch ? cityMatch[1].trim() : 'Mumbai';
+      const apiKey = '0222762e4fd7dc746123423914f0dca7'; // your key
+
+      try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('City not found or API limit reached');
+        const data = await res.json();
+        const icon = data.weather[0].icon;
+        return `
+          <div style="display:flex; align-items:center; gap:12px;">
+            <img src="https://openweathermap.org/img/wn/${icon}@2x.png" style="width:60px;height:60px;">
+            <div>
+              <strong style="font-size:1.2rem;">${data.name}, ${data.sys.country}</strong><br>
+              <span style="font-size:2rem; font-weight:700;">${Math.round(data.main.temp)}°C</span>
+              <span style="text-transform:capitalize; color:var(--muted);">${data.weather[0].description}</span><br>
+              <small>Humidity: ${data.main.humidity}% | Wind: ${data.wind.speed} m/s</small>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        return `⚠️ Couldn't fetch weather for "${city}". ${err.message}`;
+      }
     }
   };
 
-  // ========== TYPEWRITER EFFECT ==========
+  // ========== TYPEWRITER & MARKDOWN ==========
+  function simpleMarkdown(md) {
+    return md
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`(.*?)`/g, '<code style="background:#1a1a1a;padding:1px 5px;border-radius:4px;">$1</code>')
+      .replace(/\n/g, '<br>');
+  }
   async function typewriteText(container, text) {
     container.innerHTML = '';
     let i = 0;
-    const total = text.length;
     return new Promise(resolve => {
       function type() {
-        if (i < total) {
-          // Render with basic Markdown support
+        if (i < text.length) {
           container.innerHTML = simpleMarkdown(text.substring(0, i + 1)) + '<span class="typing-cursor">▌</span>';
           i++;
-          const speed = 15 + Math.random() * 20; // ms per char
-          setTimeout(type, speed);
+          setTimeout(type, 15 + Math.random() * 20);
           if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
         } else {
           container.innerHTML = simpleMarkdown(text);
@@ -221,16 +192,7 @@
     });
   }
 
-  // Simple Markdown → HTML (bold, italic, code, line breaks)
-  function simpleMarkdown(md) {
-    return md
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`(.*?)`/g, '<code style="background:#1a1a1a;padding:1px 5px;border-radius:4px;">$1</code>')
-      .replace(/\n/g, '<br>');
-  }
-
-  // ========== ORIGINAL MODULES (unchanged) ==========
+  // ========== MATH & NEWS (unchanged) ==========
   function executeCalculation(expr) {
     const messagesContainer = document.getElementById('es-messages');
     const sysBubble = createSysBubble("Calculation processed:");
@@ -247,13 +209,7 @@
     card.className = 'es-result-card';
     card.style.borderLeft = isError ? '2px solid #ff3b5c' : '2px solid var(--accent)';
     card.style.background = '#0a0a0a';
-    card.innerHTML = `
-      <div style="font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px;">
-        <i class="fa-solid fa-calculator" style="margin-right:5px; color:${isError?'#ff3b5c':'var(--accent)'}"></i> Math Kernel Engine
-      </div>
-      <div style="font-size:0.8rem; color:var(--muted); font-family:monospace;">${expr}</div>
-      <div style="font-size:1.15rem; font-weight:700; color:${isError?'#ff3b5c':'var(--text)'}; margin-top:4px;">= ${result}</div>
-    `;
+    card.innerHTML = `<div style="font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:2px;"><i class="fa-solid fa-calculator" style="margin-right:5px; color:${isError?'#ff3b5c':'var(--accent)'}"></i> Math Kernel Engine</div><div style="font-size:0.8rem; color:var(--muted); font-family:monospace;">${expr}</div><div style="font-size:1.15rem; font-weight:700; color:${isError?'#ff3b5c':'var(--text)'}; margin-top:4px;">= ${result}</div>`;
     sysBubble.appendChild(card);
     messagesContainer.appendChild(sysBubble);
   }
@@ -267,9 +223,9 @@
     else if (cleanQuery.includes("infra") || cleanQuery.includes("transport")) focusTag = "Infrastructure";
     else if (cleanQuery.includes("local")) focusTag = "Regional Bulletin";
     const feed = [
-      { tag: focusTag, title: "Decentralised storage reshapes data sovereignty across edge deployments", summary: "Self-hosted bare-metal clusters gain traction as enterprises bypass centralised cloud dependency.", time: "12m ago" },
-      { tag: "India Tech", title: "Semiconductor mission accelerates fabless ecosystem in tier‑2 cities", summary: "Startup grants and skill hubs push fabrication R&D beyond metros.", time: "1h ago" },
-      { tag: "Transit", title: "Algorithmic fleet management pilots show 30% drop in wait times", summary: "Smart dispatch integrates with public transit APIs for first‑mile connectivity.", time: "3h ago" }
+      { tag: focusTag, title: "Decentralised storage reshapes data sovereignty", summary: "Self-hosted bare-metal clusters gain traction.", time: "12m ago" },
+      { tag: "India Tech", title: "Semiconductor mission accelerates fabless ecosystem", summary: "Startup grants push fabrication R&D beyond metros.", time: "1h ago" },
+      { tag: "Transit", title: "Algorithmic fleet management pilots show 30% drop in wait times", summary: "Smart dispatch integrates with public transit APIs.", time: "3h ago" }
     ];
     feed.forEach(item => {
       const card = document.createElement('div');
@@ -277,14 +233,7 @@
       card.style.marginBottom = '10px';
       card.style.background = '#0a0a0a';
       card.style.borderColor = '#1a1a1a';
-      card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <span style="font-size:0.58rem; background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.2); color:var(--accent); padding:2px 8px; border-radius:99px; font-weight:600; letter-spacing:0.04em;">${item.tag}</span>
-          <span style="font-size:0.6rem; color:var(--muted);">${item.time}</span>
-        </div>
-        <div style="font-size:0.86rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px;">${item.title}</div>
-        <div style="font-size:0.74rem; color:var(--muted); line-height:1.45;">${item.summary}</div>
-      `;
+      card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:0.58rem; background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.2); color:var(--accent); padding:2px 8px; border-radius:99px; font-weight:600;">${item.tag}</span><span style="font-size:0.6rem; color:var(--muted);">${item.time}</span></div><div style="font-size:0.86rem; font-weight:600; color:var(--text); line-height:1.3; margin-bottom:4px;">${item.title}</div><div style="font-size:0.74rem; color:var(--muted); line-height:1.45;">${item.summary}</div>`;
       sysBubble.appendChild(card);
     });
     messagesContainer.appendChild(sysBubble);
@@ -293,10 +242,12 @@
   function createSysBubble(headerText) {
     const bubble = document.createElement('div');
     bubble.className = 'es-bubble-sys';
-    const header = document.createElement('div');
-    header.className = 'es-bubble-sys-text';
-    header.textContent = headerText;
-    bubble.appendChild(header);
+    if (headerText) {
+      const header = document.createElement('div');
+      header.className = 'es-bubble-sys-text';
+      header.textContent = headerText;
+      bubble.appendChild(header);
+    }
     return bubble;
   }
 
@@ -309,7 +260,7 @@
         const query = val.trim();
         const lowerQuery = query.toLowerCase();
 
-        // --- Math Detection ---
+        // Math
         const mathRegex = /^[0-9\s+\-*/().]+$/;
         const containsOperator = /[+\-*/]/.test(query);
         const isMathWord = lowerQuery.startsWith("calc") || lowerQuery.startsWith("evaluate");
@@ -320,18 +271,17 @@
           return;
         }
 
-        // --- News Detection ---
+        // News
         const newsKeywords = ["news", "current affairs", "updates", "headlines", "trends", "breaking"];
-        const matchesNews = newsKeywords.some(keyword => lowerQuery.includes(keyword));
-        if (matchesNews) {
+        if (newsKeywords.some(k => lowerQuery.includes(k))) {
           handleExtendedFeature(query, () => executeNewsReport(lowerQuery));
           return;
         }
 
-        // --- Local AI for everything else ---
+        // Local AI (with weather)
         handleExtendedFeature(query, async () => {
           const messagesContainer = document.getElementById('es-messages');
-          const sysBubble = createSysBubble(""); // no header for AI
+          const sysBubble = createSysBubble("");
           const contentDiv = document.createElement('div');
           contentDiv.className = 'ai-response-content';
           contentDiv.style.fontSize = '0.9rem';
@@ -340,10 +290,15 @@
           sysBubble.appendChild(contentDiv);
           messagesContainer.appendChild(sysBubble);
 
-          // Show blinking cursor while generating
           contentDiv.innerHTML = '<span class="typing-cursor">▌</span>';
           const answer = await LocalAI.respond(query);
-          await typewriteText(contentDiv, answer);
+          // If answer is HTML (weather card), inject directly; else typewrite
+          if (answer.trim().startsWith('<')) {
+            contentDiv.innerHTML = answer;
+          } else {
+            await typewriteText(contentDiv, answer);
+          }
+          if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
         });
       };
     }
@@ -358,22 +313,15 @@
     if (suggestions) suggestions.style.display = 'none';
     const greet = document.getElementById('es-greeting');
     if (greet) greet.style.display = 'none';
-    if (typeof window.appendEsBubbleUser === 'function') {
-      window.appendEsBubbleUser(userQuery);
-    }
+    if (typeof window.appendEsBubbleUser === 'function') window.appendEsBubbleUser(userQuery);
     setTimeout(() => {
       executionCallback();
-      if (typeof window.scrollEsToBottom === 'function') {
-        window.scrollEsToBottom();
-      }
+      if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
     }, 320);
   }
 
-  // Inject cursor animation
+  // Cursor animation
   const style = document.createElement('style');
-  style.textContent = `
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .typing-cursor { font-weight:100; color:var(--accent); }
-  `;
+  style.textContent = `@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}.typing-cursor{font-weight:100;color:var(--accent);}`;
   document.head.appendChild(style);
 })();
