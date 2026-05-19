@@ -648,29 +648,291 @@
       engToggleTotal.style.background = 'transparent';
     };
     engToggleTotal.onclick = () => {
-      engIndivDiv.style.display = 'none';
-      engTotalDiv.style.display = 'block';
-      engToggleTotal.style.background = 'rgba(255,255,255,0.1)';
-      engToggleIndiv.style.background = 'transparent';
+      engIndivDiv.style.disp  // ========== KCET PREDICTOR (REENGINEERED) ==========
+  function launchKcetPredictor() {
+    const container = document.getElementById('es-messages');
+    if (!container) return;
+    const sysBubble = document.createElement('div');
+    sysBubble.className = 'es-bubble-sys';
+    sysBubble.style.width = '100%';
+    sysBubble.style.maxWidth = '680px'; // Wider, aesthetic container
+    sysBubble.style.margin = '16px auto';
+    
+    const uid = Date.now();
+
+    sysBubble.innerHTML = `
+      <div class="kcet-monolith-card" style="background: #000000; border: 1px solid #1a1a1a; border-radius: 16px; padding: 32px; color: #ffffff; font-family: 'Space Grotesk', sans-serif; box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative; overflow: hidden;">
+        
+        <!-- Subtle Top Glass Accent Line -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);"></div>
+
+        <!-- Header Matrix -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; border-bottom: 1px solid #1a1a1a; padding-bottom: 20px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid #262626; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-layer-group" style="color: #ffffff; font-size: 1.2rem;"></i>
+            </div>
+            <div>
+              <div style="font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: #ffffff;">x0s Matrix Rank Engine</div>
+              <div style="font-size: 0.68rem; color: #666666; font-family: monospace; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 2px;">Predictive Analytics // KCET 2026</div>
+            </div>
+          </div>
+          <div style="font-size: 0.62rem; color: #ffffff; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; font-family: monospace; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid #262626;">
+            v2.0_stable
+          </div>
+        </div>
+
+        <!-- Mode Selection Matrix -->
+        <div style="display: flex; background: #0a0a0a; border: 1px solid #1a1a1a; padding: 4px; border-radius: 8px; margin-bottom: 32px;">
+          <button id="eng-mode-${uid}" class="kcet-mode-btn" data-mode="eng" style="flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; background: #ffffff; color: #000000; transition: all 0.2s ease;">Engineering Matrix</button>
+          <button id="non-mode-${uid}" class="kcet-mode-btn" data-mode="non" style="flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; background: transparent; color: #666666; transition: all 0.2s ease;">Pharma & Split Matrix</button>
+        </div>
+
+        <!-- ================= ENGINEERING MODE PANEL ================= -->
+        <div id="eng-panel-${uid}">
+          <div style="margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em;"><i class="fa-solid fa-graduation-cap" style="margin-right: 8px; font-size: 0.75rem;"></i> PCM Board Marks</div>
+              <div id="board-toggle-eng-${uid}" style="display: flex; gap: 4px; background: #0a0a0a; padding: 2px; border-radius: 6px; border: 1px solid #1a1a1a;">
+                <button class="board-mode-btn" data-mode="individual" data-target="eng" style="padding: 4px 10px; background: #1a1a1a; border: none; border-radius: 4px; font-size: 0.65rem; color: #ffffff; cursor: pointer; font-family: inherit;">Breakdown</button>
+                <button class="board-mode-btn" data-mode="total" data-target="eng" style="padding: 4px 10px; background: transparent; border: none; border-radius: 4px; font-size: 0.65rem; color: #666666; cursor: pointer; font-family: inherit;">Aggregate</button>
+              </div>
+            </div>
+            
+            <div id="eng-board-individual" style="display: flex; flex-direction: column; gap: 10px;">
+              ${renderWideSubjectInput('eng-phy', 'Physics Breakdown', 'fa-solid fa-atom')}
+              ${renderWideSubjectInput('eng-chem', 'Chemistry Breakdown', 'fa-solid fa-flask-vial')}
+              ${renderWideSubjectInput('eng-math', 'Mathematics Breakdown', 'fa-solid fa-square-root-variable')}
+            </div>
+            
+            <div id="eng-board-total" style="display: none;">
+              ${renderWideAggregateInput(`eng-total-board-${uid}`, 'PCM Cumulative Score', '0 - 300', 'fa-solid fa-calculator')}
+            </div>
+          </div>
+
+          <div style="margin-bottom: 32px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;"><i class="fa-solid fa-pen-to-square" style="margin-right: 8px; font-size: 0.75rem;"></i> KCET Metrics</div>
+            ${renderWideAggregateInput(`eng-kcet-total-${uid}`, 'Total Core Score Secured', '0 - 180', 'fa-solid fa-bolt')}
+          </div>
+
+          <button onclick="window.calcKcetEngineering('${uid}')" style="width: 100%; padding: 16px; background: #ffffff; border: 1px solid #ffffff; border-radius: 8px; color: #000000; font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; cursor: pointer; font-family: inherit; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Execute Predictive Evaluation</button>
+          <div id="eng-result-${uid}" style="margin-top: 28px; border-top: 1px solid #1a1a1a; padding-top: 24px; display: none;"></div>
+        </div>
+
+        <!-- ================= PHARMA / SPLIT MODE PANEL ================= -->
+        <div id="non-panel-${uid}" style="display: none;">
+          <div style="margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em;"><i class="fa-solid fa-graduation-cap" style="margin-right: 8px; font-size: 0.75rem;"></i> PCMB Board Marks</div>
+              <div id="board-toggle-non-${uid}" style="display: flex; gap: 4px; background: #0a0a0a; padding: 2px; border-radius: 6px; border: 1px solid #1a1a1a;">
+                <button class="board-mode-btn" data-mode="individual" data-target="non" style="padding: 4px 10px; background: #1a1a1a; border: none; border-radius: 4px; font-size: 0.65rem; color: #ffffff; cursor: pointer; font-family: inherit;">Breakdown</button>
+                <button class="board-mode-btn" data-mode="total" data-target="non" style="padding: 4px 10px; background: transparent; border: none; border-radius: 4px; font-size: 0.65rem; color: #666666; cursor: pointer; font-family: inherit;">Aggregate</button>
+              </div>
+            </div>
+            
+            <div id="non-board-individual" style="display: flex; flex-direction: column; gap: 10px;">
+              ${renderWideSubjectInput('non-phy', 'Physics Breakdown', 'fa-solid fa-atom')}
+              ${renderWideSubjectInput('non-chem', 'Chemistry Breakdown', 'fa-solid fa-flask-vial')}
+              ${renderWideSubjectInput('non-math', 'Mathematics Breakdown', 'fa-solid fa-square-root-variable')}
+              ${renderWideSubjectInput('non-bio', 'Biology Breakdown', 'fa-solid fa-dna')}
+            </div>
+            
+            <div id="non-board-total" style="display: none;">
+              ${renderWideAggregateInput(`non-total-board-${uid}`, 'PCMB Cumulative Score', '0 - 400', 'fa-solid fa-calculator')}
+            </div>
+          </div>
+
+          <div style="margin-bottom: 32px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;"><i class="fa-solid fa-network-wired" style="margin-right: 8px; font-size: 0.75rem;"></i> KCET Competitive Split Scores</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              ${renderWideSubjectInput('non-kcet-pcm-total', 'PCM Core Total Score (for Engineering)', 'fa-solid fa-pen-ruler')}
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                ${renderWideSubjectInput('non-kcet-bio', 'Biology (0-60)', 'fa-solid fa-dna')}
+                ${renderWideSubjectInput('non-kcet-math', 'Math (0-60)', 'fa-solid fa-calculator')}
+              </div>
+            </div>
+          </div>
+
+          <button onclick="window.calcKcetNonEngineering('${uid}')" style="width: 100%; padding: 16px; background: #ffffff; border: 1px solid #ffffff; border-radius: 8px; color: #000000; font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; cursor: pointer; font-family: inherit; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Evaluate Competitive Split Matrices</button>
+          <div id="non-result-${uid}" style="margin-top: 28px; border-top: 1px solid #1a1a1a; padding-top: 24px; display: none;"></div>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(sysBubble);
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+
+    // Event Wireframe and Handlers
+    setupCoreInteractions(uid);
+  }
+
+  // ========== WIDER COMPONENT RENDERERS ==========
+  function renderWideSubjectInput(id, placeholder, iconClass) {
+    return `
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); padding: 14px 20px; border-radius: 8px; border: 1px solid #1a1a1a; transition: border-color 0.2s ease;" onmouseover="this.style.borderColor='#262626'" onmouseout="this.style.borderColor='#1a1a1a'">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <i class="${iconClass}" style="color: #666666; font-size: 0.9rem; width: 16px; text-align: center;"></i>
+          <span style="font-size: 0.85rem; font-weight: 500; color: #cccccc;">${placeholder}</span>
+        </div>
+        <input type="number" id="in-${id}" placeholder="00" min="0" max="100" style="width: 70px; background: transparent; border: none; color: #ffffff; text-align: right; font-size: 0.95rem; font-weight: 700; font-family: monospace; outline: none;">
+      </div>
+    `;
+  }
+
+  function renderWideAggregateInput(id, title, bounds, iconClass) {
+    return `
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); padding: 14px 20px; border-radius: 8px; border: 1px solid #1a1a1a;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <i class="${iconClass}" style="color: #666666; font-size: 0.9rem; width: 16px; text-align: center;"></i>
+          <span style="font-size: 0.85rem; font-weight: 500; color: #cccccc;">${title} <span style="font-size: 0.7rem; color: #444444; margin-left: 4px;">(${bounds})</span></span>
+        </div>
+        <input type="number" id="${id}" placeholder="000" style="width: 90px; background: transparent; border: none; color: #ffffff; text-align: right; font-size: 0.95rem; font-weight: 700; font-family: monospace; outline: none;">
+      </div>
+    `;
+  }
+
+  // ========== CORE MECHANICS INTERACTORS ==========
+  function setupCoreInteractions(uid) {
+    const engModeBtn = document.getElementById(`eng-mode-${uid}`);
+    const nonModeBtn = document.getElementById(`non-mode-${uid}`);
+    const engPanel = document.getElementById(`eng-panel-${uid}`);
+    const nonPanel = document.getElementById(`non-panel-${uid}`);
+
+    engModeBtn.onclick = () => {
+      engModeBtn.style.background = '#ffffff'; engModeBtn.style.color = '#000000';
+      nonModeBtn.style.background = 'transparent'; nonModeBtn.style.color = '#666666';
+      engPanel.style.display = 'block'; nonPanel.style.display = 'none';
+    };
+    nonModeBtn.onclick = () => {
+      nonModeBtn.style.background = '#ffffff'; nonModeBtn.style.color = '#000000';
+      engModeBtn.style.background = 'transparent'; engModeBtn.style.color = '#666666';
+      nonPanel.style.display = 'block'; engPanel.style.display = 'none';
     };
 
-    // Board toggle handlers for Non-Engineering
-    const nonToggleIndiv = document.querySelector(`#board-toggle-non-${uid} .board-mode-btn[data-mode="individual"]`);
-    const nonToggleTotal = document.querySelector(`#board-toggle-non-${uid} .board-mode-btn[data-mode="total"]`);
-    const nonIndivDiv = document.getElementById(`non-board-individual`);
-    const nonTotalDiv = document.getElementById(`non-board-total`);
-    nonToggleIndiv.onclick = () => {
-      nonIndivDiv.style.display = 'flex';
-      nonTotalDiv.style.display = 'none';
-      nonToggleIndiv.style.background = 'rgba(255,255,255,0.1)';
-      nonToggleTotal.style.background = 'transparent';
-    };
-    nonToggleTotal.onclick = () => {
-      nonIndivDiv.style.display = 'none';
-      nonTotalDiv.style.display = 'block';
-      nonToggleTotal.style.background = 'rgba(255,255,255,0.1)';
-      nonToggleIndiv.style.background = 'transparent';
-    };
+    // Toggle Matrix Systems
+    ['eng', 'non'].forEach(type => {
+      const toggleIndiv = document.querySelector(`#board-toggle-${type}-${uid} .board-mode-btn[data-mode="individual"]`);
+      const toggleTotal = document.querySelector(`#board-toggle-${type}-${uid} .board-mode-btn[data-mode="total"]`);
+      const indivDiv = document.getElementById(`${type}-board-individual`);
+      const totalDiv = document.getElementById(`${type}-board-total`);
+
+      toggleIndiv.onclick = () => {
+        indivDiv.style.display = 'flex'; totalDiv.style.display = 'none';
+        toggleIndiv.style.background = '#1a1a1a'; toggleIndiv.style.color = '#ffffff';
+        toggleTotal.style.background = 'transparent'; toggleTotal.style.color = '#666666';
+      };
+      toggleTotal.onclick = () => {
+        indivDiv.style.display = 'none'; totalDiv.style.display = 'block';
+        toggleTotal.style.background = '#1a1a1a'; toggleTotal.style.color = '#ffffff';
+        toggleIndiv.style.background = 'transparent'; toggleIndiv.style.color = '#666666';
+      };
+    });
+  }
+
+  // ========== ENGINE ALGORITHMS EVALUATION ==========
+  window.calcKcetEngineering = (uid) => {
+    let boardPercent = 0;
+    const totalBoardInput = document.getElementById(`eng-total-board-${uid}`);
+    const isTotalMode = totalBoardInput && totalBoardInput.parentElement.style.display !== 'none';
+
+    if (isTotalMode) {
+      const total = parseFloat(totalBoardInput.value);
+      if (isNaN(total) || total < 0 || total > 300) return alert("System requires valid Cumulative Board parameters [0-300].");
+      boardPercent = (total / 300) * 100;
+    } else {
+      const phy = parseFloat(document.getElementById(`in-eng-phy`)?.value) || 0;
+      const chem = parseFloat(document.getElementById(`in-eng-chem`)?.value) || 0;
+      const math = parseFloat(document.getElementById(`in-eng-math`)?.value) || 0;
+      if (phy > 100 || chem > 100 || math > 100) return alert("Individual metrics bounds cannot exceed 100.");
+      boardPercent = ((phy + chem + math) / 300) * 100;
+    }
+
+    const kcetTotal = parseFloat(document.getElementById(`eng-kcet-total-${uid}`).value);
+    if (isNaN(kcetTotal) || kcetTotal < 0 || kcetTotal > 180) return alert("System requires valid KCET structural metric parameters [0-180].");
+    const kcetPercent = (kcetTotal / 180) * 100;
+
+    const evaluation = computeRank(boardPercent, kcetPercent);
+    const resultDiv = document.getElementById(`eng-result-${uid}`);
+    
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div style="background: #0a0a0a; border: 1px solid #1a1a1a; padding: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 0.65rem; font-family: monospace; color: #666666; letter-spacing: 0.1em; text-transform: uppercase;"><i class="fa-solid fa-circle-nodes" style="color:#007aff; margin-right:6px;"></i> Predicted Engineering Rank</div>
+          <div style="font-size: 2.2rem; font-weight: 700; color: #ffffff; letter-spacing: -0.04em; margin-top: 6px;">~ ${evaluation.rank.toLocaleString()}</div>
+        </div>
+        <div style="text-align: right; font-family: monospace; font-size: 0.7rem; color: #888888; line-height: 1.6;">
+          <div>BOARD SCORE: <span style="color:#fff">${boardPercent.toFixed(2)}%</span></div>
+          <div>KCET SCORE: <span style="color:#fff">${kcetPercent.toFixed(2)}%</span></div>
+          <div style="border-top:1px solid #1a1a1a; margin-top:4px; padding-top:4px;">INDEX VALUE: <span style="color:#007aff">${evaluation.indexScore.toFixed(2)}</span></div>
+        </div>
+      </div>
+    `;
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+  };
+
+  window.calcKcetNonEngineering = (uid) => {
+    let boardPercent = 0;
+    const totalBoardInput = document.getElementById(`non-total-board-${uid}`);
+    const isTotalMode = totalBoardInput && totalBoardInput.parentElement.style.display !== 'none';
+
+    if (isTotalMode) {
+      const total = parseFloat(totalBoardInput.value);
+      if (isNaN(total) || total < 0 || total > 400) return alert("System requires valid Cumulative Board parameters [0-400].");
+      boardPercent = (total / 400) * 100;
+    } else {
+      const phy = parseFloat(document.getElementById(`in-non-phy`)?.value) || 0;
+      const chem = parseFloat(document.getElementById(`in-non-chem`)?.value) || 0;
+      const math = parseFloat(document.getElementById(`in-non-math`)?.value) || 0;
+      const bio = parseFloat(document.getElementById(`in-non-bio`)?.value) || 0;
+      if (phy > 100 || chem > 100 || math > 100 || bio > 100) return alert("Individual metrics bounds cannot exceed 100.");
+      boardPercent = ((phy + chem + math + bio) / 400) * 100;
+    }
+
+    // Capture Split Sections
+    const pcmCore = parseFloat(document.getElementById(`in-non-kcet-pcm-total`)?.value) || 0;
+    const bioScore = parseFloat(document.getElementById(`in-non-kcet-bio`)?.value) || 0;
+    const mathScore = parseFloat(document.getElementById(`in-non-kcet-math`)?.value) || 0;
+
+    if (pcmCore > 180 || bioScore > 60 || mathScore > 60) return alert("Parameters out of official bounds schema.");
+
+    // Pharma Calculation: Uses Board % + (Physics + Chemistry + Biology KCET score converted to %)
+    // Extracting estimated PC from the parsed PCM core to bundle with Bio
+    const estimatedPhysChem = (pcmCore - mathScore); 
+    const pcbTotalSecure = estimatedPhysChem + bioScore;
+    const pcbPercent = (pcbTotalSecure / 180) * 100;
+    const pharmaMatrix = computeRank(boardPercent, pcbPercent);
+
+    // Engineering Calculation matrix from PCM Core values directly
+    const pcmPercent = (pcmCore / 180) * 100;
+    const engineeringMatrix = computeRank(boardPercent, pcmPercent);
+
+    const resultDiv = document.getElementById(`non-result-${uid}`);
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div style="background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 8px;">
+          <div style="font-size: 0.62rem; font-family: monospace; color: #666666; letter-spacing: 0.08em; text-transform: uppercase;"><i class="fa-solid fa-capsules" style="color:#007aff; margin-right:4px;"></i> Pharma Matrix Rank</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #ffffff; letter-spacing: -0.03em; margin: 8px 0;">~ ${pharmaMatrix.rank.toLocaleString()}</div>
+          <div style="font-size: 0.65rem; font-family: monospace; color: #444444; line-height: 1.4;">
+            KCET (PCB): <span style="color:#888">${pcbPercent.toFixed(1)}%</span>
+          </div>
+        </div>
+        <div style="background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 8px;">
+          <div style="font-size: 0.62rem; font-family: monospace; color: #666666; letter-spacing: 0.08em; text-transform: uppercase;"><i class="fa-solid fa-microchip" style="color:#007aff; margin-right:4px;"></i> Eng. Split Rank</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #ffffff; letter-spacing: -0.03em; margin: 8px 0;">~ ${engineeringMatrix.rank.toLocaleString()}</div>
+          <div style="font-size: 0.65rem; font-family: monospace; color: #444444; line-height: 1.4;">
+            KCET (PCM): <span style="color:#888">${pcmPercent.toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; background: #0a0a0a; border: 1px solid #1a1a1a; padding: 10px 16px; border-radius: 6px; font-size: 0.68rem; color: #666666; font-family: monospace; text-align: center;">
+        Matrix normalization complete. Evaluation generated safely on-device.
+      </div>
+    `;
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+  };
+
   }
 
   function renderSubjectInput(id, label) {
