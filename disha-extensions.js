@@ -656,4 +656,95 @@
       };
     }
   });
+    // ========== 1. KCET PREDICTION ENGINE ==========
+  function launchKcetPredictor() {
+    const container = document.getElementById('es-messages');
+    const sysBubble = document.createElement('div');
+    sysBubble.className = 'es-bubble-sys';
+    const uid = Date.now(); // Unique ID to prevent overlaps
+
+    sysBubble.innerHTML = `
+      <div class="es-result-card" style="background:#0a0a0a; border-left:3px solid var(--accent); padding:16px; border-radius:14px;">
+        <div style="font-size:0.6rem; color:var(--accent); font-weight:700; margin-bottom:10px; letter-spacing:0.1em;">KCET RANK PREDICTOR 2026</div>
+        
+        <div id="kcet-step-1-${uid}">
+          <div style="font-size:0.85rem; color:#fff; margin-bottom:12px;">Are you a Biology or CS student?</div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="setupKcetForm('${uid}', 'cs')" style="flex:1; padding:10px; background:rgba(0,122,255,0.1); border:1px solid var(--accent); color:#fff; border-radius:8px; font-size:0.75rem; cursor:pointer;">CS Student</button>
+            <button onclick="setupKcetForm('${uid}', 'bio')" style="flex:1; padding:10px; background:#111; border:1px solid #1a1a1a; color:#888; border-radius:8px; font-size:0.75rem; cursor:pointer;">Bio Student</button>
+          </div>
+        </div>
+
+        <div id="kcet-form-${uid}" style="display:none; margin-top:15px;">
+           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+              <input type="number" id="b-p-${uid}" placeholder="Phy Board" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
+              <input type="number" id="c-p-${uid}" placeholder="Phy KCET" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
+              <input type="number" id="b-c-${uid}" placeholder="Chem Board" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
+              <input type="number" id="c-c-${uid}" placeholder="Chem KCET" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
+              <input type="number" id="b-opt-${uid}" placeholder="Math Board" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
+              <input type="number" id="c-opt-${uid}" placeholder="Math KCET" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
+           </div>
+           <button onclick="calculateKcetRank('${uid}')" style="width:100%; padding:12px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:0.8rem;">Predict My Rank</button>
+        </div>
+        
+        <div id="kcet-result-${uid}" style="display:none; margin-top:15px; border-top:1px dashed #222; padding-top:15px;"></div>
+      </div>
+    `;
+    container.appendChild(sysBubble);
+    window.scrollEsToBottom();
+  }
+
+  // Helper functions for the UI
+  window.setupKcetForm = (uid, type) => {
+    document.getElementById(`kcet-step-1-${uid}`).style.display = 'none';
+    const form = document.getElementById(`kcet-form-${uid}`);
+    form.style.display = 'block';
+    const optInputBoard = document.getElementById(`b-opt-${uid}`);
+    const optInputKcet = document.getElementById(`c-opt-${uid}`);
+    
+    if(type === 'bio') {
+      optInputBoard.placeholder = "Bio Board";
+      optInputKcet.placeholder = "Bio KCET";
+    }
+  };
+
+  window.calculateKcetRank = (uid) => {
+    // 50-50 Logic
+    const bAvg = (parseFloat(document.getElementById(`b-p-${uid}`).value) + parseFloat(document.getElementById(`b-c-${uid}`).value) + parseFloat(document.getElementById(`b-opt-${uid}`).value)) / 3;
+    const cAvg = ((parseFloat(document.getElementById(`c-p-${uid}`).value) + parseFloat(document.getElementById(`c-c-${uid}`).value) + parseFloat(document.getElementById(`c-opt-${uid}`).value)) / 180) * 100;
+    
+    const finalScore = (bAvg + cAvg) / 2;
+    let rank = Math.round(Math.pow(100 - finalScore, 2.5) * 5); // Rough estimation formula
+
+    const resArea = document.getElementById(`kcet-result-${uid}`);
+    resArea.style.display = 'block';
+    resArea.innerHTML = `
+      <div style="font-size:0.65rem; color:#888;">EXPECTED ENGINEERING RANK</div>
+      <div style="font-size:1.8rem; font-weight:700; color:#fff; margin:5px 0;">~ ${rank.toLocaleString()}</div>
+      <button onclick="launchKcetPredictor()" style="background:transparent; border:1px solid #222; color:#555; padding:6px 12px; border-radius:6px; font-size:0.65rem; cursor:pointer; margin-top:10px;"><i class="fa-solid fa-rotate-right"></i> Resend</button>
+    `;
+  };
+
+  // ========== 2. THE ROUTER (THE BRAIN) ==========
+  // This overrides the original search to handle your new features
+  const originalSearch = window.doEsSearch;
+  window.doEsSearch = function(val) {
+    const q = val.toLowerCase().trim();
+    
+    if (q.includes("kcet") || q.includes("prediction")) {
+      // 1. Hide greeting
+      document.getElementById('es-greeting').style.display = 'none';
+      // 2. Show user bubble
+      window.appendEsBubbleUser(val);
+      // 3. Clear input
+      document.getElementById('es-input').value = '';
+      // 4. Launch KCET
+      setTimeout(launchKcetPredictor, 300);
+      return;
+    }
+    
+    // If not KCET, use the standard search (colleges/people)
+    originalSearch(val);
+  };
+  
 })();
