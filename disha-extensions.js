@@ -612,24 +612,141 @@
     });
   }
 
-  // ========== MAIN HOOK ==========
+    // ========== MAIN HOOK (MASTER ROUTER) ==========
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof window.doEsSearch === "function") {
-      const coreEsSearch = window.doEsSearch;
+      const coreEsSearch = window.doEsSearch; // Save original college search
 
       window.doEsSearch = async function (val) {
         if (!val || !val.trim()) return;
         const query = val.trim();
         const lowerQuery = query.toLowerCase();
 
-        // Route to LocalAI
+        // 1. UI RESET
         const messagesContainer = document.getElementById('es-messages');
+        const greet = document.getElementById('es-greeting');
+        if (greet) greet.style.display = 'none';
+
+        // 2. CREATE USER BUBBLE
+        if (typeof window.appendEsBubbleUser === 'function') {
+          window.appendEsBubbleUser(query);
+        } else {
+          const userBubble = document.createElement('div');
+          userBubble.className = 'es-bubble-user';
+          userBubble.textContent = query;
+          messagesContainer.appendChild(userBubble);
+        }
         
-        // Create user bubble
-        const userBubble = document.createElement('div');
-        userBubble.className = 'es-bubble-user';
-        userBubble.textContent = query;
-        messagesContainer.appendChild(userBubble);
+        document.getElementById('es-input').value = ''; // Clear input
+
+        // 3. ROUTING LOGIC
+        
+        // --- ROUTE A: KCET PREDICTION ---
+        if (lowerQuery.includes("kcet") || lowerQuery.includes("prediction")) {
+          setTimeout(launchKcetPredictor, 300);
+          return;
+        }
+
+        // --- ROUTE B: LOCAL AI (Math, Weather, GK, Utils) ---
+        const sysBubble = document.createElement('div');
+        sysBubble.className = 'es-bubble-sys';
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'ai-response-content';
+        contentDiv.style.fontSize = '0.9rem';
+        contentDiv.style.color = 'var(--text)';
+        contentDiv.style.lineHeight = '1.6';
+        sysBubble.appendChild(contentDiv);
+        messagesContainer.appendChild(sysBubble);
+        contentDiv.innerHTML = '<span class="typing-cursor" style="color:var(--accent);">▌</span>';
+
+        try {
+          const answer = await LocalAI.respond(query);
+          
+          // Check if it's a fallback response. If so, let College Search try.
+          if (answer.includes("Try asking about") || answer.includes("Not in my local database")) {
+            messagesContainer.removeChild(sysBubble); 
+            coreEsSearch(val);
+          } else {
+            await typewriteText(contentDiv, answer);
+          }
+        } catch (err) {
+          contentDiv.innerHTML = `<span style="color:#ef4444;">⚠️ Engine Error: ${err.message}</span>`;
+        }
+
+        if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+      };
+    }
+  });
+
+  // ========== KCET ENGINE FUNCTIONS ==========
+  function launchKcetPredictor() {
+    const container = document.getElementById('es-messages');
+    const sysBubble = document.createElement('div');
+    sysBubble.className = 'es-bubble-sys';
+    const uid = Date.now();
+
+    sysBubble.innerHTML = `
+      <div class="es-result-card" style="background:#0a0a0a; border-left:3px solid var(--accent); padding:16px; border-radius:14px; border: 1px solid #1a1a1a; border-left-width: 3px; border-left-color: var(--accent);">
+        <div style="font-size:0.6rem; color:var(--accent); font-weight:700; margin-bottom:10px; letter-spacing:0.1em; text-transform:uppercase;">KCET Rank Matrix v2.6</div>
+        
+        <div id="kcet-step-1-${uid}">
+          <div style="font-size:0.85rem; color:#fff; margin-bottom:12px; font-weight:300;">Select academic stream:</div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="setupKcetForm('${uid}', 'cs')" style="flex:1; padding:10px; background:rgba(0,122,255,0.1); border:1px solid var(--accent); color:#fff; border-radius:8px; font-size:0.75rem; cursor:pointer;">Engineering (CS)</button>
+            <button onclick="setupKcetForm('${uid}', 'bio')" style="flex:1; padding:10px; background:#111; border:1px solid #1a1a1a; color:#888; border-radius:8px; font-size:0.75rem; cursor:pointer;">Medical (Bio)</button>
+          </div>
+        </div>
+
+        <div id="kcet-form-${uid}" style="display:none; margin-top:15px;">
+           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+              <input type="number" id="b-p-${uid}" placeholder="Phy Board" style="background:#111; border:1px solid #222; color:#fff; padding:10px; border-radius:6px; font-size:0.75rem; outline:none;">
+              <input type="number" id="c-p-${uid}" placeholder="Phy KCET" style="background:#111; border:1px solid #222; color:#fff; padding:10px; border-radius:6px; font-size:0.75rem; outline:none;">
+              <input type="number" id="b-c-${uid}" placeholder="Chem Board" style="background:#111; border:1px solid #222; color:#fff; padding:10px; border-radius:6px; font-size:0.75rem; outline:none;">
+              <input type="number" id="c-c-${uid}" placeholder="Chem KCET" style="background:#111; border:1px solid #222; color:#fff; padding:10px; border-radius:6px; font-size:0.75rem; outline:none;">
+              <input type="number" id="b-opt-${uid}" placeholder="Math Board" style="background:#111; border:1px solid #222; color:#fff; padding:10px; border-radius:6px; font-size:0.75rem; outline:none;">
+              <input type="number" id="c-opt-${uid}" placeholder="Math KCET" style="background:#111; border:1px solid #222; color:#fff; padding:10px; border-radius:6px; font-size:0.75rem; outline:none;">
+           </div>
+           <button onclick="calculateKcetRank('${uid}')" style="width:100%; padding:12px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer;">Execute Prediction</button>
+        </div>
+        
+        <div id="kcet-result-${uid}" style="display:none; margin-top:15px; border-top:1px dashed #222; padding-top:15px;"></div>
+      </div>
+    `;
+    container.appendChild(sysBubble);
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+  }
+
+  window.setupKcetForm = (uid, type) => {
+    document.getElementById(`kcet-step-1-${uid}`).style.display = 'none';
+    document.getElementById(`kcet-form-${uid}`).style.display = 'block';
+    if(type === 'bio') {
+      document.getElementById(`b-opt-${uid}`).placeholder = "Bio Board";
+      document.getElementById(`c-opt-${uid}`).placeholder = "Bio KCET";
+    }
+  };
+
+  window.calculateKcetRank = (uid) => {
+    const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+    const boardAvg = (getVal(`b-p-${uid}`) + getVal(`b-c-${uid}`) + getVal(`b-opt-${uid}`)) / 3;
+    const kcetScore = (getVal(`c-p-${uid}`) + getVal(`c-c-${uid}`) + getVal(`c-opt-${uid}`));
+    const kcetPerc = (kcetScore / 180) * 100;
+    const indexScore = (boardAvg + kcetPerc) / 2;
+    
+    // Rank formula
+    let estRank = Math.round(Math.pow(101 - indexScore, 2.8) * 2.5);
+    if (indexScore > 95) estRank = Math.round(Math.pow(101 - indexScore, 2.1) * 10);
+    
+    const resArea = document.getElementById(`kcet-result-${uid}`);
+    resArea.style.display = 'block';
+    resArea.innerHTML = `
+      <div style="font-size:0.65rem; color:#666; font-family:monospace; margin-bottom:4px;">PREDICTED RANK RADIUS</div>
+      <div style="font-size:1.8rem; font-weight:700; color:#fff; letter-spacing:-0.03em;">~ ${estRank.toLocaleString()}</div>
+      <div style="font-size:0.7rem; color:#444; margin-top:4px;">Index Score: ${indexScore.toFixed(2)}% | 50:50 Applied</div>
+      <button onclick="launchKcetPredictor()" style="background:transparent; border:1px solid #222; color:#555; padding:8px 16px; border-radius:6px; font-size:0.65rem; cursor:pointer; margin-top:12px;"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+    `;
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+  };
+
 
         // Create system bubble
         const sysBubble = document.createElement('div');
