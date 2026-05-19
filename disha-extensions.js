@@ -775,41 +775,117 @@
   });
     // ========== 1. KCET PREDICTION ENGINE ==========
   function launchKcetPredictor() {
+    function launchKcetPredictor() {
     const container = document.getElementById('es-messages');
     const sysBubble = document.createElement('div');
     sysBubble.className = 'es-bubble-sys';
-    const uid = Date.now(); // Unique ID to prevent overlaps
+    const uid = Date.now();
 
     sysBubble.innerHTML = `
-      <div class="es-result-card" style="background:#0a0a0a; border-left:3px solid var(--accent); padding:16px; border-radius:14px;">
-        <div style="font-size:0.6rem; color:var(--accent); font-weight:700; margin-bottom:10px; letter-spacing:0.1em;">KCET RANK PREDICTOR 2026</div>
-        
-        <div id="kcet-step-1-${uid}">
-          <div style="font-size:0.85rem; color:#fff; margin-bottom:12px;">Are you a Biology or CS student?</div>
-          <div style="display:flex; gap:8px;">
-            <button onclick="setupKcetForm('${uid}', 'cs')" style="flex:1; padding:10px; background:rgba(0,122,255,0.1); border:1px solid var(--accent); color:#fff; border-radius:8px; font-size:0.75rem; cursor:pointer;">CS Student</button>
-            <button onclick="setupKcetForm('${uid}', 'bio')" style="flex:1; padding:10px; background:#111; border:1px solid #1a1a1a; color:#888; border-radius:8px; font-size:0.75rem; cursor:pointer;">Bio Student</button>
+      <div class="kcet-glass-card" style="
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 28px;
+        padding: 24px;
+        width: 100%;
+        color: #ffffff;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      ">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+          <div style="width:44px; height:44px; background:rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius:14px; display:flex; align-items:center; justify-content:center;">
+            <i class="fa-solid fa-chart-line" style="color:#ffffff; font-size:1.1rem;"></i>
+          </div>
+          <div>
+            <div style="font-size:1rem; font-weight:700; letter-spacing:-0.01em;">KCET Rank Engine</div>
+            <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.05em;">Predictive Matrix // 2026</div>
           </div>
         </div>
 
-        <div id="kcet-form-${uid}" style="display:none; margin-top:15px;">
-           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
-              <input type="number" id="b-p-${uid}" placeholder="Phy Board" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
-              <input type="number" id="c-p-${uid}" placeholder="Phy KCET" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
-              <input type="number" id="b-c-${uid}" placeholder="Chem Board" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
-              <input type="number" id="c-c-${uid}" placeholder="Chem KCET" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
-              <input type="number" id="b-opt-${uid}" placeholder="Math Board" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
-              <input type="number" id="c-opt-${uid}" placeholder="Math KCET" style="background:#111; border:1px solid #222; color:#fff; padding:8px; border-radius:6px; font-size:0.75rem;">
-           </div>
-           <button onclick="calculateKcetRank('${uid}')" style="width:100%; padding:12px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-weight:700; font-size:0.8rem;">Predict My Rank</button>
+        <div style="margin-bottom:24px;">
+          <div style="display:flex; background:rgba(255,255,255,0.03); padding:5px; border-radius:16px; border:1px solid rgba(255,255,255,0.05);">
+            <button id="eng-btn-${uid}" onclick="setupKcetForm('${uid}', 'cs')" style="flex:1; padding:10px; border:none; border-radius:11px; font-size:0.75rem; font-weight:600; cursor:pointer; background:#ffffff; color:#000000; transition:all 0.3s var(--ease);">Engineering</button>
+            <button id="non-btn-${uid}" onclick="setupKcetForm('${uid}', 'bio')" style="flex:1; padding:10px; border:none; border-radius:11px; font-size:0.75rem; font-weight:600; cursor:pointer; background:transparent; color:rgba(255,255,255,0.4); transition:all 0.3s var(--ease);">Non-Engineering</button>
+          </div>
         </div>
-        
-        <div id="kcet-result-${uid}" style="display:none; margin-top:15px; border-top:1px dashed #222; padding-top:15px;"></div>
+
+        <div id="kcet-form-${uid}">
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            ${renderInputRow(uid, 'math', 'Maths', 'fa-square-root-variable')}
+            ${renderInputRow(uid, 'phy', 'Physics', 'fa-atom')}
+            ${renderInputRow(uid, 'chem', 'Chemistry', 'fa-vial')}
+            <div id="bio-row-wrapper-${uid}" style="display:none;">
+              ${renderInputRow(uid, 'bio', 'Biology', 'fa-dna')}
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:12px; margin:24px 0;">
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.05);"></div>
+            <div style="font-size:0.6rem; color:rgba(255,255,255,0.2); font-weight:800; letter-spacing:0.1em;">OR</div>
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.05);"></div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.05);">
+             <div style="display:flex; align-items:center; gap:12px;">
+                <i class="fa-solid fa-layer-group" style="color:rgba(255,255,255,0.3); font-size:0.9rem;"></i>
+                <span style="font-size:0.85rem; color:rgba(255,255,255,0.7);">Total Aggregate</span>
+             </div>
+             <div style="display:flex; align-items:center; gap:6px;">
+                <input type="number" id="total-m-${uid}" placeholder="000" style="width:60px; background:transparent; border:none; color:#ffffff; text-align:right; font-size:0.9rem; font-weight:600; outline:none;">
+                <span style="font-size:0.8rem; color:rgba(255,255,255,0.2);">/600</span>
+             </div>
+          </div>
+
+          <button onclick="calculateKcetRank('${uid}')" style="
+            width:100%; margin-top:24px; padding:16px; 
+            background: #ffffff; border: none; 
+            border-radius: 18px; color: #000000; font-weight:700; font-size:0.85rem;
+            display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer;
+            transition: opacity 0.2s;
+          " onactive="this.style.opacity='0.8'">
+            Get Prediction
+          </button>
+        </div>
+
+        <div id="kcet-result-${uid}" style="display:none; margin-top:24px; padding-top:24px; border-top:1px solid rgba(255,255,255,0.05);"></div>
       </div>
     `;
     container.appendChild(sysBubble);
     window.scrollEsToBottom();
   }
+
+  function renderInputRow(uid, id, label, icon) {
+    return `
+      <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.05);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <i class="fa-solid ${icon}" style="color:rgba(255,255,255,0.3); font-size:0.9rem; width:20px; text-align:center;"></i>
+          <span style="font-size:0.85rem; color:rgba(255,255,255,0.7);">${label}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:4px;">
+          <input type="number" id="in-${id}-${uid}" placeholder="00" style="width:50px; background:transparent; border:none; color:#ffffff; text-align:right; font-size:0.9rem; font-weight:600; outline:none;">
+          <span style="font-size:0.8rem; color:rgba(255,255,255,0.2);">/100</span>
+        </div>
+      </div>
+    `;
+  }
+
+  window.setupKcetForm = (uid, type) => {
+    const engBtn = document.getElementById(`eng-btn-${uid}`);
+    const nonBtn = document.getElementById(`non-btn-${uid}`);
+    const bioRow = document.getElementById(`bio-row-wrapper-${uid}`);
+
+    if (type === 'cs') {
+      engBtn.style.background = '#ffffff'; engBtn.style.color = '#000000';
+      nonBtn.style.background = 'transparent'; nonBtn.style.color = 'rgba(255,255,255,0.4)';
+      bioRow.style.display = 'none';
+    } else {
+      nonBtn.style.background = '#ffffff'; nonBtn.style.color = '#000000';
+      engBtn.style.background = 'transparent'; engBtn.style.color = 'rgba(255,255,255,0.4)';
+      bioRow.style.display = 'block';
+    }
+  };
+
 
   // Helper functions for the UI
   window.setupKcetForm = (uid, type) => {
