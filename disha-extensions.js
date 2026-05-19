@@ -10,9 +10,9 @@
   const CONFIG = {
     weatherApiKey: '0222762e4fd7dc746123423914f0dca7', // Rotate this in production
     defaultCity: 'Mumbai',
-    newsApiKey: null, // Set to use real news API, null = mock feed
+    newsApiKey: null,
     currencyApiBase: 'https://api.exchangerate-api.com/v4/latest/',
-    typingSpeed: 12, // ms per char
+    typingSpeed: 12,
     maxHistory: 50
   };
 
@@ -44,12 +44,10 @@
       State.history.push({ query: q, time: Date.now() });
       if (State.history.length > CONFIG.maxHistory) State.history.shift();
 
-      // Context-aware follow-ups
       if (lower.match(/^(and |what about |how about |also |plus )/i) && State.context.lastIntent) {
         return this.handleFollowUp(lower);
       }
 
-      // Intent Classification (ordered by specificity)
       const intents = [
         { name: 'calculator', patterns: [/^(calc|calculate|compute|solve|eval)\s+/i, /^[\d\s+\-*/().^%]+$/, /^(what is|what's)\s+[\d\s+\-*/().^%]+/i], priority: 10 },
         { name: 'converter', patterns: [/\b(convert|conversion)\b/i, /\b(\d+\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp))\b/i, /\b(km to mi|miles to km|kg to lbs|celsius to fahrenheit|usd to inr)\b/i], priority: 9 },
@@ -276,7 +274,6 @@
 
     handleDefinition(query) {
       let term = query.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+|explain\s+)/i, '').replace(/\?/g, '').trim().toLowerCase();
-      // replace spaces with underscores for dictionary lookup
       const key = term.replace(/\s+/g, '_');
       const defs = {
         photosynthesis: "Process by which green plants use sunlight to synthesize nutrients from CO₂ and water.",
@@ -533,7 +530,7 @@
     });
   }
 
-  // ========== KCET PREDICTOR (UNIFIED) ==========
+  // ========== KCET PREDICTOR (REDESIGNED) ==========
   function launchKcetPredictor() {
     const container = document.getElementById('es-messages');
     if (!container) return;
@@ -541,129 +538,266 @@
     sysBubble.className = 'es-bubble-sys';
     const uid = Date.now();
 
+    // We'll build the HTML with two modes inside a single card.
     sysBubble.innerHTML = `
-      <div class="kcet-glass-card" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; padding: 24px; width: 100%; color: #ffffff; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+      <div class="kcet-glass-card" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; padding: 24px; color: #fff; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
           <div style="width:44px; height:44px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; display:flex; align-items:center; justify-content:center;">
-            <i class="fa-solid fa-chart-line" style="color:#ffffff; font-size:1.1rem;"></i>
+            <i class="fa-solid fa-chart-line" style="color:#fff; font-size:1.1rem;"></i>
           </div>
           <div>
-            <div style="font-size:1rem; font-weight:700; letter-spacing:-0.01em;">KCET Rank Engine</div>
-            <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.05em;">Predictive Matrix // 2026</div>
+            <div style="font-size:1rem; font-weight:700;">KCET Rank Engine</div>
+            <div style="font-size:0.7rem; color:rgba(255,255,255,0.4); text-transform:uppercase;">Predictive Matrix // 2026</div>
           </div>
         </div>
-        <div style="margin-bottom:24px;">
-          <div style="display:flex; background:rgba(255,255,255,0.03); padding:5px; border-radius:16px; border:1px solid rgba(255,255,255,0.05);">
-            <button id="eng-btn-${uid}" class="kcet-toggle-btn" data-uid="${uid}" data-type="cs" style="flex:1; padding:10px; border:none; border-radius:11px; font-size:0.75rem; font-weight:600; cursor:pointer; background:#ffffff; color:#000000; transition:all 0.3s;">Engineering</button>
-            <button id="non-btn-${uid}" class="kcet-toggle-btn" data-uid="${uid}" data-type="bio" style="flex:1; padding:10px; border:none; border-radius:11px; font-size:0.75rem; font-weight:600; cursor:pointer; background:transparent; color:rgba(255,255,255,0.4); transition:all 0.3s;">Non-Engineering</button>
-          </div>
+
+        <!-- Mode Toggle -->
+        <div style="display:flex; background:rgba(255,255,255,0.03); padding:5px; border-radius:16px; margin-bottom:24px;">
+          <button id="eng-mode-${uid}" class="kcet-mode-btn" data-mode="eng" style="flex:1; padding:10px; border:none; border-radius:11px; font-size:0.75rem; font-weight:600; cursor:pointer; background:#fff; color:#000;">Engineering</button>
+          <button id="non-mode-${uid}" class="kcet-mode-btn" data-mode="non" style="flex:1; padding:10px; border:none; border-radius:11px; font-size:0.75rem; font-weight:600; cursor:pointer; background:transparent; color:rgba(255,255,255,0.4);">Non-Engineering</button>
         </div>
-        <div id="kcet-form-${uid}">
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            ${renderInputRow(uid, 'math', 'Maths', 'fa-square-root-variable')}
-            ${renderInputRow(uid, 'phy', 'Physics', 'fa-atom')}
-            ${renderInputRow(uid, 'chem', 'Chemistry', 'fa-vial')}
-            <div id="bio-row-wrapper-${uid}" style="display:none;">${renderInputRow(uid, 'bio', 'Biology', 'fa-dna')}</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:12px; margin:24px 0;">
-            <div style="flex:1; height:1px; background:rgba(255,255,255,0.05);"></div>
-            <div style="font-size:0.6rem; color:rgba(255,255,255,0.2); font-weight:800; letter-spacing:0.1em;">OR</div>
-            <div style="flex:1; height:1px; background:rgba(255,255,255,0.05);"></div>
-          </div>
-          <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.05);">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <i class="fa-solid fa-layer-group" style="color:rgba(255,255,255,0.3); font-size:0.9rem;"></i>
-              <span style="font-size:0.85rem; color:rgba(255,255,255,0.7);">Total Aggregate</span>
+
+        <!-- Engineering Panel -->
+        <div id="eng-panel-${uid}">
+          <div style="margin-bottom:20px;">
+            <div style="font-size:0.8rem; margin-bottom:12px;">📚 Board Marks (out of 100 each)</div>
+            <div id="board-toggle-eng-${uid}" style="display:flex; gap:8px; margin-bottom:12px;">
+              <button class="board-mode-btn" data-mode="individual" data-target="eng" style="flex:1; padding:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:0.7rem; cursor:pointer;">Individual</button>
+              <button class="board-mode-btn" data-mode="total" data-target="eng" style="flex:1; padding:6px; background:transparent; border:1px solid rgba(255,255,255,0.1); border-radius:8px; font-size:0.7rem; cursor:pointer;">Total /300</button>
             </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <input type="number" id="total-m-${uid}" placeholder="000" style="width:60px; background:transparent; border:none; color:#ffffff; text-align:right; font-size:0.9rem; font-weight:600; outline:none;">
-              <span style="font-size:0.8rem; color:rgba(255,255,255,0.2);">/600</span>
+            <div id="eng-board-individual" style="display:flex; flex-direction:column; gap:8px;">
+              ${renderSubjectInput('phy', 'Physics')}
+              ${renderSubjectInput('chem', 'Chemistry')}
+              ${renderSubjectInput('math', 'Mathematics')}
+            </div>
+            <div id="eng-board-total" style="display:none;">
+              <input type="number" id="eng-total-board-${uid}" placeholder="Total board marks (0-300)" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px; color:#fff; outline:none;">
             </div>
           </div>
-          <button onclick="window.calculateKcetRank('${uid}')" style="width:100%; margin-top:24px; padding:16px; background:#ffffff; border:none; border-radius:18px; color:#000000; font-weight:700; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer;">Get Prediction</button>
+          <div style="margin-bottom:20px;">
+            <div style="font-size:0.8rem; margin-bottom:12px;">📝 KCET Total Marks (out of 180)</div>
+            <input type="number" id="eng-kcet-total-${uid}" placeholder="KCET total (0-180)" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px; color:#fff; outline:none;">
+          </div>
+          <button onclick="window.calcKcetEngineering('${uid}')" style="width:100%; padding:14px; background:#fff; border:none; border-radius:18px; color:#000; font-weight:700; cursor:pointer;">Predict Engineering Rank</button>
+          <div id="eng-result-${uid}" style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px; display:none;"></div>
         </div>
-        <div id="kcet-result-${uid}" style="display:none; margin-top:24px; padding-top:24px; border-top:1px solid rgba(255,255,255,0.05);"></div>
+
+        <!-- Non-Engineering Panel (hidden initially) -->
+        <div id="non-panel-${uid}" style="display:none;">
+          <div style="margin-bottom:20px;">
+            <div style="font-size:0.8rem; margin-bottom:12px;">📚 Board Marks (PCMB – each out of 100)</div>
+            <div id="board-toggle-non-${uid}" style="display:flex; gap:8px; margin-bottom:12px;">
+              <button class="board-mode-btn" data-mode="individual" data-target="non" style="flex:1; padding:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; font-size:0.7rem; cursor:pointer;">Individual</button>
+              <button class="board-mode-btn" data-mode="total" data-target="non" style="flex:1; padding:6px; background:transparent; border:1px solid rgba(255,255,255,0.1); border-radius:8px; font-size:0.7rem; cursor:pointer;">Total /400</button>
+            </div>
+            <div id="non-board-individual" style="display:flex; flex-direction:column; gap:8px;">
+              ${renderSubjectInput('phy', 'Physics')}
+              ${renderSubjectInput('chem', 'Chemistry')}
+              ${renderSubjectInput('math', 'Mathematics')}
+              ${renderSubjectInput('bio', 'Biology')}
+            </div>
+            <div id="non-board-total" style="display:none;">
+              <input type="number" id="non-total-board-${uid}" placeholder="Total board marks (0-400)" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px; color:#fff; outline:none;">
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <div style="font-size:0.8rem; margin-bottom:12px;">🎯 KCET Subject Marks (each out of 60)</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${renderSubjectInput('phy-kcet', 'Physics')}
+              ${renderSubjectInput('chem-kcet', 'Chemistry')}
+              ${renderSubjectInput('math-kcet', 'Mathematics')}
+              ${renderSubjectInput('bio-kcet', 'Biology')}
+            </div>
+          </div>
+          <button onclick="window.calcKcetNonEngineering('${uid}')" style="width:100%; padding:14px; background:#fff; border:none; border-radius:18px; color:#000; font-weight:700; cursor:pointer;">Predict Both Ranks</button>
+          <div id="non-result-${uid}" style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px; display:none;"></div>
+        </div>
       </div>
     `;
     container.appendChild(sysBubble);
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
 
-    // Attach toggle event listeners
-    const engBtn = document.getElementById(`eng-btn-${uid}`);
-    const nonBtn = document.getElementById(`non-btn-${uid}`);
-    if (engBtn && nonBtn) {
-      const setup = (type) => window.setupKcetForm(uid, type);
-      engBtn.onclick = () => setup('cs');
-      nonBtn.onclick = () => setup('bio');
-    }
+    // Attach mode switchers
+    const engModeBtn = document.getElementById(`eng-mode-${uid}`);
+    const nonModeBtn = document.getElementById(`non-mode-${uid}`);
+    const engPanel = document.getElementById(`eng-panel-${uid}`);
+    const nonPanel = document.getElementById(`non-panel-${uid}`);
+
+    engModeBtn.onclick = () => {
+      engModeBtn.style.background = '#fff'; engModeBtn.style.color = '#000';
+      nonModeBtn.style.background = 'transparent'; nonModeBtn.style.color = 'rgba(255,255,255,0.4)';
+      engPanel.style.display = 'block';
+      nonPanel.style.display = 'none';
+    };
+    nonModeBtn.onclick = () => {
+      nonModeBtn.style.background = '#fff'; nonModeBtn.style.color = '#000';
+      engModeBtn.style.background = 'transparent'; engModeBtn.style.color = 'rgba(255,255,255,0.4)';
+      nonPanel.style.display = 'block';
+      engPanel.style.display = 'none';
+    };
+
+    // Board toggle handlers for Engineering
+    const engToggleIndiv = document.querySelector(`#board-toggle-eng-${uid} .board-mode-btn[data-mode="individual"]`);
+    const engToggleTotal = document.querySelector(`#board-toggle-eng-${uid} .board-mode-btn[data-mode="total"]`);
+    const engIndivDiv = document.getElementById(`eng-board-individual`);
+    const engTotalDiv = document.getElementById(`eng-board-total`);
+    engToggleIndiv.onclick = () => {
+      engIndivDiv.style.display = 'flex';
+      engTotalDiv.style.display = 'none';
+      engToggleIndiv.style.background = 'rgba(255,255,255,0.1)';
+      engToggleTotal.style.background = 'transparent';
+    };
+    engToggleTotal.onclick = () => {
+      engIndivDiv.style.display = 'none';
+      engTotalDiv.style.display = 'block';
+      engToggleTotal.style.background = 'rgba(255,255,255,0.1)';
+      engToggleIndiv.style.background = 'transparent';
+    };
+
+    // Board toggle handlers for Non-Engineering
+    const nonToggleIndiv = document.querySelector(`#board-toggle-non-${uid} .board-mode-btn[data-mode="individual"]`);
+    const nonToggleTotal = document.querySelector(`#board-toggle-non-${uid} .board-mode-btn[data-mode="total"]`);
+    const nonIndivDiv = document.getElementById(`non-board-individual`);
+    const nonTotalDiv = document.getElementById(`non-board-total`);
+    nonToggleIndiv.onclick = () => {
+      nonIndivDiv.style.display = 'flex';
+      nonTotalDiv.style.display = 'none';
+      nonToggleIndiv.style.background = 'rgba(255,255,255,0.1)';
+      nonToggleTotal.style.background = 'transparent';
+    };
+    nonToggleTotal.onclick = () => {
+      nonIndivDiv.style.display = 'none';
+      nonTotalDiv.style.display = 'block';
+      nonToggleTotal.style.background = 'rgba(255,255,255,0.1)';
+      nonToggleIndiv.style.background = 'transparent';
+    };
   }
 
-  function renderInputRow(uid, id, label, icon) {
+  function renderSubjectInput(id, label) {
     return `
-      <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.05);">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <i class="fa-solid ${icon}" style="color:rgba(255,255,255,0.3); font-size:0.9rem; width:20px; text-align:center;"></i>
-          <span style="font-size:0.85rem; color:rgba(255,255,255,0.7);">${label}</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:4px;">
-          <input type="number" id="in-${id}-${uid}" placeholder="00" style="width:50px; background:transparent; border:none; color:#ffffff; text-align:right; font-size:0.9rem; font-weight:600; outline:none;">
-          <span style="font-size:0.8rem; color:rgba(255,255,255,0.2);">/100</span>
-        </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); padding:10px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.05);">
+        <span style="font-size:0.85rem;">${label}</span>
+        <input type="number" id="in-${id}" placeholder="0" style="width:60px; background:transparent; border:none; color:#fff; text-align:right; font-size:0.9rem; font-weight:600; outline:none;">
       </div>
     `;
   }
 
-  window.setupKcetForm = (uid, type) => {
-    const engBtn = document.getElementById(`eng-btn-${uid}`);
-    const nonBtn = document.getElementById(`non-btn-${uid}`);
-    const bioRow = document.getElementById(`bio-row-wrapper-${uid}`);
-    if (engBtn && nonBtn) {
-      if (type === 'cs') {
-        engBtn.style.background = '#ffffff'; engBtn.style.color = '#000000';
-        nonBtn.style.background = 'transparent'; nonBtn.style.color = 'rgba(255,255,255,0.4)';
-        if (bioRow) bioRow.style.display = 'none';
+  // Helper to compute rank from board% and kcet%
+  function computeRank(boardPercent, kcetPercent) {
+    const indexScore = (boardPercent + kcetPercent) / 2;
+    let rank = Math.round(Math.pow(101 - indexScore, 2.5) * 5);
+    if (rank < 1) rank = 1;
+    if (rank > 200000) rank = 200000;
+    return { rank, indexScore };
+  }
+
+  window.calcKcetEngineering = (uid) => {
+    // Board marks
+    let boardPercent = null;
+    const totalBoardInput = document.getElementById(`eng-total-board-${uid}`);
+    const isTotalMode = totalBoardInput && totalBoardInput.parentElement.style.display !== 'none';
+    if (isTotalMode) {
+      const total = parseFloat(totalBoardInput.value);
+      if (!isNaN(total) && total >= 0 && total <= 300) {
+        boardPercent = (total / 300) * 100;
       } else {
-        nonBtn.style.background = '#ffffff'; nonBtn.style.color = '#000000';
-        engBtn.style.background = 'transparent'; engBtn.style.color = 'rgba(255,255,255,0.4)';
-        if (bioRow) bioRow.style.display = 'block';
+        alert("Please enter a valid total board marks (0-300).");
+        return;
       }
+    } else {
+      const phy = parseFloat(document.getElementById(`in-phy`)?.value) || 0;
+      const chem = parseFloat(document.getElementById(`in-chem`)?.value) || 0;
+      const math = parseFloat(document.getElementById(`in-math`)?.value) || 0;
+      if (isNaN(phy) || isNaN(chem) || isNaN(math)) {
+        alert("Please enter valid marks for Physics, Chemistry, Mathematics (0-100 each).");
+        return;
+      }
+      boardPercent = ((phy + chem + math) / 300) * 100;
     }
+
+    // KCET total
+    const kcetTotal = parseFloat(document.getElementById(`eng-kcet-total-${uid}`).value);
+    if (isNaN(kcetTotal) || kcetTotal < 0 || kcetTotal > 180) {
+      alert("Please enter a valid KCET total marks (0-180).");
+      return;
+    }
+    const kcetPercent = (kcetTotal / 180) * 100;
+
+    const { rank, indexScore } = computeRank(boardPercent, kcetPercent);
+    const resultDiv = document.getElementById(`eng-result-${uid}`);
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div style="font-size:0.7rem; color:#aaa;">PREDICTED ENGINEERING RANK</div>
+      <div style="font-size:2rem; font-weight:700; margin:5px 0;">~ ${rank.toLocaleString()}</div>
+      <div style="font-size:0.7rem; color:#aaa;">Board: ${boardPercent.toFixed(1)}% | KCET: ${kcetPercent.toFixed(1)}% | Index: ${indexScore.toFixed(1)}</div>
+      <button onclick="launchKcetPredictor()" style="margin-top:12px; background:transparent; border:1px solid #333; padding:6px 12px; border-radius:20px; color:#ccc; cursor:pointer;">⟳ New</button>
+    `;
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
 
-  window.calculateKcetRank = (uid) => {
-    const getVal = (id) => parseFloat(document.getElementById(id)?.value) || 0;
-    // Try aggregate first
-    let totalAgg = getVal(`total-m-${uid}`);
-    let rank = null;
-    if (totalAgg > 0 && totalAgg <= 600) {
-      // simple mock formula – replace with real logic
-      const score = (totalAgg / 600) * 100;
-      rank = Math.round(Math.pow(101 - score, 2.5) * 5);
+  window.calcKcetNonEngineering = (uid) => {
+    // Board marks
+    let boardPercent = null;
+    const totalBoardInput = document.getElementById(`non-total-board-${uid}`);
+    const isTotalMode = totalBoardInput && totalBoardInput.parentElement.style.display !== 'none';
+    if (isTotalMode) {
+      const total = parseFloat(totalBoardInput.value);
+      if (!isNaN(total) && total >= 0 && total <= 400) {
+        boardPercent = (total / 400) * 100;
+      } else {
+        alert("Please enter a valid total board marks (0-400).");
+        return;
+      }
     } else {
-      const mathScore = getVal(`in-math-${uid}`);
-      const phyScore = getVal(`in-phy-${uid}`);
-      const chemScore = getVal(`in-chem-${uid}`);
-      const bioScore = getVal(`in-bio-${uid}`);
-      const isBio = document.getElementById(`bio-row-wrapper-${uid}`)?.style.display === 'block';
-      let subjects = [mathScore, phyScore, chemScore];
-      if (isBio && !isNaN(bioScore)) subjects.push(bioScore);
-      const avgBoard = subjects.reduce((a,b) => a + b, 0) / subjects.length;
-      const kcetTotal = (phyScore + chemScore + (isBio ? bioScore : mathScore));
-      const kcetPerc = (kcetTotal / (isBio ? 180 : 180)) * 100; // assuming 180 max for PCM/B
-      const indexScore = (avgBoard + kcetPerc) / 2;
-      rank = Math.round(Math.pow(101 - indexScore, 2.5) * 5);
+      const phy = parseFloat(document.getElementById(`in-phy`)?.value) || 0;
+      const chem = parseFloat(document.getElementById(`in-chem`)?.value) || 0;
+      const math = parseFloat(document.getElementById(`in-math`)?.value) || 0;
+      const bio = parseFloat(document.getElementById(`in-bio`)?.value) || 0;
+      if (isNaN(phy) || isNaN(chem) || isNaN(math) || isNaN(bio)) {
+        alert("Please enter valid marks for Physics, Chemistry, Mathematics, Biology (0-100 each).");
+        return;
+      }
+      boardPercent = ((phy + chem + math + bio) / 400) * 100;
     }
-    if (rank === null || rank < 1) rank = 50000;
-    const resultDiv = document.getElementById(`kcet-result-${uid}`);
-    if (resultDiv) {
-      resultDiv.style.display = 'block';
-      resultDiv.innerHTML = `
-        <div style="font-size:0.65rem; color:#888;">EXPECTED RANK RANGE</div>
-        <div style="font-size:1.8rem; font-weight:700; color:#fff; margin:5px 0;">~ ${rank.toLocaleString()}</div>
-        <button onclick="launchKcetPredictor()" style="background:transparent; border:1px solid #222; color:#555; padding:8px 16px; border-radius:6px; font-size:0.7rem; cursor:pointer; margin-top:12px;">⟳ New Prediction</button>
-      `;
-      if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+
+    // KCET subject marks
+    const phyK = parseFloat(document.getElementById(`in-phy-kcet`)?.value) || 0;
+    const chemK = parseFloat(document.getElementById(`in-chem-kcet`)?.value) || 0;
+    const mathK = parseFloat(document.getElementById(`in-math-kcet`)?.value) || 0;
+    const bioK = parseFloat(document.getElementById(`in-bio-kcet`)?.value) || 0;
+    if (isNaN(phyK) || isNaN(chemK) || isNaN(mathK) || isNaN(bioK)) {
+      alert("Please enter all KCET subject marks (0-60 each).");
+      return;
     }
+
+    // Pharma rank uses PCB (Physics, Chemistry, Biology)
+    const pcbTotal = phyK + chemK + bioK;
+    const pcbPercent = (pcbTotal / 180) * 100;
+    const pharmaRankObj = computeRank(boardPercent, pcbPercent);
+
+    // Engineering rank uses PCM (Physics, Chemistry, Maths)
+    const pcmTotal = phyK + chemK + mathK;
+    const pcmPercent = (pcmTotal / 180) * 100;
+    const engRankObj = computeRank(boardPercent, pcmPercent);
+
+    const resultDiv = document.getElementById(`non-result-${uid}`);
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <div style="flex:1; text-align:center; background:rgba(255,255,255,0.02); border-radius:20px; padding:12px;">
+          <div style="font-size:0.7rem; color:#aaa;">PHARMA RANK</div>
+          <div style="font-size:1.8rem; font-weight:700;">~ ${pharmaRankObj.rank.toLocaleString()}</div>
+          <div style="font-size:0.65rem; color:#aaa;">Board: ${boardPercent.toFixed(1)}%<br>KCET (PCB): ${pcbPercent.toFixed(1)}%</div>
+        </div>
+        <div style="flex:1; text-align:center; background:rgba(255,255,255,0.02); border-radius:20px; padding:12px;">
+          <div style="font-size:0.7rem; color:#aaa;">ENGINEERING RANK</div>
+          <div style="font-size:1.8rem; font-weight:700;">~ ${engRankObj.rank.toLocaleString()}</div>
+          <div style="font-size:0.65rem; color:#aaa;">Board: ${boardPercent.toFixed(1)}%<br>KCET (PCM): ${pcmPercent.toFixed(1)}%</div>
+        </div>
+      </div>
+      <button onclick="launchKcetPredictor()" style="margin-top:16px; background:transparent; border:1px solid #333; padding:6px 12px; border-radius:20px; color:#ccc; cursor:pointer; width:100%;">⟳ New Prediction</button>
+    `;
+    if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
 
   // ========== MAIN HOOK (OVERRIDE SEARCH) ==========
@@ -675,12 +809,10 @@
         const query = val.trim();
         const lowerQuery = query.toLowerCase();
 
-        // UI reset
         const messagesContainer = document.getElementById('es-messages');
         const greet = document.getElementById('es-greeting');
         if (greet) greet.style.display = 'none';
 
-        // Show user message
         if (typeof window.appendEsBubbleUser === 'function') {
           window.appendEsBubbleUser(query);
         } else {
@@ -692,13 +824,11 @@
         const inputEl = document.getElementById('es-input');
         if (inputEl) inputEl.value = '';
 
-        // KCET prediction
         if (lowerQuery.includes("kcet") || lowerQuery.includes("prediction")) {
           setTimeout(launchKcetPredictor, 300);
           return;
         }
 
-        // Local AI response
         const sysBubble = document.createElement('div');
         sysBubble.className = 'es-bubble-sys';
         const contentDiv = document.createElement('div');
@@ -712,7 +842,6 @@
 
         try {
           const answer = await LocalAI.respond(query);
-          // If the AI didn't know, fall back to original college search
           if (answer.includes("Try asking about") || answer.includes("Not in my local database")) {
             if (messagesContainer && sysBubble.parentNode) messagesContainer.removeChild(sysBubble);
             originalSearch(val);
