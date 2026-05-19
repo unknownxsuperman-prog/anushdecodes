@@ -1,93 +1,64 @@
 /**
- * x0s.link – Disha Intelligence Extensions Module (Production Build)
- * LOCAL AI + Live Weather + Math + News + Utilities + Smart Search + KCET Predictor
- * Zero external AI APIs – everything runs on-device except weather/news APIs
+ * x0s.link – Disha Intelligence Extensions Module
+ * KCET Predictor redesigned: Nothing Phone × X aesthetic
  */
 (function () {
   'use strict';
 
-  // ========== CONFIGURATION ==========
+  // ========== CONFIG ==========
   const CONFIG = {
-    weatherApiKey: '0222762e4fd7dc746123423914f0dca7', // Rotate this in production
+    weatherApiKey: '0222762e4fd7dc746123423914f0dca7',
     defaultCity: 'Mumbai',
-    newsApiKey: null,
-    currencyApiBase: 'https://api.exchangerate-api.com/v4/latest/',
     typingSpeed: 12,
     maxHistory: 50
   };
 
-  // ========== STATE MANAGEMENT ==========
+  // ========== STATE ==========
   const State = {
     history: [],
-    context: {
-      lastCity: null,
-      lastTopic: null,
-      lastIntent: null,
-      lastQuery: null,
-      sessionStart: Date.now()
-    },
-    stats: {
-      queriesHandled: 0,
-      mathSolved: 0,
-      weatherFetched: 0
-    }
+    context: { lastCity: null, lastTopic: null, lastIntent: null, lastQuery: null, sessionStart: Date.now() },
+    stats: { queriesHandled: 0, mathSolved: 0, weatherFetched: 0 }
   };
 
-  // ========== LOCAL AI ENGINE ==========
+  // ========== LOCAL AI ==========
   const LocalAI = {
     async respond(query) {
       const q = query.trim();
       if (!q) return "I didn't catch that. Could you repeat?";
-
       const lower = q.toLowerCase();
       State.stats.queriesHandled++;
       State.history.push({ query: q, time: Date.now() });
       if (State.history.length > CONFIG.maxHistory) State.history.shift();
 
-      if (lower.match(/^(and |what about |how about |also |plus )/i) && State.context.lastIntent) {
-        return this.handleFollowUp(lower);
-      }
-
       const intents = [
         { name: 'calculator', patterns: [/^(calc|calculate|compute|solve|eval)\s+/i, /^[\d\s+\-*/().^%]+$/, /^(what is|what's)\s+[\d\s+\-*/().^%]+/i], priority: 10 },
-        { name: 'converter', patterns: [/\b(convert|conversion)\b/i, /\b(\d+\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp))\b/i, /\b(km to mi|miles to km|kg to lbs|celsius to fahrenheit|usd to inr)\b/i], priority: 9 },
-        { name: 'weather', patterns: [/\b(weather|temperature|forecast|humidity|wind in)\b/i], priority: 9 },
-        { name: 'time', patterns: [/\b(time|clock|current time)\s+(in|at|for)\b/i, /\bwhat\s+time\b/i], priority: 8 },
+        { name: 'converter', patterns: [/\b(convert|conversion)\b/i, /\b(\d+\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp))\b/i], priority: 9 },
+        { name: 'weather', patterns: [/\b(weather|temperature|forecast|humidity)\b/i], priority: 9 },
+        { name: 'time', patterns: [/\b(time|clock)\s+(in|at|for)\b/i, /\bwhat\s+time\b/i], priority: 8 },
         { name: 'date', patterns: [/\b(date|today|day|what day)\b/i], priority: 8 },
         { name: 'timer', patterns: [/\b(timer|countdown|set a timer|remind me in)\b/i], priority: 8 },
-        { name: 'news', patterns: [/\b(news|headlines|current affairs|updates|breaking|latest)\b/i], priority: 7 },
         { name: 'definition', patterns: [/\b(define|definition|meaning of|what is|what are|explain)\b/i], priority: 7 },
-        { name: 'translate', patterns: [/\b(translate|in spanish|in french|in hindi|in german|meaning in)\b/i], priority: 7 },
-        { name: 'stock', patterns: [/\b(stock|share price|ticker|nasdaq|nse|bse|market)\b/i], priority: 6 },
-        { name: 'todo', patterns: [/\b(todo|task|add task|remind me to|remember to)\b/i], priority: 6 },
-        { name: 'note', patterns: [/\b(note|save this|remember that|write down| jot)\b/i], priority: 6 },
-        { name: 'password', patterns: [/\b(password|generate password|strong password|secure password)\b/i], priority: 5 },
-        { name: 'uuid', patterns: [/\b(uuid|guid|generate id|unique id)\b/i], priority: 5 },
+        { name: 'password', patterns: [/\b(password|generate password|strong password)\b/i], priority: 5 },
+        { name: 'uuid', patterns: [/\b(uuid|guid|generate id)\b/i], priority: 5 },
         { name: 'greeting', patterns: [/^(hi|hello|hey|yo|good\s(morning|afternoon|evening))/i], priority: 1 },
-        { name: 'farewell', patterns: [/\b(bye|goodbye|see\syou|tata|later)\b/i], priority: 1 },
-        { name: 'who_are_you', patterns: [/\b(who\s(are|r)\s?(you|u)|your\sname|what\s(are|r)\s?(you|u))\b/i], priority: 1 },
-        { name: 'what_can_you_do', patterns: [/\b(what\s(can|do)\s(you|u)\s(do|help)|abilities|features|commands)\b/i], priority: 1 },
-        { name: 'creator', patterns: [/\b(who\s(created|made|built)\s?(you|u)|your\screator|who made you)\b/i], priority: 1 },
-        { name: 'thanks', patterns: [/\b(thanks|thank\s?(you|u)|thx|ty|appreciate)\b/i], priority: 1 },
-        { name: 'how_are_you', patterns: [/\b(how\s(are|r)\s?(you|u)|what'?s\sup|how you doing)\b/i], priority: 1 },
-        { name: 'help', patterns: [/\b(help|assist|support|how to use|commands)\b/i], priority: 1 },
+        { name: 'farewell', patterns: [/\b(bye|goodbye|see\syou|tata)\b/i], priority: 1 },
+        { name: 'who_are_you', patterns: [/\b(who\s(are|r)\s?(you|u)|your\sname)\b/i], priority: 1 },
+        { name: 'what_can_you_do', patterns: [/\b(what\s(can|do)\s(you|u)\s(do|help)|abilities|features)\b/i], priority: 1 },
+        { name: 'creator', patterns: [/\b(who\s(created|made|built)\s?(you|u))\b/i], priority: 1 },
+        { name: 'thanks', patterns: [/\b(thanks|thank\s?(you|u)|thx|ty)\b/i], priority: 1 },
+        { name: 'how_are_you', patterns: [/\b(how\s(are|r)\s?(you|u)|what'?s\sup)\b/i], priority: 1 },
         { name: 'general', patterns: [/.*/], priority: 0 }
       ];
 
-      let bestMatch = null;
-      let bestScore = -1;
+      let bestMatch = null, bestScore = -1;
       for (const intent of intents) {
         for (const pattern of intent.patterns) {
           if (pattern.test(lower)) {
             const score = intent.priority * 10 + (pattern.source.length > 5 ? 5 : 0);
-            if (score > bestScore) {
-              bestScore = score;
-              bestMatch = intent.name;
-            }
+            if (score > bestScore) { bestScore = score; bestMatch = intent.name; }
           }
         }
       }
-
       State.context.lastIntent = bestMatch;
       State.context.lastQuery = q;
 
@@ -98,12 +69,7 @@
         case 'time': return this.handleTime(lower);
         case 'date': return this.handleDate();
         case 'timer': return this.handleTimer(lower);
-        case 'news': return this.handleNews(lower);
         case 'definition': return this.handleDefinition(lower);
-        case 'translate': return this.handleTranslate(q, lower);
-        case 'stock': return this.handleStock(lower);
-        case 'todo': return this.handleTodo(q, lower);
-        case 'note': return this.handleNote(q, lower);
         case 'password': return this.generatePassword(lower);
         case 'uuid': return this.generateUUID();
         case 'greeting': return this.respondGreeting();
@@ -113,7 +79,6 @@
         case 'creator': return this.respondCreator();
         case 'thanks': return this.respondThanks();
         case 'how_are_you': return this.respondStatus();
-        case 'help': return this.respondHelp();
         default: return this.respondGeneralKnowledge(lower);
       }
     },
@@ -122,378 +87,141 @@
       State.stats.mathSolved++;
       let expr = query.replace(/^(calc|calculate|compute|solve|eval|what is|what's)\s+/i, '').trim();
       expr = expr.replace(/\^/g, '**').replace(/×/g, '*').replace(/÷/g, '/');
-      const unitMatch = expr.match(/^(\d+(?:\.\d+)?)\s*(km|mi|kg|lb|°c|°f|c|f)\s*(to|in|=)\s*(km|mi|kg|lb|°c|°f|c|f)$/i);
-      if (unitMatch) {
-        return this.convertUnits(parseFloat(unitMatch[1]), unitMatch[2], unitMatch[4]);
-      }
       try {
-        if (!/^[\d\s+\-*/().%^]+$/.test(expr)) throw new Error('Invalid characters');
+        if (!/^[\d\s+\-*/().%^]+$/.test(expr)) throw new Error('Invalid');
         const result = Function('"use strict"; return (' + expr + ')')();
-        if (!isFinite(result)) throw new Error('Result not finite');
+        if (!isFinite(result)) throw new Error('Not finite');
         return `**${expr}** = **${result.toLocaleString('en-IN')}**`;
       } catch (e) {
-        return `⚠️ **Calculation Error**: ${e.message || 'Invalid expression'}\nTry: \`calc 15 * 23.5\` or \`45 km to mi\``;
+        return `⚠️ Invalid expression. Try: \`calc 15 * 23.5\``;
       }
     },
 
     handleConverter(query, lower) {
-      const match = query.match(/(\d+(?:\.\d+)?)\s*(km|mi|miles|kg|lb|pounds|°c|°f|c|f|usd|eur|inr|gbp|jpy)\s*(?:to|in|=)\s*(km|mi|miles|kg|lb|pounds|°c|°f|c|f|usd|eur|inr|gbp|jpy)/i);
-      if (match) {
-        return this.convertUnits(parseFloat(match[1]), match[2], match[3]);
-      }
-      return "Usage: \`convert 100 km to mi\` or \`25 °c to f\` or \`100 USD to INR\`";
+      const match = query.match(/(\d+(?:\.\d+)?)\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp)\s*(?:to|in|=)\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp)/i);
+      if (match) return this.convertUnits(parseFloat(match[1]), match[2], match[3]);
+      return "Usage: `convert 100 km to mi` or `25 °c to f`";
     },
 
     convertUnits(value, from, to) {
-      from = from.toLowerCase().replace('°', '').replace('miles', 'mi').replace('pounds', 'lb');
-      to = to.toLowerCase().replace('°', '').replace('miles', 'mi').replace('pounds', 'lb');
-      const conversions = {
-        'km-mi': v => v * 0.621371, 'mi-km': v => v * 1.60934,
-        'kg-lb': v => v * 2.20462, 'lb-kg': v => v * 0.453592,
-        'c-f': v => (v * 9/5) + 32, 'f-c': v => (v - 32) * 5/9,
-        'usd-inr': v => v * 83.5, 'inr-usd': v => v / 83.5,
-        'usd-eur': v => v * 0.92, 'eur-usd': v => v / 0.92,
-        'usd-gbp': v => v * 0.79, 'gbp-usd': v => v / 0.79,
-        'usd-jpy': v => v * 150, 'jpy-usd': v => v / 150
-      };
+      from = from.toLowerCase().replace('°',''); to = to.toLowerCase().replace('°','');
+      const conv = { 'km-mi': v=>v*0.621371,'mi-km': v=>v*1.60934,'kg-lb': v=>v*2.20462,'lb-kg': v=>v*0.453592,'c-f': v=>(v*9/5)+32,'f-c': v=>(v-32)*5/9,'usd-inr': v=>v*83.5,'inr-usd': v=>v/83.5 };
       const key = `${from}-${to}`;
-      if (conversions[key]) {
-        const result = conversions[key](value);
-        return `**${value} ${from.toUpperCase()}** = **${result.toFixed(2)} ${to.toUpperCase()}**`;
-      }
-      return `❌ Conversion from **${from}** to **${to}** not supported yet.`;
+      if (conv[key]) return `**${value} ${from.toUpperCase()}** = **${conv[key](value).toFixed(2)} ${to.toUpperCase()}**`;
+      return `Conversion from ${from} to ${to} not supported.`;
     },
 
     async getWeatherReport(query) {
-      const cityMatch = query.match(/(?:weather|temperature|forecast)\s+(?:in|for|at)?\s*([a-zA-Z\s]+?)(?:\s+(?:today|now|tomorrow|forecast))?$|([a-zA-Z\s]+?)\s+(?:weather|temperature)/i);
-      let city = (cityMatch?.[1] || cityMatch?.[2] || State.context.lastCity || CONFIG.defaultCity).trim();
+      const m = query.match(/(?:weather|temperature|forecast)\s+(?:in|for|at)?\s*([a-zA-Z\s]+?)(?:\s+(?:today|now))?$|([a-zA-Z\s]+?)\s+(?:weather|temperature)/i);
+      let city = (m?.[1] || m?.[2] || State.context.lastCity || CONFIG.defaultCity).trim();
       State.context.lastCity = city;
       try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${CONFIG.weatherApiKey}&units=metric`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(response.status === 404 ? 'City not found' : 'API error');
-        const data = await response.json();
-        const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-        const sunrise = new Date(data.sys.sunrise * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-        const sunset = new Date(data.sys.sunset * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-        return `
-          <div class="weather-card" style="display:flex; align-items:center; gap:16px; padding:16px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius:12px; border:1px solid #334155;">
-            <img src="${iconUrl}" style="width:80px; height:80px; filter:drop-shadow(0 0 10px rgba(255,255,255,0.1));" alt="${data.weather[0].description}">
-            <div style="flex:1;">
-              <div style="font-size:1.1rem; font-weight:600; color:#e2e8f0; margin-bottom:4px;">${data.name}, ${data.sys.country}</div>
-              <div style="font-size:2.5rem; font-weight:700; color:#f8fafc; line-height:1;">${Math.round(data.main.temp)}°C</div>
-              <div style="text-transform:capitalize; color:#94a3b8; font-size:0.9rem; margin-top:4px;">${data.weather[0].description}</div>
-              <div style="display:flex; gap:16px; margin-top:12px; font-size:0.8rem; color:#64748b;">
-                <span>💧 ${data.main.humidity}%</span>
-                <span>💨 ${data.wind.speed} m/s</span>
-                <span>🌅 ${sunrise}</span>
-                <span>🌇 ${sunset}</span>
-              </div>
-            </div>
-          </div>`;
-      } catch (err) {
-        return `⚠️ Weather unavailable for "${city}": ${err.message}. Try a major city.`;
+        const r = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${CONFIG.weatherApiKey}&units=metric`);
+        if (!r.ok) throw new Error(r.status === 404 ? 'City not found' : 'API error');
+        const d = await r.json();
+        const sunrise = new Date(d.sys.sunrise * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        const sunset = new Date(d.sys.sunset * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        return `<div style="padding:16px;background:#0a0a0a;border-radius:14px;border:1px solid #1a1a1a;display:flex;align-items:center;gap:14px;"><img src="https://openweathermap.org/img/wn/${d.weather[0].icon}@2x.png" style="width:64px;height:64px;" alt=""><div><div style="font-weight:700;font-size:.95rem;">${d.name}, ${d.sys.country}</div><div style="font-size:2rem;font-weight:700;line-height:1.1;">${Math.round(d.main.temp)}°C</div><div style="color:#666;font-size:.75rem;text-transform:capitalize;">${d.weather[0].description}</div><div style="display:flex;gap:12px;margin-top:8px;font-size:.7rem;color:#555;">💧${d.main.humidity}% · 💨${d.wind.speed}m/s · 🌅${sunrise} · 🌇${sunset}</div></div></div>`;
+      } catch (e) {
+        return `Weather unavailable for "${city}": ${e.message}`;
       }
     },
 
     handleTime(query) {
-      const cityMatch = query.match(/time\s+(?:in|at|for)?\s*([a-zA-Z\s]+)/i);
-      let timezone = 'Asia/Kolkata';
-      const tzMap = {
-        'london': 'Europe/London', 'new york': 'America/New_York', 'ny': 'America/New_York',
-        'tokyo': 'Asia/Tokyo', 'sydney': 'Australia/Sydney', 'dubai': 'Asia/Dubai',
-        'singapore': 'Asia/Singapore', 'berlin': 'Europe/Berlin', 'paris': 'Europe/Paris',
-        'los angeles': 'America/Los_Angeles', 'la': 'America/Los_Angeles', 'chicago': 'America/Chicago',
-        'beijing': 'Asia/Shanghai', 'shanghai': 'Asia/Shanghai', 'moscow': 'Europe/Moscow',
-        'mumbai': 'Asia/Kolkata', 'delhi': 'Asia/Kolkata', 'bangalore': 'Asia/Kolkata',
-        'kolkata': 'Asia/Kolkata', 'chennai': 'Asia/Kolkata'
-      };
-      if (cityMatch) {
-        const city = cityMatch[1].trim().toLowerCase();
-        timezone = tzMap[city] || timezone;
-      }
-      const now = new Date().toLocaleString('en-IN', { timeZone: timezone, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' });
-      return `🕐 **${now}**`;
+      const m = query.match(/time\s+(?:in|at|for)?\s*([a-zA-Z\s]+)/i);
+      const tzMap = { 'london':'Europe/London','new york':'America/New_York','tokyo':'Asia/Tokyo','sydney':'Australia/Sydney','dubai':'Asia/Dubai','singapore':'Asia/Singapore','mumbai':'Asia/Kolkata','delhi':'Asia/Kolkata','bangalore':'Asia/Kolkata' };
+      let tz = 'Asia/Kolkata';
+      if (m) tz = tzMap[m[1].trim().toLowerCase()] || tz;
+      return `🕐 **${new Date().toLocaleString('en-IN', { timeZone: tz, weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', timeZoneName:'short' })}**`;
     },
 
     handleDate() {
       const now = new Date();
-      const daysLeft = Math.ceil((new Date(now.getFullYear(), 11, 31) - now) / (1000 * 60 * 60 * 24));
-      return `📅 **${now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}**\n\n${daysLeft} days remaining in ${now.getFullYear()}.`;
+      const daysLeft = Math.ceil((new Date(now.getFullYear(), 11, 31) - now) / 86400000);
+      return `📅 **${now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}**\n\n${daysLeft} days remaining in ${now.getFullYear()}.`;
     },
 
     handleTimer(query) {
-      const match = query.match(/(\d+)\s*(min|minute|sec|second|hour|hr)s?/i);
-      if (match) {
-        const val = parseInt(match[1]);
-        const unit = match[2].toLowerCase();
+      const m = query.match(/(\d+)\s*(min|minute|sec|second|hour|hr)s?/i);
+      if (m) {
+        const val = parseInt(m[1]), unit = m[2].toLowerCase();
         let ms = val * 1000;
-        if (unit.startsWith('min')) ms = val * 60 * 1000;
-        if (unit.startsWith('hour') || unit === 'hr') ms = val * 60 * 60 * 1000;
-        setTimeout(() => {
-          if (typeof window.notifyUser === 'function') window.notifyUser(`⏰ Timer: ${val} ${unit}${val > 1 ? 's' : ''} up!`);
-        }, ms);
-        return `⏱️ Timer set for **${val} ${unit}${val > 1 ? 's' : ''}**. I'll notify you when it's done.`;
+        if (unit.startsWith('min')) ms = val * 60000;
+        if (unit.startsWith('hour') || unit === 'hr') ms = val * 3600000;
+        setTimeout(() => { if (typeof window.notifyUser === 'function') window.notifyUser(`⏰ ${val} ${unit}s up!`); }, ms);
+        return `⏱️ Timer set for **${val} ${unit}${val > 1 ? 's' : ''}**.`;
       }
-      return "Usage: \`timer 5 minutes\` or \`set timer 30 seconds\`";
-    },
-
-    handleNews(query) {
-      const topics = ['tech', 'india', 'business', 'sports', 'science', 'health', 'politics', 'entertainment'];
-      const topic = topics.find(t => query.includes(t)) || State.context.lastTopic || 'general';
-      State.context.lastTopic = topic;
-      const feeds = {
-        tech: [
-          { title: "Apple unveils M4 Ultra chip with 32-core neural engine", summary: "New silicon promises 50% faster AI inference for on-device models.", time: "2h ago", source: "TechCrunch" },
-          { title: "Open-source LLMs close gap on GPT-4 in coding benchmarks", summary: "DeepSeek-Coder-V2 and Llama-3-70B show competitive performance.", time: "4h ago", source: "Ars Technica" }
-        ],
-        india: [
-          { title: "ISRO successfully tests reusable launch vehicle landing", summary: "RLV-TD autonomous landing marks milestone in space shuttle program.", time: "1h ago", source: "The Hindu" },
-          { title: "UPI transactions cross 15 billion monthly volume", summary: "NPCI reports record digital payments growth in Q1 2026.", time: "3h ago", source: "Economic Times" }
-        ],
-        business: [
-          { title: "Fed signals potential rate cut in July meeting", summary: "Inflation cooling faster than expected, markets rally on news.", time: "30m ago", source: "Reuters" },
-          { title: "Tesla India factory plans advance with state approvals", summary: "Gujarat and Maharashtra compete for $2B manufacturing unit.", time: "5h ago", source: "Bloomberg" }
-        ]
-      };
-      const feed = feeds[topic] || feeds.tech;
-      let html = `<div style="margin-bottom:12px; font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">📰 ${topic.toUpperCase()} NEWS</div>`;
-      feed.forEach(item => {
-        html += `
-          <div class="news-card" style="padding:12px; margin-bottom:8px; background:#0a0a0a; border-left:3px solid var(--accent); border-radius:0 8px 8px 0;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-              <span style="font-size:0.85rem; font-weight:600; color:var(--text); line-height:1.3;">${item.title}</span>
-              <span style="font-size:0.65rem; color:var(--muted); white-space:nowrap; margin-left:8px;">${item.time}</span>
-            </div>
-            <div style="font-size:0.78rem; color:var(--muted); line-height:1.4; margin-bottom:6px;">${item.summary}</div>
-            <div style="font-size:0.65rem; color:#475569; font-weight:500;">${item.source}</div>
-          </div>`;
-      });
-      return html;
+      return "Usage: `timer 5 minutes`";
     },
 
     handleDefinition(query) {
-      let term = query.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+|explain\s+)/i, '').replace(/\?/g, '').trim().toLowerCase();
-      const key = term.replace(/\s+/g, '_');
+      let term = query.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+|explain\s+)/i,'').replace(/\?/g,'').trim().toLowerCase();
+      const key = term.replace(/\s+/g,'_');
       const defs = {
-        photosynthesis: "Process by which green plants use sunlight to synthesize nutrients from CO₂ and water.",
-        gravity: "Natural phenomenon by which all things with mass are brought toward one another.",
-        algorithm: "Finite set of well-defined instructions for solving a problem or accomplishing a task.",
-        ai: "Artificial Intelligence – simulation of human intelligence in machines.",
-        machine_learning: "Subset of AI where systems learn patterns from data without explicit programming.",
-        blockchain: "Distributed ledger technology maintaining immutable, decentralized transaction records.",
-        dns: "Domain Name System – translates human-readable domain names to IP addresses.",
-        api: "Application Programming Interface – allows software applications to communicate.",
-        rest: "Representational State Transfer – architectural style for designing networked applications.",
-        graphql: "Query language for APIs allowing clients to request exactly the data they need.",
-        docker: "Platform for developing, shipping, and running applications in containers.",
-        kubernetes: "Open-source system for automating deployment, scaling, and management of containerized applications.",
-        sql: "Structured Query Language – standard language for relational database management.",
-        nosql: "Non-relational database approach for unstructured or semi-structured data.",
-        latency: "Time delay between cause and effect in a system, critical in networking.",
-        throughput: "Rate of production or processing, often measured in requests per second.",
-        recursion: "Function calling itself to solve problems by breaking them into smaller sub-problems.",
-        big_o: "Notation describing performance or complexity of an algorithm.",
-        ci_cd: "Continuous Integration / Continuous Deployment – automated software delivery practices.",
-        oauth: "Open standard for access delegation, commonly used for token-based authentication."
+        photosynthesis:'Plants use sunlight to make food from CO₂ and water.',
+        gravity:'Natural force attracting masses toward each other.',
+        algorithm:'Step-by-step instructions for solving a problem.',
+        ai:'Artificial Intelligence — machines simulating human intelligence.',
+        machine_learning:'AI systems that learn from data without explicit programming.',
+        blockchain:'Distributed immutable ledger for decentralized records.',
+        api:'Interface that lets software applications communicate.',
+        sql:'Language for managing relational databases.',
+        recursion:'Function that calls itself to solve sub-problems.',
+        dns:'System translating domain names to IP addresses.'
       };
       if (defs[key]) return `**${term}**: ${defs[key]}`;
       const partial = Object.keys(defs).find(k => k.includes(term) || term.includes(k));
-      if (partial) return `**${partial.replace(/_/g, ' ')}**: ${defs[partial]}`;
-      return `I don't have "${term}" in my local knowledge base. Try a web search or ask about: ${Object.keys(defs).slice(0, 5).join(', ')}...`;
-    },
-
-    handleTranslate(query, lower) {
-      const match = query.match(/translate\s+["']?(.+?)["']?\s+(?:to|in)\s+(\w+)/i) || query.match(/["']?(.+?)["']?\s+(?:in|to)\s+(\w+)/i);
-      if (!match) return "Usage: \`translate 'Hello' to Hindi\` or \`Good morning in Spanish\`";
-      const [, text, lang] = match;
-      const translations = {
-        'hello': { spanish: 'Hola', french: 'Bonjour', german: 'Hallo', hindi: 'नमस्ते', japanese: 'こんにちは', chinese: '你好', arabic: 'مرحبا', russian: 'Привет' },
-        'thank you': { spanish: 'Gracias', french: 'Merci', german: 'Danke', hindi: 'धन्यवाद', japanese: 'ありがとう', chinese: '谢谢', arabic: 'شكراً', russian: 'Спасибо' },
-        'good morning': { spanish: 'Buenos días', french: 'Bonjour', german: 'Guten Morgen', hindi: 'सुप्रभात', japanese: 'おはようございます', chinese: '早上好', arabic: 'صباح الخير', russian: 'Доброе утро' },
-        'good night': { spanish: 'Buenas noches', french: 'Bonne nuit', german: 'Gute Nacht', hindi: 'शुभ रात्रि', japanese: 'おやすみなさい', chinese: '晚安', arabic: 'تصبح على خير', russian: 'Спокойной ночи' },
-        'how are you': { spanish: '¿Cómo estás?', french: 'Comment allez-vous?', german: 'Wie geht es dir?', hindi: 'आप कैसे हैं?', japanese: 'お元気ですか？', chinese: '你好吗？', arabic: 'كيف حالك؟', russian: 'Как дела?' }
-      };
-      const key = text.toLowerCase().trim();
-      const targetLang = lang.toLowerCase();
-      if (translations[key]?.[targetLang]) {
-        return `**${text}** → **${translations[key][targetLang]}** (${targetLang})`;
-      }
-      return `Local translation for "${text}" in ${targetLang} not available. Supported: hello, thank you, good morning, good night, how are you.`;
-    },
-
-    handleStock(query) {
-      const match = query.match(/\b([A-Z]{1,5})\b/i);
-      const ticker = match ? match[1].toUpperCase() : 'AAPL';
-      const stocks = {
-        'AAPL': { price: 189.52, change: '+1.2%', name: 'Apple Inc.' },
-        'GOOGL': { price: 142.18, change: '-0.4%', name: 'Alphabet Inc.' },
-        'TSLA': { price: 245.67, change: '+2.1%', name: 'Tesla, Inc.' },
-        'MSFT': { price: 378.91, change: '+0.8%', name: 'Microsoft Corp.' },
-        'NVDA': { price: 892.45, change: '+3.2%', name: 'NVIDIA Corp.' },
-        'RELIANCE': { price: 2847.30, change: '+0.5%', name: 'Reliance Industries', currency: '₹' },
-        'TCS': { price: 3892.15, change: '-0.2%', name: 'Tata Consultancy', currency: '₹' },
-        'INFY': { price: 1523.40, change: '+1.1%', name: 'Infosys Ltd', currency: '₹' }
-      };
-      const stock = stocks[ticker];
-      if (!stock) return `Stock data for ${ticker} not in local cache. Try: AAPL, GOOGL, TSLA, MSFT, NVDA, RELIANCE, TCS, INFY.`;
-      const color = stock.change.startsWith('+') ? '#22c55e' : '#ef4444';
-      return `
-        <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#0a0a0a; border-radius:8px; border:1px solid #1a1a1a;">
-          <div style="font-size:1.5rem;">📈</div>
-          <div>
-            <div style="font-weight:600; color:var(--text);">${stock.name} (${ticker})</div>
-            <div style="font-size:1.3rem; font-weight:700; color:var(--text);">${stock.currency || '$'}${stock.price}</div>
-            <div style="color:${color}; font-size:0.9rem; font-weight:600;">${stock.change}</div>
-          </div>
-        </div>`;
-    },
-
-    handleTodo(query, lower) {
-      const task = query.replace(/(add|create|set|remind me to|remember to)\s+(a\s+)?(task|todo|reminder)?\s*/i, '').trim();
-      if (!task || task === query) return "Usage: \`add task review pull requests\` or \`remind me to call mom\`";
-      const todos = JSON.parse(localStorage.getItem('disha_todos') || '[]');
-      todos.push({ task, created: Date.now(), done: false });
-      localStorage.setItem('disha_todos', JSON.stringify(todos));
-      return `✅ Added to your list: **"${task}"**\nYou have ${todos.length} task${todos.length > 1 ? 's' : ''} total.`;
-    },
-
-    handleNote(query, lower) {
-      const note = query.replace(/(save|remember|write down|note|jot)\s+(this|that)?\s*/i, '').trim();
-      if (!note || note === query) return "Usage: \`note API key is in the vault\` or \`remember that meeting is at 3pm\`";
-      const notes = JSON.parse(localStorage.getItem('disha_notes') || '[]');
-      notes.push({ note, created: Date.now() });
-      localStorage.setItem('disha_notes', JSON.stringify(notes));
-      return `📝 Saved: **"${note}"**`;
+      if (partial) return `**${partial.replace(/_/g,' ')}**: ${defs[partial]}`;
+      return `"${term}" not in local knowledge base.`;
     },
 
     generatePassword(query) {
-      const lenMatch = query.match(/(\d+)\s*(char|digit|length)/i);
-      const length = lenMatch ? Math.min(parseInt(lenMatch[1]), 64) : 16;
+      const m = query.match(/(\d+)\s*(char|digit|length)/i);
+      const length = m ? Math.min(parseInt(m[1]), 64) : 16;
       const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
       let pwd = '';
-      const array = new Uint32Array(length);
-      crypto.getRandomValues(array);
-      for (let i = 0; i < length; i++) pwd += chars[array[i] % chars.length];
-      return `🔐 **Generated Password** (${length} chars):\n\`${pwd}\`\n\n*Copy this immediately — I don't store passwords.*`;
+      const arr = new Uint32Array(length);
+      crypto.getRandomValues(arr);
+      for (let i = 0; i < length; i++) pwd += chars[arr[i] % chars.length];
+      return `🔐 **Password** (${length} chars):\n\`${pwd}\``;
     },
 
-    generateUUID() {
-      return `🆔 **UUID v4**:\n\`${crypto.randomUUID()}\``;
-    },
-
-    handleFollowUp(query) {
-      if (State.context.lastIntent === 'weather') {
-        return this.getWeatherReport(query + ' ' + (State.context.lastCity || ''));
-      }
-      if (State.context.lastIntent === 'news') {
-        return this.handleNews(query);
-      }
-      return "Could you be more specific? I lost track of our conversation.";
-    },
+    generateUUID() { return `🆔 **UUID v4**:\n\`${crypto.randomUUID()}\``; },
 
     respondGreeting() {
-      const hour = new Date().getHours();
-      const timeGreeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-      const greetings = [`${timeGreeting}! 👋 Ready to get things done?`, `${timeGreeting}! What are we working on today?`, `Hey there! I'm online and ready.`];
-      return greetings[Math.floor(Math.random() * greetings.length)];
+      const h = new Date().getHours();
+      const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      return `${g}! 👋 Ready when you are.`;
     },
-
-    respondFarewell() {
-      const sessionMins = Math.floor((Date.now() - State.context.sessionStart) / 60000);
-      return `Goodbye! 👋 Session time: ${sessionMins}m. Queries handled: ${State.stats.queriesHandled}. See you tomorrow.`;
-    },
-
-    respondIdentity() {
-      return "I'm **Disha**, your on-device intelligence layer for x0s.link. I handle math, weather, conversions, notes, passwords, and quick lookups — all without sending your data to AI clouds.";
-    },
-
-    respondCapabilities() {
-      return `**Available commands:**
-• \`calc 15 * 23.5\` — Calculator
-• \`weather in London\` — Live weather
-• \`convert 100 km to mi\` — Unit converter
-• \`time in Tokyo\` — World clock
-• \`news tech\` — Headlines
-• \`define API\` — Definitions
-• \`translate hello to Hindi\` — Translations
-• \`stock AAPL\` — Stock prices
-• \`add task review PRs\` — Todo list
-• \`note meeting at 3pm\` — Quick notes
-• \`password 20 chars\` — Secure password
-• \`uuid\` — Generate UUID
-• \`timer 5 minutes\` — Countdown timer`;
-    },
-
-    respondCreator() {
-      return "Built by the x0s.link engineering team. Runs entirely in your browser — no AI APIs, no data harvesting.";
-    },
-
-    respondThanks() {
-      return "Anytime. 🎯";
-    },
-
-    respondStatus() {
-      return `Systems nominal. Uptime: ${Math.floor((Date.now() - State.context.sessionStart) / 1000)}s. Math solved: ${State.stats.mathSolved}. Weather checks: ${State.stats.weatherFetched}.`;
-    },
-
-    respondHelp() {
-      return this.respondCapabilities();
-    },
+    respondFarewell() { return `Goodbye! 👋 Queries handled: ${State.stats.queriesHandled}.`; },
+    respondIdentity() { return "I'm **Disha**, your on-device intelligence layer for x0s.link. Math, weather, KCET predictions, and more — no cloud AI."; },
+    respondCapabilities() { return `**Disha can handle:**\n• \`calc 15 * 23\` — Math\n• \`weather in Bangalore\` — Live weather\n• \`convert 100 km to mi\` — Units\n• \`time in Tokyo\` — World clock\n• \`define API\` — Definitions\n• \`password 20\` — Secure password\n• \`timer 5 minutes\` — Countdown\n• \`kcet predict\` — KCET rank predictor`; },
+    respondCreator() { return "Built by the x0s.link team. Runs entirely in your browser."; },
+    respondThanks() { return "Anytime. 🎯"; },
+    respondStatus() { return `All systems nominal. Uptime: ${Math.floor((Date.now() - State.context.sessionStart) / 1000)}s.`; },
 
     respondGeneralKnowledge(lower) {
       const kb = [
-        { keys: ['capital', 'india'], answer: "New Delhi" },
-        { keys: ['capital', 'france'], answer: "Paris" },
-        { keys: ['capital', 'japan'], answer: "Tokyo" },
-        { keys: ['capital', 'germany'], answer: "Berlin" },
-        { keys: ['capital', 'australia'], answer: "Canberra" },
-        { keys: ['capital', 'canada'], answer: "Ottawa" },
-        { keys: ['capital', 'brazil'], answer: "Brasília" },
-        { keys: ['largest', 'ocean'], answer: "Pacific Ocean (~165M km²)" },
-        { keys: ['largest', 'continent'], answer: "Asia (~44.6M km²)" },
-        { keys: ['longest', 'river'], answer: "Nile (~6,650 km) or Amazon (~6,400 km) depending on measurement criteria." },
-        { keys: ['tallest', 'mountain'], answer: "Mount Everest (8,848.86 m)" },
-        { keys: ['deepest', 'ocean'], answer: "Mariana Trench (~10,935 m)" },
-        { keys: ['speed', 'light'], answer: "299,792,458 m/s (exact, since 1983)" },
-        { keys: ['pi'], answer: "π ≈ 3.141592653589793..." },
-        { keys: ['golden', 'ratio'], answer: "φ ≈ 1.6180339887..." },
-        { keys: ['planck', 'constant'], answer: "h ≈ 6.626 × 10⁻³⁴ J⋅s" },
-        { keys: ['water', 'boil'], answer: "100°C (212°F) at 1 atm sea level" },
-        { keys: ['absolute', 'zero'], answer: "0 K (-273.15°C / -459.67°F)" },
-        { keys: ['human', 'bones'], answer: "206 bones (adult); 270 at birth" },
-        { keys: ['human', 'dna'], answer: "~3 billion base pairs, 23 chromosome pairs" },
-        { keys: ['earth', 'age'], answer: "~4.54 billion years" },
-        { keys: ['universe', 'age'], answer: "~13.8 billion years" },
-        { keys: ['who', 'linux'], answer: "Linus Torvalds, 1991" },
-        { keys: ['who', 'python'], answer: "Guido van Rossum, 1991" },
-        { keys: ['who', 'javascript'], answer: "Brendan Eich, 1995 (in 10 days)" },
-        { keys: ['first', 'computer'], answer: "ENIAC (1945) or Z3 (1941) depending on definition" },
-        { keys: ['tcp', 'ip'], answer: "Vint Cerf and Bob Kahn, 1974" },
-        { keys: ['www'], answer: "Tim Berners-Lee, CERN, 1989" },
-        { keys: ['bitcoin'], answer: "Satoshi Nakamoto (pseudonym), 2008 whitepaper" },
-        { keys: ['fibonacci'], answer: "Sequence: 0, 1, 1, 2, 3, 5, 8, 13... Each number is the sum of the two preceding ones." },
-        { keys: ['pythagorean'], answer: "a² + b² = c² for right triangles" },
-        { keys: ['quadratic'], answer: "ax² + bx + c = 0 → x = (-b ± √(b²-4ac)) / 2a" },
-        { keys: ['prime', 'number'], answer: "A natural number >1 with no positive divisors other than 1 and itself." },
-        { keys: ['president', 'usa'], answer: "Donald Trump (47th President, since Jan 2025)" },
-        { keys: ['prime', 'minister', 'india'], answer: "Narendra Modi (since 2014)" },
-        { keys: ['ceo', 'google'], answer: "Sundar Pichai (CEO of Alphabet and Google)" },
-        { keys: ['ceo', 'microsoft'], answer: "Satya Nadella (since 2014)" },
-        { keys: ['ceo', 'apple'], answer: "Tim Cook (since 2011)" },
-        { keys: ['richest', 'person'], answer: "Elon Musk (~$300B net worth, fluctuates)" },
+        { keys:['capital','india'], answer:'New Delhi' },
+        { keys:['capital','france'], answer:'Paris' },
+        { keys:['capital','japan'], answer:'Tokyo' },
+        { keys:['largest','ocean'], answer:'Pacific Ocean (~165M km²)' },
+        { keys:['tallest','mountain'], answer:'Mount Everest (8,848.86 m)' },
+        { keys:['speed','light'], answer:'299,792,458 m/s' },
+        { keys:['pi'], answer:'π ≈ 3.14159265358979…' },
+        { keys:['who','linux'], answer:'Linus Torvalds, 1991' },
+        { keys:['who','python'], answer:'Guido van Rossum, 1991' },
+        { keys:['who','javascript'], answer:'Brendan Eich, 1995' },
+        { keys:['prime','minister','india'], answer:'Narendra Modi (since 2014)' },
+        { keys:['ceo','apple'], answer:'Tim Cook (since 2011)' },
+        { keys:['ceo','google'], answer:'Sundar Pichai' },
+        { keys:['ceo','microsoft'], answer:'Satya Nadella' },
       ];
       for (const item of kb) {
-        if (item.keys.every(k => lower.includes(k))) {
-          return `**${item.keys.map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(' ')}**: ${item.answer}`;
-        }
+        if (item.keys.every(k => lower.includes(k))) return `**${item.keys.join(' ')}**: ${item.answer}`;
       }
-      const suggestions = [
-        "Try asking about: weather, calculations, conversions, definitions, time zones, or news.",
-        "I can calculate, convert units, check weather, or generate passwords. What do you need?",
-        "Not in my local database. Try: `define [term]`, `calc [expression]`, or `weather in [city]`."
-      ];
-      return suggestions[State.stats.queriesHandled % suggestions.length];
+      const s = ['Try: weather, calc, convert, define, kcet predict, password.','Ask me: weather in Mumbai, calc 2^10, define algorithm.','Not in local DB. Try a specific command.'];
+      return s[State.stats.queriesHandled % s.length];
     }
   };
 
@@ -502,22 +230,19 @@
     return md
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/`(.*?)`/g, '<code style="background:#1e293b;padding:2px 6px;border-radius:4px;color:#7dd3fc;font-family:monospace;font-size:0.9em;">$1</code>')
+      .replace(/`(.*?)`/g, '<code style="background:#111;padding:2px 7px;border-radius:5px;color:#fff;font-family:monospace;font-size:.88em;border:1px solid #1a1a1a;">$1</code>')
       .replace(/\n/g, '<br>');
   }
 
   async function typewriteText(container, text) {
     container.innerHTML = '';
     const isHtml = text.trim().startsWith('<');
-    if (isHtml) {
-      container.innerHTML = text;
-      return;
-    }
+    if (isHtml) { container.innerHTML = text; return; }
     let i = 0;
     return new Promise(resolve => {
       function type() {
         if (i < text.length) {
-          container.innerHTML = simpleMarkdown(text.substring(0, i + 1)) + '<span class="typing-cursor" style="color:var(--accent);animation:blink 1s infinite;">▌</span>';
+          container.innerHTML = simpleMarkdown(text.substring(0, i + 1)) + '<span style="color:#007aff;animation:blink 1s infinite;">▌</span>';
           i++;
           setTimeout(type, CONFIG.typingSpeed + Math.random() * 8);
           if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
@@ -530,352 +255,286 @@
     });
   }
 
-  // ========== KCET PREDICTOR (REENGINEERED) ==========
+  // ========== KCET PREDICTOR — Nothing × X Design ==========
+  function inp(id, placeholder, max) {
+    return `<input type="number" id="in-${id}" min="0" max="${max}" placeholder="${placeholder}"
+      style="width:100%;background:#000;border:1px solid #222;border-radius:10px;padding:12px 14px;
+      color:#fff;font-family:'Space Grotesk',sans-serif;font-size:.88rem;outline:none;
+      -moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"
+      onfocus="this.style.borderColor='#fff'" onblur="this.style.borderColor='#222'">`;
+  }
+
+  function subjectRow(id, label, max) {
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;
+        padding:0 0 14px;border-bottom:1px solid #111;margin-bottom:14px;">
+        <div style="font-size:.78rem;font-weight:500;color:#888;letter-spacing:.04em;text-transform:uppercase;">${label}</div>
+        <input type="number" id="in-${id}" min="0" max="${max}" placeholder="—"
+          style="width:72px;background:transparent;border:none;border-bottom:1px solid #333;
+          color:#fff;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;
+          text-align:right;outline:none;padding:4px 0;transition:border-color .2s;"
+          onfocus="this.style.borderColor='#fff'" onblur="this.style.borderColor='#333'">
+      </div>`;
+  }
+
+  function computeRank(boardPct, kcetPct) {
+    const index = (boardPct * 0.5) + (kcetPct * 0.5);
+    let rank = Math.round(Math.pow(101 - index, 2.6) * 4.8);
+    return Math.max(1, Math.min(rank, 250000));
+  }
+
+  function rankBand(rank) {
+    if (rank <= 500)   return { label:'Elite', color:'#fff' };
+    if (rank <= 2000)  return { label:'Excellent', color:'#e5e5e5' };
+    if (rank <= 8000)  return { label:'Good', color:'#aaa' };
+    if (rank <= 25000) return { label:'Average', color:'#777' };
+    return { label:'Below Avg', color:'#555' };
+  }
+
+  function resultBlock(title, rank) {
+    const band = rankBand(rank);
+    return `
+      <div style="flex:1;background:#000;border:1px solid #1a1a1a;border-radius:16px;padding:18px 16px;text-align:center;">
+        <div style="font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#444;margin-bottom:10px;">${title}</div>
+        <div style="font-size:2.2rem;font-weight:700;letter-spacing:-.04em;color:#fff;line-height:1;">${rank.toLocaleString('en-IN')}</div>
+        <div style="font-size:.65rem;font-weight:600;color:${band.color};margin-top:6px;letter-spacing:.08em;text-transform:uppercase;">${band.label}</div>
+      </div>`;
+  }
+
   function launchKcetPredictor() {
     const container = document.getElementById('es-messages');
     if (!container) return;
-    const sysBubble = document.createElement('div');
-    sysBubble.className = 'es-bubble-sys';
-    sysBubble.style.width = '100%';
-    sysBubble.style.maxWidth = '680px'; // Wider, aesthetic container
-    sysBubble.style.margin = '16px auto';
-    
-    const uid = Date.now();
+    const uid = 'k' + Date.now();
 
-    sysBubble.innerHTML = `
-      <div class="kcet-monolith-card" style="background: #000000; border: 1px solid #1a1a1a; border-radius: 16px; padding: 32px; color: #ffffff; font-family: 'Space Grotesk', sans-serif; box-shadow: 0 20px 40px rgba(0,0,0,0.8); position: relative; overflow: hidden;">
-        
-        <!-- Subtle Top Glass Accent Line -->
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);"></div>
+    const card = document.createElement('div');
+    card.className = 'es-bubble-sys';
+    card.innerHTML = `
+    <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:24px;overflow:hidden;width:100%;max-width:420px;">
 
-        <!-- Header Matrix -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; border-bottom: 1px solid #1a1a1a; padding-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid #262626; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-              <i class="fa-solid fa-layer-group" style="color: #ffffff; font-size: 1.2rem;"></i>
-            </div>
-            <div>
-              <div style="font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; color: #ffffff;">x0s Matrix Rank Engine</div>
-              <div style="font-size: 0.68rem; color: #666666; font-family: monospace; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 2px;">Predictive Analytics // KCET 2026</div>
-            </div>
+      <!-- header -->
+      <div style="padding:20px 22px 16px;border-bottom:1px solid #111;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:1.05rem;font-weight:700;letter-spacing:-.02em;">KCET Rank Predictor</div>
+            <div style="font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#444;margin-top:3px;">2026 · Predictive Engine</div>
           </div>
-          <div style="font-size: 0.62rem; color: #ffffff; background: #1a1a1a; padding: 4px 8px; border-radius: 4px; font-family: monospace; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid #262626;">
-            v2.0_stable
+          <div style="width:36px;height:36px;border:1px solid #1a1a1a;border-radius:10px;
+            display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-chart-line" style="color:#666;font-size:.82rem;"></i>
           </div>
-        </div>
-
-        <!-- Mode Selection Matrix -->
-        <div style="display: flex; background: #0a0a0a; border: 1px solid #1a1a1a; padding: 4px; border-radius: 8px; margin-bottom: 32px;">
-          <button id="eng-mode-${uid}" class="kcet-mode-btn" data-mode="eng" style="flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; background: #ffffff; color: #000000; transition: all 0.2s ease;">Engineering Matrix</button>
-          <button id="non-mode-${uid}" class="kcet-mode-btn" data-mode="non" style="flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; font-family: inherit; cursor: pointer; background: transparent; color: #666666; transition: all 0.2s ease;">Pharma & Split Matrix</button>
-        </div>
-
-        <!-- ================= ENGINEERING MODE PANEL ================= -->
-        <div id="eng-panel-${uid}">
-          <div style="margin-bottom: 28px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em;"><i class="fa-solid fa-graduation-cap" style="margin-right: 8px; font-size: 0.75rem;"></i> PCM Board Marks</div>
-              <div id="board-toggle-eng-${uid}" style="display: flex; gap: 4px; background: #0a0a0a; padding: 2px; border-radius: 6px; border: 1px solid #1a1a1a;">
-                <button class="board-mode-btn" data-mode="individual" data-target="eng" style="padding: 4px 10px; background: #1a1a1a; border: none; border-radius: 4px; font-size: 0.65rem; color: #ffffff; cursor: pointer; font-family: inherit;">Breakdown</button>
-                <button class="board-mode-btn" data-mode="total" data-target="eng" style="padding: 4px 10px; background: transparent; border: none; border-radius: 4px; font-size: 0.65rem; color: #666666; cursor: pointer; font-family: inherit;">Aggregate</button>
-              </div>
-            </div>
-            
-            <div id="eng-board-individual" style="display: flex; flex-direction: column; gap: 10px;">
-              ${renderWideSubjectInput('eng-phy', 'Physics Breakdown', 'fa-solid fa-atom')}
-              ${renderWideSubjectInput('eng-chem', 'Chemistry Breakdown', 'fa-solid fa-flask-vial')}
-              ${renderWideSubjectInput('eng-math', 'Mathematics Breakdown', 'fa-solid fa-square-root-variable')}
-            </div>
-            
-            <div id="eng-board-total" style="display: none;">
-              ${renderWideAggregateInput(`eng-total-board-${uid}`, 'PCM Cumulative Score', '0 - 300', 'fa-solid fa-calculator')}
-            </div>
-          </div>
-
-          <div style="margin-bottom: 32px;">
-            <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;"><i class="fa-solid fa-pen-to-square" style="margin-right: 8px; font-size: 0.75rem;"></i> KCET Metrics</div>
-            ${renderWideAggregateInput(`eng-kcet-total-${uid}`, 'Total Core Score Secured', '0 - 180', 'fa-solid fa-bolt')}
-          </div>
-
-          <button onclick="window.calcKcetEngineering('${uid}')" style="width: 100%; padding: 16px; background: #ffffff; border: 1px solid #ffffff; border-radius: 8px; color: #000000; font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; cursor: pointer; font-family: inherit; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Execute Predictive Evaluation</button>
-          <div id="eng-result-${uid}" style="margin-top: 28px; border-top: 1px solid #1a1a1a; padding-top: 24px; display: none;"></div>
-        </div>
-
-        <!-- ================= PHARMA / SPLIT MODE PANEL ================= -->
-        <div id="non-panel-${uid}" style="display: none;">
-          <div style="margin-bottom: 28px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em;"><i class="fa-solid fa-graduation-cap" style="margin-right: 8px; font-size: 0.75rem;"></i> PCMB Board Marks</div>
-              <div id="board-toggle-non-${uid}" style="display: flex; gap: 4px; background: #0a0a0a; padding: 2px; border-radius: 6px; border: 1px solid #1a1a1a;">
-                <button class="board-mode-btn" data-mode="individual" data-target="non" style="padding: 4px 10px; background: #1a1a1a; border: none; border-radius: 4px; font-size: 0.65rem; color: #ffffff; cursor: pointer; font-family: inherit;">Breakdown</button>
-                <button class="board-mode-btn" data-mode="total" data-target="non" style="padding: 4px 10px; background: transparent; border: none; border-radius: 4px; font-size: 0.65rem; color: #666666; cursor: pointer; font-family: inherit;">Aggregate</button>
-              </div>
-            </div>
-            
-            <div id="non-board-individual" style="display: flex; flex-direction: column; gap: 10px;">
-              ${renderWideSubjectInput('non-phy', 'Physics Breakdown', 'fa-solid fa-atom')}
-              ${renderWideSubjectInput('non-chem', 'Chemistry Breakdown', 'fa-solid fa-flask-vial')}
-              ${renderWideSubjectInput('non-math', 'Mathematics Breakdown', 'fa-solid fa-square-root-variable')}
-              ${renderWideSubjectInput('non-bio', 'Biology Breakdown', 'fa-solid fa-dna')}
-            </div>
-            
-            <div id="non-board-total" style="display: none;">
-              ${renderWideAggregateInput(`non-total-board-${uid}`, 'PCMB Cumulative Score', '0 - 400', 'fa-solid fa-calculator')}
-            </div>
-          </div>
-
-          <div style="margin-bottom: 32px;">
-            <div style="font-size: 0.8rem; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px;"><i class="fa-solid fa-network-wired" style="margin-right: 8px; font-size: 0.75rem;"></i> KCET Competitive Split Scores</div>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              ${renderWideSubjectInput('non-kcet-pcm-total', 'PCM Core Total Score (for Engineering)', 'fa-solid fa-pen-ruler')}
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                ${renderWideSubjectInput('non-kcet-bio', 'Biology (0-60)', 'fa-solid fa-dna')}
-                ${renderWideSubjectInput('non-kcet-math', 'Math (0-60)', 'fa-solid fa-calculator')}
-              </div>
-            </div>
-          </div>
-
-          <button onclick="window.calcKcetNonEngineering('${uid}')" style="width: 100%; padding: 16px; background: #ffffff; border: 1px solid #ffffff; border-radius: 8px; color: #000000; font-weight: 700; font-size: 0.9rem; letter-spacing: -0.01em; cursor: pointer; font-family: inherit; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Evaluate Competitive Split Matrices</button>
-          <div id="non-result-${uid}" style="margin-top: 28px; border-top: 1px solid #1a1a1a; padding-top: 24px; display: none;"></div>
         </div>
       </div>
-    `;
 
-    container.appendChild(sysBubble);
+      <!-- mode toggle -->
+      <div style="display:flex;border-bottom:1px solid #111;">
+        <div id="tab-eng-${uid}" onclick="switchKcetTab('${uid}','eng')"
+          style="flex:1;padding:14px;text-align:center;font-size:.72rem;font-weight:700;
+          letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+          color:#fff;border-right:1px solid #111;border-bottom:2px solid #fff;transition:.2s;">
+          Engineering
+        </div>
+        <div id="tab-non-${uid}" onclick="switchKcetTab('${uid}','non')"
+          style="flex:1;padding:14px;text-align:center;font-size:.72rem;font-weight:700;
+          letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+          color:#444;border-bottom:2px solid transparent;transition:.2s;">
+          Non-Engineering
+        </div>
+      </div>
+
+      <!-- ENGINEERING PANEL -->
+      <div id="eng-${uid}" style="padding:22px;">
+
+        <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:16px;">Board Marks — PCM</div>
+        ${subjectRow('e-phy-'+uid, 'Physics', 100)}
+        ${subjectRow('e-che-'+uid, 'Chemistry', 100)}
+        ${subjectRow('e-mat-'+uid, 'Mathematics', 100)}
+
+        <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 16px;">KCET Marks — out of 180</div>
+        ${inp('e-kcet-'+uid, '0 – 180', 180)}
+
+        <button onclick="calcEng('${uid}')"
+          style="width:100%;margin-top:18px;padding:14px;
+          background:#fff;color:#000;border:none;border-radius:12px;
+          font-size:.82rem;font-weight:700;font-family:'Space Grotesk',sans-serif;
+          letter-spacing:.04em;cursor:pointer;transition:opacity .18s;"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          PREDICT RANK →
+        </button>
+
+        <div id="eng-result-${uid}" style="display:none;margin-top:18px;"></div>
+      </div>
+
+      <!-- NON-ENGINEERING PANEL -->
+      <div id="non-${uid}" style="padding:22px;display:none;">
+
+        <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:16px;">Board Marks — PCMB</div>
+        ${subjectRow('n-phy-'+uid, 'Physics', 100)}
+        ${subjectRow('n-che-'+uid, 'Chemistry', 100)}
+        ${subjectRow('n-mat-'+uid, 'Mathematics', 100)}
+        ${subjectRow('n-bio-'+uid, 'Biology', 100)}
+
+        <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 16px;">KCET Marks — each out of 60</div>
+        ${subjectRow('n-kphy-'+uid, 'Physics', 60)}
+        ${subjectRow('n-kche-'+uid, 'Chemistry', 60)}
+        ${subjectRow('n-kmat-'+uid, 'Mathematics', 60)}
+        ${subjectRow('n-kbio-'+uid, 'Biology', 60)}
+
+        <button onclick="calcNon('${uid}')"
+          style="width:100%;margin-top:18px;padding:14px;
+          background:#fff;color:#000;border:none;border-radius:12px;
+          font-size:.82rem;font-weight:700;font-family:'Space Grotesk',sans-serif;
+          letter-spacing:.04em;cursor:pointer;transition:opacity .18s;"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          PREDICT BOTH RANKS →
+        </button>
+
+        <div id="non-result-${uid}" style="display:none;margin-top:18px;"></div>
+      </div>
+
+      <!-- footer -->
+      <div style="padding:12px 22px;border-top:1px solid #111;display:flex;align-items:center;gap:6px;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#333;"></div>
+        <div style="font-size:.58rem;color:#333;letter-spacing:.06em;text-transform:uppercase;">Estimated · Not official KEA data</div>
+      </div>
+
+    </div>`;
+
+    container.appendChild(card);
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
-
-    // Event Wireframe and Handlers
-    setupCoreInteractions(uid);
   }
 
-  // ========== WIDER COMPONENT RENDERERS ==========
-  function renderWideSubjectInput(id, placeholder, iconClass) {
-    return `
-      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); padding: 14px 20px; border-radius: 8px; border: 1px solid #1a1a1a; transition: border-color 0.2s ease;" onmouseover="this.style.borderColor='#262626'" onmouseout="this.style.borderColor='#1a1a1a'">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <i class="${iconClass}" style="color: #666666; font-size: 0.9rem; width: 16px; text-align: center;"></i>
-          <span style="font-size: 0.85rem; font-weight: 500; color: #cccccc;">${placeholder}</span>
-        </div>
-        <input type="number" id="in-${id}" placeholder="00" min="0" max="100" style="width: 70px; background: transparent; border: none; color: #ffffff; text-align: right; font-size: 0.95rem; font-weight: 700; font-family: monospace; outline: none;">
-      </div>
-    `;
-  }
+  window.switchKcetTab = (uid, tab) => {
+    const engTab = document.getElementById(`tab-eng-${uid}`);
+    const nonTab = document.getElementById(`tab-non-${uid}`);
+    const engPanel = document.getElementById(`eng-${uid}`);
+    const nonPanel = document.getElementById(`non-${uid}`);
 
-  function renderWideAggregateInput(id, title, bounds, iconClass) {
-    return `
-      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(10px); padding: 14px 20px; border-radius: 8px; border: 1px solid #1a1a1a;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <i class="${iconClass}" style="color: #666666; font-size: 0.9rem; width: 16px; text-align: center;"></i>
-          <span style="font-size: 0.85rem; font-weight: 500; color: #cccccc;">${title} <span style="font-size: 0.7rem; color: #444444; margin-left: 4px;">(${bounds})</span></span>
-        </div>
-        <input type="number" id="${id}" placeholder="000" style="width: 90px; background: transparent; border: none; color: #ffffff; text-align: right; font-size: 0.95rem; font-weight: 700; font-family: monospace; outline: none;">
-      </div>
-    `;
-  }
-
-  // ========== CORE MECHANICS INTERACTORS ==========
-  function setupCoreInteractions(uid) {
-    const engModeBtn = document.getElementById(`eng-mode-${uid}`);
-    const nonModeBtn = document.getElementById(`non-mode-${uid}`);
-    const engPanel = document.getElementById(`eng-panel-${uid}`);
-    const nonPanel = document.getElementById(`non-panel-${uid}`);
-
-    engModeBtn.onclick = () => {
-      engModeBtn.style.background = '#ffffff'; engModeBtn.style.color = '#000000';
-      nonModeBtn.style.background = 'transparent'; nonModeBtn.style.color = '#666666';
+    if (tab === 'eng') {
+      engTab.style.color = '#fff'; engTab.style.borderBottomColor = '#fff';
+      nonTab.style.color = '#444'; nonTab.style.borderBottomColor = 'transparent';
       engPanel.style.display = 'block'; nonPanel.style.display = 'none';
-    };
-    nonModeBtn.onclick = () => {
-      nonModeBtn.style.background = '#ffffff'; nonModeBtn.style.color = '#000000';
-      engModeBtn.style.background = 'transparent'; engModeBtn.style.color = '#666666';
+    } else {
+      nonTab.style.color = '#fff'; nonTab.style.borderBottomColor = '#fff';
+      engTab.style.color = '#444'; engTab.style.borderBottomColor = 'transparent';
       nonPanel.style.display = 'block'; engPanel.style.display = 'none';
-    };
-
-    // Toggle Matrix Systems
-    ['eng', 'non'].forEach(type => {
-      const toggleIndiv = document.querySelector(`#board-toggle-${type}-${uid} .board-mode-btn[data-mode="individual"]`);
-      const toggleTotal = document.querySelector(`#board-toggle-${type}-${uid} .board-mode-btn[data-mode="total"]`);
-      const indivDiv = document.getElementById(`${type}-board-individual`);
-      const totalDiv = document.getElementById(`${type}-board-total`);
-
-      toggleIndiv.onclick = () => {
-        indivDiv.style.display = 'flex'; totalDiv.style.display = 'none';
-        toggleIndiv.style.background = '#1a1a1a'; toggleIndiv.style.color = '#ffffff';
-        toggleTotal.style.background = 'transparent'; toggleTotal.style.color = '#666666';
-      };
-      toggleTotal.onclick = () => {
-        indivDiv.style.display = 'none'; totalDiv.style.display = 'block';
-        toggleTotal.style.background = '#1a1a1a'; toggleTotal.style.color = '#ffffff';
-        toggleIndiv.style.background = 'transparent'; toggleIndiv.style.color = '#666666';
-      };
-    });
-  }
-
-  // ========== ENGINE ALGORITHMS EVALUATION ==========
-  window.calcKcetEngineering = (uid) => {
-    let boardPercent = 0;
-    const totalBoardInput = document.getElementById(`eng-total-board-${uid}`);
-    const isTotalMode = totalBoardInput && totalBoardInput.parentElement.style.display !== 'none';
-
-    if (isTotalMode) {
-      const total = parseFloat(totalBoardInput.value);
-      if (isNaN(total) || total < 0 || total > 300) return alert("System requires valid Cumulative Board parameters [0-300].");
-      boardPercent = (total / 300) * 100;
-    } else {
-      const phy = parseFloat(document.getElementById(`in-eng-phy`)?.value) || 0;
-      const chem = parseFloat(document.getElementById(`in-eng-chem`)?.value) || 0;
-      const math = parseFloat(document.getElementById(`in-eng-math`)?.value) || 0;
-      if (phy > 100 || chem > 100 || math > 100) return alert("Individual metrics bounds cannot exceed 100.");
-      boardPercent = ((phy + chem + math) / 300) * 100;
     }
+  };
 
-    const kcetTotal = parseFloat(document.getElementById(`eng-kcet-total-${uid}`).value);
-    if (isNaN(kcetTotal) || kcetTotal < 0 || kcetTotal > 180) return alert("System requires valid KCET structural metric parameters [0-180].");
-    const kcetPercent = (kcetTotal / 180) * 100;
+  function getVal(id) { return parseFloat(document.getElementById(`in-${id}`)?.value) || 0; }
 
-    const evaluation = computeRank(boardPercent, kcetPercent);
-    const resultDiv = document.getElementById(`eng-result-${uid}`);
-    
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = `
-      <div style="background: #0a0a0a; border: 1px solid #1a1a1a; padding: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-          <div style="font-size: 0.65rem; font-family: monospace; color: #666666; letter-spacing: 0.1em; text-transform: uppercase;"><i class="fa-solid fa-circle-nodes" style="color:#007aff; margin-right:6px;"></i> Predicted Engineering Rank</div>
-          <div style="font-size: 2.2rem; font-weight: 700; color: #ffffff; letter-spacing: -0.04em; margin-top: 6px;">~ ${evaluation.rank.toLocaleString()}</div>
-        </div>
-        <div style="text-align: right; font-family: monospace; font-size: 0.7rem; color: #888888; line-height: 1.6;">
-          <div>BOARD SCORE: <span style="color:#fff">${boardPercent.toFixed(2)}%</span></div>
-          <div>KCET SCORE: <span style="color:#fff">${kcetPercent.toFixed(2)}%</span></div>
-          <div style="border-top:1px solid #1a1a1a; margin-top:4px; padding-top:4px;">INDEX VALUE: <span style="color:#007aff">${evaluation.indexScore.toFixed(2)}</span></div>
+  window.calcEng = (uid) => {
+    const phy = getVal(`e-phy-${uid}`), che = getVal(`e-che-${uid}`), mat = getVal(`e-mat-${uid}`);
+    const kcet = getVal(`e-kcet-${uid}`);
+    if (kcet < 0 || kcet > 180) { alert('Enter KCET marks between 0–180'); return; }
+    const boardPct = ((phy + che + mat) / 300) * 100;
+    const kcetPct = (kcet / 180) * 100;
+    const rank = computeRank(boardPct, kcetPct);
+    const band = rankBand(rank);
+    const res = document.getElementById(`eng-result-${uid}`);
+    res.style.display = 'block';
+    res.innerHTML = `
+      <div style="background:#000;border:1px solid #1a1a1a;border-radius:16px;padding:20px;text-align:center;">
+        <div style="font-size:.58rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#444;margin-bottom:12px;">Predicted Engineering Rank</div>
+        <div style="font-size:3rem;font-weight:700;letter-spacing:-.04em;color:#fff;line-height:1;">${rank.toLocaleString('en-IN')}</div>
+        <div style="font-size:.7rem;font-weight:600;color:${band.color};margin-top:8px;letter-spacing:.1em;text-transform:uppercase;">${band.label}</div>
+        <div style="display:flex;justify-content:center;gap:20px;margin-top:14px;padding-top:14px;border-top:1px solid #111;font-size:.65rem;color:#444;letter-spacing:.04em;">
+          <span>BOARD ${boardPct.toFixed(1)}%</span>
+          <span>KCET ${kcetPct.toFixed(1)}%</span>
+          <span>INDEX ${((boardPct + kcetPct)/2).toFixed(1)}</span>
         </div>
       </div>
-    `;
+      <div onclick="launchKcetPredictor()"
+        style="text-align:center;margin-top:12px;font-size:.65rem;color:#444;
+        letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:8px;">
+        ⟳ NEW PREDICTION
+      </div>`;
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
 
-  window.calcKcetNonEngineering = (uid) => {
-    let boardPercent = 0;
-    const totalBoardInput = document.getElementById(`non-total-board-${uid}`);
-    const isTotalMode = totalBoardInput && totalBoardInput.parentElement.style.display !== 'none';
-
-    if (isTotalMode) {
-      const total = parseFloat(totalBoardInput.value);
-      if (isNaN(total) || total < 0 || total > 400) return alert("System requires valid Cumulative Board parameters [0-400].");
-      boardPercent = (total / 400) * 100;
-    } else {
-      const phy = parseFloat(document.getElementById(`in-non-phy`)?.value) || 0;
-      const chem = parseFloat(document.getElementById(`in-non-chem`)?.value) || 0;
-      const math = parseFloat(document.getElementById(`in-non-math`)?.value) || 0;
-      const bio = parseFloat(document.getElementById(`in-non-bio`)?.value) || 0;
-      if (phy > 100 || chem > 100 || math > 100 || bio > 100) return alert("Individual metrics bounds cannot exceed 100.");
-      boardPercent = ((phy + chem + math + bio) / 400) * 100;
-    }
-
-    // Capture Split Sections
-    const pcmCore = parseFloat(document.getElementById(`in-non-kcet-pcm-total`)?.value) || 0;
-    const bioScore = parseFloat(document.getElementById(`in-non-kcet-bio`)?.value) || 0;
-    const mathScore = parseFloat(document.getElementById(`in-non-kcet-math`)?.value) || 0;
-
-    if (pcmCore > 180 || bioScore > 60 || mathScore > 60) return alert("Parameters out of official bounds schema.");
-
-    // Pharma Calculation: Uses Board % + (Physics + Chemistry + Biology KCET score converted to %)
-    // Extracting estimated PC from the parsed PCM core to bundle with Bio
-    const estimatedPhysChem = (pcmCore - mathScore); 
-    const pcbTotalSecure = estimatedPhysChem + bioScore;
-    const pcbPercent = (pcbTotalSecure / 180) * 100;
-    const pharmaMatrix = computeRank(boardPercent, pcbPercent);
-
-    // Engineering Calculation matrix from PCM Core values directly
-    const pcmPercent = (pcmCore / 180) * 100;
-    const engineeringMatrix = computeRank(boardPercent, pcmPercent);
-
-    const resultDiv = document.getElementById(`non-result-${uid}`);
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = `
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div style="background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 8px;">
-          <div style="font-size: 0.62rem; font-family: monospace; color: #666666; letter-spacing: 0.08em; text-transform: uppercase;"><i class="fa-solid fa-capsules" style="color:#007aff; margin-right:4px;"></i> Pharma Matrix Rank</div>
-          <div style="font-size: 1.8rem; font-weight: 700; color: #ffffff; letter-spacing: -0.03em; margin: 8px 0;">~ ${pharmaMatrix.rank.toLocaleString()}</div>
-          <div style="font-size: 0.65rem; font-family: monospace; color: #444444; line-height: 1.4;">
-            KCET (PCB): <span style="color:#888">${pcbPercent.toFixed(1)}%</span>
-          </div>
-        </div>
-        <div style="background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 8px;">
-          <div style="font-size: 0.62rem; font-family: monospace; color: #666666; letter-spacing: 0.08em; text-transform: uppercase;"><i class="fa-solid fa-microchip" style="color:#007aff; margin-right:4px;"></i> Eng. Split Rank</div>
-          <div style="font-size: 1.8rem; font-weight: 700; color: #ffffff; letter-spacing: -0.03em; margin: 8px 0;">~ ${engineeringMatrix.rank.toLocaleString()}</div>
-          <div style="font-size: 0.65rem; font-family: monospace; color: #444444; line-height: 1.4;">
-            KCET (PCM): <span style="color:#888">${pcmPercent.toFixed(1)}%</span>
-          </div>
-        </div>
+  window.calcNon = (uid) => {
+    const phy = getVal(`n-phy-${uid}`), che = getVal(`n-che-${uid}`), mat = getVal(`n-mat-${uid}`), bio = getVal(`n-bio-${uid}`);
+    const kphy = getVal(`n-kphy-${uid}`), kche = getVal(`n-kche-${uid}`), kmat = getVal(`n-kmat-${uid}`), kbio = getVal(`n-kbio-${uid}`);
+    const boardPct = ((phy + che + mat + bio) / 400) * 100;
+    const pharmaPct = ((kphy + kche + kbio) / 180) * 100;
+    const engPct   = ((kphy + kche + kmat) / 180) * 100;
+    const pharmaRank = computeRank(boardPct, pharmaPct);
+    const engRank    = computeRank(boardPct, engPct);
+    const res = document.getElementById(`non-result-${uid}`);
+    res.style.display = 'block';
+    res.innerHTML = `
+      <div style="display:flex;gap:10px;">
+        ${resultBlock('Pharma Rank', pharmaRank)}
+        ${resultBlock('Engg Rank', engRank)}
       </div>
-      <div style="margin-top: 12px; background: #0a0a0a; border: 1px solid #1a1a1a; padding: 10px 16px; border-radius: 6px; font-size: 0.68rem; color: #666666; font-family: monospace; text-align: center;">
-        Matrix normalization complete. Evaluation generated safely on-device.
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #111;display:flex;gap:20px;font-size:.62rem;color:#444;letter-spacing:.04em;">
+        <span>BOARD ${boardPct.toFixed(1)}%</span>
+        <span>PCB ${pharmaPct.toFixed(1)}%</span>
+        <span>PCM ${engPct.toFixed(1)}%</span>
       </div>
-    `;
+      <div onclick="launchKcetPredictor()"
+        style="text-align:center;margin-top:12px;font-size:.65rem;color:#444;
+        letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:8px;">
+        ⟳ NEW PREDICTION
+      </div>`;
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
 
-  function computeRank(boardPercent, kcetPercent) {
-    const indexScore = (boardPercent + kcetPercent) / 2;
-    let rank = Math.round(Math.pow(101 - indexScore, 2.5) * 5);
-    if (rank < 1) rank = 1;
-    if (rank > 200000) rank = 200000;
-    return { rank, indexScore };
-  }
-
-  // ========== MAIN HOOK (OVERRIDE SEARCH) ==========
+  // ========== HOOK INTO DISHA SEARCH ==========
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof window.doEsSearch === "function") {
       const originalSearch = window.doEsSearch;
       window.doEsSearch = async function (val) {
         if (!val || !val.trim()) return;
         const query = val.trim();
-        const lowerQuery = query.toLowerCase();
+        const lower = query.toLowerCase();
 
-        const messagesContainer = document.getElementById('es-messages');
+        const container = document.getElementById('es-messages');
         const greet = document.getElementById('es-greeting');
         if (greet) greet.style.display = 'none';
 
         if (typeof window.appendEsBubbleUser === 'function') {
           window.appendEsBubbleUser(query);
         } else {
-          const userBubble = document.createElement('div');
-          userBubble.className = 'es-bubble-user';
-          userBubble.textContent = query;
-          if (messagesContainer) messagesContainer.appendChild(userBubble);
+          const b = document.createElement('div');
+          b.className = 'es-bubble-user';
+          b.textContent = query;
+          if (container) container.appendChild(b);
         }
+
         const inputEl = document.getElementById('es-input');
         if (inputEl) inputEl.value = '';
+        document.getElementById('es-send')?.classList.remove('visible');
 
-        if (lowerQuery.includes("kcet") || lowerQuery.includes("prediction")) {
-          setTimeout(launchKcetPredictor, 300);
+        // KCET trigger
+        if (lower.includes('kcet') || lower.includes('predict') || lower.includes('rank predictor')) {
+          setTimeout(launchKcetPredictor, 280);
           return;
         }
 
+        // AI response
         const sysBubble = document.createElement('div');
         sysBubble.className = 'es-bubble-sys';
         const contentDiv = document.createElement('div');
         contentDiv.className = 'ai-response-content';
-        contentDiv.style.fontSize = '0.9rem';
-        contentDiv.style.color = 'var(--text)';
-        contentDiv.style.lineHeight = '1.6';
+        contentDiv.style.cssText = 'font-size:.88rem;color:var(--text);line-height:1.6;';
         sysBubble.appendChild(contentDiv);
-        if (messagesContainer) messagesContainer.appendChild(sysBubble);
-        contentDiv.innerHTML = '<span class="typing-cursor" style="color:var(--accent);">▌</span>';
+        if (container) container.appendChild(sysBubble);
+        contentDiv.innerHTML = '<span style="color:#007aff;">▌</span>';
 
         try {
           const answer = await LocalAI.respond(query);
-          if (answer.includes("Try asking about") || answer.includes("Not in my local database")) {
-            if (messagesContainer && sysBubble.parentNode) messagesContainer.removeChild(sysBubble);
+          if (answer.includes("Not in local DB") || answer.includes("Try:") || answer.includes("not in local")) {
+            if (container && sysBubble.parentNode) container.removeChild(sysBubble);
             originalSearch(val);
           } else {
             await typewriteText(contentDiv, answer);
           }
         } catch (err) {
-          contentDiv.innerHTML = `<span style="color:#ef4444;">⚠️ Engine Error: ${err.message}</span>`;
+          contentDiv.innerHTML = `<span style="color:#ef4444;">⚠️ ${err.message}</span>`;
         }
         if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
       };
     }
   });
+
 })();
