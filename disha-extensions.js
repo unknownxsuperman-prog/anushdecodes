@@ -435,27 +435,88 @@
   window.launchCollegePredictor=launchCollegePredictor;
 
   /* ── INTERCEPT doEsSearch ── */
+
+  // Keywords that Disha owns — if ANY of these appear in the query,
+  // Disha handles it. Everything else falls through to originalSearch.
+  const DISHA_KEYWORDS = [
+    // identity & memory
+    'my name','who am i','who are you','what are you','your name',
+    'call me','remember','i am','i\'m',
+    // greetings / small talk
+    'hi','hello','hey','yo','good morning','good afternoon','good evening','good night',
+    'how are you','how r u','what\'s up','bye','goodbye','thanks','thank you','thx',
+    // math & numbers
+    'calc','calculate','compute','solve','eval','sqrt','sin','cos','tan','log','factorial',
+    'prime','factor','roman','morse','base64','binary','decimal','hex','octal',
+    // conversions
+    ' to ',' in km',' in mi',' in kg',' in lb',' in mb',' in gb',' in ml',
+    ' km to',' mi to',' kg to',' lb to',' c to',' f to',' mb to',' gb to',
+    'convert','conversion',
+    // weather & time
+    'weather','temperature','forecast','humidity','rain','climate',
+    'time in','time at','what time','current time','date','today','what day',
+    'timer','countdown','remind me',
+    // tools
+    'password','generate password','uuid','guid','generate id',
+    'word count','char count','count words','base64','regex','regexp',
+    'color of','colour of','hex code','rgb of','color #','colour #',
+    // finance
+    'emi','loan','mortgage','% of','percent of','tip ',
+    'born in','how old','age from',
+    // knowledge
+    'define','definition','meaning of','explain','full form',
+    'what is ','what are ','who is ','who was ','who made ','who created ',
+    'capital of','largest ','tallest ','deepest ','longest ','fastest ',
+    'speed of','distance from','age of','formula of','atomic number',
+    'founder of','ceo of','prime minister','president of',
+    // kcet
+    'kcet','kea','rank predict','predict rank','college for rank','colleges for',
+    // easter eggs & fun
+    'meaning of life','are you sentient','do you dream','tell me a joke',
+    'hack the planet','sudo','hello world','coffee','love','marry me',
+    // help
+    'help','what can you do','features','commands','abilities',
+  ];
+
+  function dishaOwns(lower) {
+    return DISHA_KEYWORDS.some(kw => lower.includes(kw));
+  }
+
   document.addEventListener('DOMContentLoaded',()=>{
     if(typeof window.doEsSearch==='function'){
       const orig=window.doEsSearch;
       window.doEsSearch=async function(val){
         if(!val||!val.trim())return;
-        const query=val.trim(),lower=query.toLowerCase();
+        const query=val.trim(),lower=query.toLowerCase().trim();
         const container=document.getElementById('es-messages');
         const greet=document.getElementById('es-greeting');if(greet)greet.style.display='none';
-        if(typeof window.appendEsBubbleUser==='function'){window.appendEsBubbleUser(query);}else{const b=document.createElement('div');b.className='es-bubble-user';b.textContent=query;if(container)container.appendChild(b);}
-        const inputEl=document.getElementById('es-input');if(inputEl)inputEl.value='';document.getElementById('es-send')?.classList.remove('visible');
-        if(/\b(kcet\s*(predict|rank|engine)|rank\s*predictor)\b/i.test(lower)){setTimeout(launchKcetPredictor,280);return;}
-        const cm=lower.match(/(?:kcet\s+)?colleges?\s+(?:for\s+)?(?:rank\s+)?(\d+)(?:\s+(pharma|pharmacy|engineering|engg))?/i);
+
+        // ── If Disha doesn't own this query, pass to original search ──
+        if(!dishaOwns(lower)){orig(val);return;}
+
+        // ── Disha owns it — show user bubble ──
+        if(typeof window.appendEsBubbleUser==='function'){window.appendEsBubbleUser(query);}
+        else{const b=document.createElement('div');b.className='es-bubble-user';b.textContent=query;if(container)container.appendChild(b);}
+        const inputEl=document.getElementById('es-input');if(inputEl)inputEl.value='';
+        document.getElementById('es-send')?.classList.remove('visible');
+
+        // ── KCET predictor widget ──
+        if(/kcet|rank\s*predict|predict\s*rank/i.test(lower)&&!/college.*\d|\d.*college/i.test(lower)){
+          setTimeout(launchKcetPredictor,280);return;
+        }
+        // ── College shortlist widget ──
+        const cm=lower.match(/college[s]?\s*(?:for\s*)?(?:rank\s*)?(\d+)(?:\s*(pharma|pharmacy|engineering|engg|eng))?/i);
         if(cm){const rank=parseInt(cm[1]);const type=/pharma/i.test(cm[2]||'')?'pharma':'eng';setTimeout(()=>launchCollegePredictor(rank,type),280);return;}
+
+        // ── AI response ──
         const sysBubble=document.createElement('div');sysBubble.className='es-bubble-sys';
-        const contentDiv=document.createElement('div');contentDiv.className='ai-response-content';contentDiv.style.cssText='font-size:.88rem;color:var(--text);line-height:1.6;';
-        sysBubble.appendChild(contentDiv);if(container)container.appendChild(sysBubble);contentDiv.innerHTML='<span style="color:#007aff;">▌</span>';
+        const contentDiv=document.createElement('div');contentDiv.className='ai-response-content';
+        contentDiv.style.cssText='font-size:.88rem;color:var(--text);line-height:1.6;';
+        sysBubble.appendChild(contentDiv);if(container)container.appendChild(sysBubble);
+        contentDiv.innerHTML='<span style="color:#007aff;">▌</span>';
         try{
           const answer=await LocalAI.respond(query);
-          const isBlank=/not in my local|isn't in my local|outside my local|type `help`/i.test(answer);
-          if(isBlank){if(container&&sysBubble.parentNode)container.removeChild(sysBubble);orig(val);}
-          else{await typewriteText(contentDiv,answer);}
+          await typewriteText(contentDiv,answer);
         }catch(err){contentDiv.innerHTML='<span style="color:#ef4444;">⚠️ '+err.message+'</span>';}
         if(typeof window.scrollEsToBottom==='function')window.scrollEsToBottom();
       };
