@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Caster // Unified</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  
+  <style>
+    :root {
+      --bg-color: #000000;
+      --accent-color: #007aff;
+      --card-bg: rgba(10, 10, 10, 0.7);
+      --border-color: #1a1a1a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-color);
+      color: #ffffff;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .utility-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      transition: transform 0.15s ease-out;
+    }
+
+    /* Views */
+    .view-layer { display: none; width: 100%; flex-direction: column; align-items: center; gap: 24px; }
+    .view-layer.active { display: flex; animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+    @keyframes slideUp {
+      0% { transform: translateY(20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .dev-badge {
+      background: var(--accent-color);
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    h2 { font-weight: 500; font-size: 1.25rem; align-self: flex-start; }
+    p { font-size: 14px; color: #888; text-align: center; line-height: 1.5; }
+
+    /* Buttons */
+    .btn-group { display: flex; gap: 16px; width: 100%; }
+    button {
+      flex: 1;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    button:active { transform: scale(0.96); }
+    button.outline { background: transparent; color: #ffffff; border: 1px solid #333; }
+
+    /* Scanner & Video */
+    #qr-display { background: #fff; padding: 16px; border-radius: 8px; }
+    #reader { width: 100%; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid var(--border-color); }
+    
+    #video-container {
+      width: 100%; aspect-ratio: 16/9; background: #000;
+      border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;
+    }
+    video { width: 100%; height: 100%; object-fit: contain; }
+    
+    /* Overrides for HTML5 QR Code built-in UI */
+    #reader button { background: var(--accent-color); color: #fff; border: none; padding: 8px 16px; border-radius: 4px; margin: 10px 0;}
+    #reader a { display: none; }
+    
+    .status-box {
+      width: 100%; padding: 12px; background: #000; border: 1px dashed var(--accent-color);
+      border-radius: 8px; font-family: monospace; font-size: 12px; color: var(--accent-color);
+      text-align: center; word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="utility-card" id="main-card">
+    
+    <div id="view-menu" class="view-layer active">
+      <div class="dev-badge">SYS.CORE // 00</div>
+      <h2>Select Device Role</h2>
+      <div class="btn-group">
+        <button onclick="switchView('view-receiver'); initReceiver();">Receive Cast</button>
+        <button class="outline" onclick="switchView('view-scanner'); initScanner();">Scan & Cast</button>
+      </div>
+    </div>
+
+    <div id="view-receiver" class="view-layer">
+      <div class="dev-badge">SYS.RECV // 01</div>
+      <h2>Awaiting Connection</h2>
+      <div id="qr-display"></div>
+      <div id="video-container" style="display:none;">
+        <video id="remote-video" autoplay playsinline></video>
+      </div>
+      <p id="recv-instructions">Scan this code from your mobile device to initiate a 4K WebRTC stream.</p>
+    </div>
+
+    <div id="view-scanner" class="view-layer">
+      <div class="dev-badge">SYS.SCAN // 02</div>
+      <h2>Pair Device</h2>
+      <div id="reader"></div>
+      <p>Point camera at the receiver's QR code.</p>
+    </div>
+
+    <div id="view-broadcaster" class="view-layer">
+      <div class="dev-badge">SYS.CAST // 03</div>
+      <h2>Live Broadcasting</h2>
+      <div class="status-box">Requesting 4K Screen Capture...</div>
+      <video id="local-preview" autoplay playsinline muted style="margin-top: 16px; max-height: 300px; border-radius: 8px; border: 1px solid #333;"></video>
+      <button class="outline" onclick="stopCast()" style="margin-top: 16px; color: #ff3b30; border-color: #ff3b30;">Stop Casting</button>
+    </div>
+
+  </div>
+
+  <script>
+    // Global State
+    let html5QrCode = null;
+    let localStream = null;
+
+    // View Routing
+    function switchView(viewId) {
+      document.querySelectorAll('.view-layer').forEach(el => el.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+    }
+
+    // --- RECEIVER LOGIC ---
+    function initReceiver() {
+      const sessionId = Math.random().toString(36).substring(2, 10);
+      
+      // In reality, this URL points to your hosted app
+      // If deployed at https://myapp.com, it will generate https://myapp.com?room=xyz
+      const baseUrl = window.location.href.split('?')[0]; 
+      const castUrl = `${baseUrl}?room=${sessionId}`;
+
+      document.getElementById('qr-display').innerHTML = ""; // Clear existing
+      new QRCode(document.getElementById("qr-display"), {
+        text: castUrl, width: 200, height: 200,
+        colorDark : "#000000", colorLight : "#ffffff"
+      });
+
+      // WebRTC Signaling would connect here to listen for the mobile device
+    }
+
+    // --- SCANNER LOGIC ---
+    function initScanner() {
+      html5QrCode = new Html5Qrcode("reader");
+      
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      
+      html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+        html5QrCode.stop().then(() => {
+          // Parse room ID from the QR Code URL
+          console.log("Scanned URL:", decodedText);
+          switchView('view-broadcaster');
+          start4KCast();
+        });
+      }).catch(err => console.error("Camera error:", err));
+    }
+
+    // --- 4K BROADCASTER LOGIC ---
+    async function start4KCast() {
+      const statusBox = document.querySelector('#view-broadcaster .status-box');
+      
+      try {
+        // Here is where we enforce 4K constraints for WebRTC
+        const displayMediaOptions = {
+          video: {
+            width: { ideal: 3840, max: 3840 },
+            height: { ideal: 2160, max: 2160 },
+            frameRate: { ideal: 30, max: 60 }
+          },
+          audio: true 
+        };
+
+        localStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+        
+        // Show local preview
+        document.getElementById('local-preview').srcObject = localStream;
+        statusBox.innerText = "4K Stream Active. Transmitting to Receiver.";
+        statusBox.style.color = "#34c759"; // Green active state
+        statusBox.style.borderColor = "#34c759";
+
+        // Handle user clicking "Stop Sharing" on the native browser popup
+        localStream.getVideoTracks()[0].onended = () => {
+          stopCast();
+        };
+
+        // WebRTC Connection Logic (ICE Candidates, Offers) goes here.
+
+      } catch (err) {
+        console.error("Screen capture failed:", err);
+        statusBox.innerText = `Error: ${err.message}`;
+        statusBox.style.color = "#ff3b30";
+        statusBox.style.borderColor = "#ff3b30";
+      }
+    }
+
+    function stopCast() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+      window.location.reload(); // Reset state
+    }
+
+    // --- AUTO-ROUTE ---
+    // If user scans QR code natively and opens URL with ?room=xyz, jump straight to broadcast
+    window.onload = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('room')) {
+        switchView('view-broadcaster');
+        start4KCast();
+      }
+    };
+  </script>
+</body>
+</html>
