@@ -1,4 +1,4 @@
-**
+/**
  * x0s.link – Disha Intelligence Extensions Module
  * KCET Predictor redesigned: Nothing Phone × X aesthetic
  */
