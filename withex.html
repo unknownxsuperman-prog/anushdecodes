@@ -1143,8 +1143,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
         placeholder="Search name, @id, college…"
         autocomplete="off"
         oninput="onEsInput(this.value)"
-        onkeydown="if(event.key==='Enter')doEsSearch(this.value)">
-      <div class="es-send" id="es-send" onclick="doEsSearch(document.getElementById('es-input').value)">
+        onkeydown="if(event.key==='Enter')window.doEsSearch(this.value)">
+<div class="es-send" id="es-send" onclick="window.doEsSearch(document.getElementById('es-input').value)">
         <i class="fa-solid fa-arrow-up"></i>
       </div>
     </div>
