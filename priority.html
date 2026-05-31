@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Priority Registry</title>
+    <!-- Nothing/X Style typography - clean, geometric sans-serif -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --surface-glass: rgba(22, 22, 22, 0.65);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-focus: rgba(255, 255, 255, 0.25);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --glass-blur: blur(20px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* Search Block (Nothing/X Input Style) */
+        .search-block {
+            position: relative;
+            z-index: 100;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glass);
+            /* Non-edgy, heavily rounded capsule look typical of modern UI layers */
+            border-radius: 28px; 
+            padding: 16px 24px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            letter-spacing: -0.2px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: rgba(26, 26, 26, 0.75);
+        }
+
+        /* Suggestions Dropdown Overlay */
+        .suggestions-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px; /* Smooth non-edgy corners */
+            overflow: hidden;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            display: none;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .suggestion-row {
+            padding: 14px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .suggestion-row:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-row:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        /* Priority List Layout */
+        .list-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding-left: 12px;
+            margin-bottom: 4px;
+        }
+
+        /* Organic, round-cornered Nothing-style card architecture */
+        .college-item-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px; /* Highly rounded, non-edgy geometric aesthetic */
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .card-main-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar-frame {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            border-radius: 50%; /* Completely round avatar elements */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .meta-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .meta-details h3 {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.1px;
+            max-width: 280px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pill-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            padding: 3px 10px;
+            border-radius: 12px; /* Smooth oval pills */
+            color: var(--text-secondary);
+        }
+
+        /* Action triggers */
+        .clear-action-trigger {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            font-weight: 300;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+
+        .clear-action-trigger:hover {
+            color: #ffffff;
+            background: var(--surface-hover);
+        }
+
+        .fallback-notice {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Input Section Layer -->
+    <div class="search-block">
+        <div class="search-input-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="Find institutions..." autocomplete="off">
+            <div id="suggestions" class="suggestions-dropdown"></div>
+        </div>
+    </div>
+
+    <!-- Live Priority Node Queue -->
+    <div class="list-section">
+        <div class="section-label">Preference Queue</div>
+        <div id="priorityList">
+            <!-- Programmatic components insert natively here -->
+        </div>
+    </div>
+</div>
+
+<script src="colleges.js"></script>
+
+<script>
+    const searchNode = document.getElementById('searchInput');
+    const panelNode = document.getElementById('suggestions');
+    const viewPortNode = document.getElementById('priorityList');
+
+    let localRegistry = JSON.parse(localStorage.getItem('xos_custom_priorities')) || [];
+
+    function runtime() {
+        populateInterface();
+        
+        searchNode.addEventListener('input', executeFiltering);
+        
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.search-block')) {
+                panelNode.style.display = 'none';
+            }
+        });
+    }
+
+    function executeFiltering(e) {
+        const query = e.target.value.toLowerCase();
+        panelNode.innerHTML = '';
+        
+        if (query.trim().length < 1) {
+            panelNode.style.display = 'none';
+            return;
+        }
+
+        const dataPool = window.XOS_COLLEGES || [];
+        const matchSet = dataPool
+            .filter(node => node.name.toLowerCase().includes(query) || node.id.toLowerCase().includes(query))
+            .slice(0, 4);
+
+        if (matchSet.length > 0) {
+            panelNode.style.display = 'block';
+            matchSet.forEach(element => {
+                const layer = document.createElement('div');
+                layer.className = 'suggestion-row';
+                layer.textContent = element.name;
+                layer.onclick = () => registerTarget(element);
+                panelNode.appendChild(layer);
+            });
+        } else {
+            panelNode.style.display = 'none';
+        }
+    }
+
+    function registerTarget(target) {
+        if (!localRegistry.some(registered => registered.id === target.id)) {
+            localRegistry.push(target);
+            syncStorage();
+            populateInterface();
+        }
+        searchNode.value = '';
+        panelNode.style.display = 'none';
+    }
+
+    function removeTarget(id) {
+        localRegistry = localRegistry.filter(registered => registered.id !== id);
+        syncStorage();
+        populateInterface();
+    }
+
+    function syncStorage() {
+        localStorage.setItem('xos_custom_priorities', JSON.stringify(localRegistry));
+    }
+
+    function populateInterface() {
+        viewPortNode.innerHTML = '';
+        
+        if (localRegistry.length === 0) {
+            viewPortNode.innerHTML = '<div class="fallback-notice">Registry clear. No colleges staged.</div>';
+            return;
+        }
+
+        localRegistry.forEach(item => {
+            const module = document.createElement('div');
+            module.className = 'college-item-card';
+            module.innerHTML = `
+                <div class="card-main-meta">
+                    <div class="avatar-frame">🏛️</div>
+                    <div class="meta-details">
+                        <h3>${item.name}</h3>
+                        <div class="pill-container">
+                            <span class="status-pill">${item.pill1}</span>
+                            <span class="status-pill">${item.pill2}</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="clear-action-trigger" onclick="removeTarget('${item.id}')">×</button>
+            `;
+            viewPortNode.appendChild(module);
+        });
+    }
+
+    runtime();
+</script>
+
+</body>
+</html>
