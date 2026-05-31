@@ -1,10 +1,10 @@
-/**
+**
  * x0s.link – Disha Intelligence Extensions Module
  * KCET Predictor redesigned: Nothing Phone × X aesthetic
  */
 (function () {
   'use strict';
-
+ 
   // ========== CONFIG ==========
   const CONFIG = {
     weatherApiKey: '0222762e4fd7dc746123423914f0dca7',
@@ -12,14 +12,14 @@
     typingSpeed: 12,
     maxHistory: 50
   };
-
+ 
   // ========== STATE ==========
   const State = {
     history: [],
     context: { lastCity: null, lastTopic: null, lastIntent: null, lastQuery: null, sessionStart: Date.now() },
     stats: { queriesHandled: 0, mathSolved: 0, weatherFetched: 0 }
   };
-
+ 
   // ========== LOCAL AI ==========
   const LocalAI = {
     async respond(query) {
@@ -29,7 +29,7 @@
       State.stats.queriesHandled++;
       State.history.push({ query: q, time: Date.now() });
       if (State.history.length > CONFIG.maxHistory) State.history.shift();
-
+ 
       const intents = [
         { name: 'calculator', patterns: [/^(calc|calculate|compute|solve|eval)\s+/i, /^[\d\s+\-*/().^%]+$/, /^(what is|what's)\s+[\d\s+\-*/().^%]+/i], priority: 10 },
         { name: 'converter', patterns: [/\b(convert|conversion)\b/i, /\b(\d+\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp))\b/i], priority: 9 },
@@ -49,7 +49,7 @@
         { name: 'how_are_you', patterns: [/\b(how\s(are|r)\s?(you|u)|what'?s\sup)\b/i], priority: 1 },
         { name: 'general', patterns: [/.*/], priority: 0 }
       ];
-
+ 
       let bestMatch = null, bestScore = -1;
       for (const intent of intents) {
         for (const pattern of intent.patterns) {
@@ -61,7 +61,7 @@
       }
       State.context.lastIntent = bestMatch;
       State.context.lastQuery = q;
-
+ 
       switch (bestMatch) {
         case 'calculator': return this.handleCalculator(q, lower);
         case 'converter': return this.handleConverter(q, lower);
@@ -82,7 +82,7 @@
         default: return this.respondGeneralKnowledge(lower);
       }
     },
-
+ 
     handleCalculator(query, lower) {
       State.stats.mathSolved++;
       let expr = query.replace(/^(calc|calculate|compute|solve|eval|what is|what's)\s+/i, '').trim();
@@ -96,13 +96,13 @@
         return `⚠️ Invalid expression. Try: \`calc 15 * 23.5\``;
       }
     },
-
+ 
     handleConverter(query, lower) {
       const match = query.match(/(\d+(?:\.\d+)?)\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp)\s*(?:to|in|=)\s*(km|mi|kg|lb|°c|°f|c|f|usd|eur|inr|gbp)/i);
       if (match) return this.convertUnits(parseFloat(match[1]), match[2], match[3]);
       return "Usage: `convert 100 km to mi` or `25 °c to f`";
     },
-
+ 
     convertUnits(value, from, to) {
       from = from.toLowerCase().replace('°',''); to = to.toLowerCase().replace('°','');
       const conv = { 'km-mi': v=>v*0.621371,'mi-km': v=>v*1.60934,'kg-lb': v=>v*2.20462,'lb-kg': v=>v*0.453592,'c-f': v=>(v*9/5)+32,'f-c': v=>(v-32)*5/9,'usd-inr': v=>v*83.5,'inr-usd': v=>v/83.5 };
@@ -110,7 +110,7 @@
       if (conv[key]) return `**${value} ${from.toUpperCase()}** = **${conv[key](value).toFixed(2)} ${to.toUpperCase()}**`;
       return `Conversion from ${from} to ${to} not supported.`;
     },
-
+ 
     async getWeatherReport(query) {
       const m = query.match(/(?:weather|temperature|forecast)\s+(?:in|for|at)?\s*([a-zA-Z\s]+?)(?:\s+(?:today|now))?$|([a-zA-Z\s]+?)\s+(?:weather|temperature)/i);
       let city = (m?.[1] || m?.[2] || State.context.lastCity || CONFIG.defaultCity).trim();
@@ -126,7 +126,7 @@
         return `Weather unavailable for "${city}": ${e.message}`;
       }
     },
-
+ 
     handleTime(query) {
       const m = query.match(/time\s+(?:in|at|for)?\s*([a-zA-Z\s]+)/i);
       const tzMap = { 'london':'Europe/London','new york':'America/New_York','tokyo':'Asia/Tokyo','sydney':'Australia/Sydney','dubai':'Asia/Dubai','singapore':'Asia/Singapore','mumbai':'Asia/Kolkata','delhi':'Asia/Kolkata','bangalore':'Asia/Kolkata' };
@@ -134,13 +134,13 @@
       if (m) tz = tzMap[m[1].trim().toLowerCase()] || tz;
       return `🕐 **${new Date().toLocaleString('en-IN', { timeZone: tz, weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', timeZoneName:'short' })}**`;
     },
-
+ 
     handleDate() {
       const now = new Date();
       const daysLeft = Math.ceil((new Date(now.getFullYear(), 11, 31) - now) / 86400000);
       return `📅 **${now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}**\n\n${daysLeft} days remaining in ${now.getFullYear()}.`;
     },
-
+ 
     handleTimer(query) {
       const m = query.match(/(\d+)\s*(min|minute|sec|second|hour|hr)s?/i);
       if (m) {
@@ -153,7 +153,7 @@
       }
       return "Usage: `timer 5 minutes`";
     },
-
+ 
     handleDefinition(query) {
       let term = query.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+|explain\s+)/i,'').replace(/\?/g,'').trim().toLowerCase();
       const key = term.replace(/\s+/g,'_');
@@ -174,7 +174,7 @@
       if (partial) return `**${partial.replace(/_/g,' ')}**: ${defs[partial]}`;
       return `"${term}" not in local knowledge base.`;
     },
-
+ 
     generatePassword(query) {
       const m = query.match(/(\d+)\s*(char|digit|length)/i);
       const length = m ? Math.min(parseInt(m[1]), 64) : 16;
@@ -185,9 +185,9 @@
       for (let i = 0; i < length; i++) pwd += chars[arr[i] % chars.length];
       return `🔐 **Password** (${length} chars):\n\`${pwd}\``;
     },
-
+ 
     generateUUID() { return `🆔 **UUID v4**:\n\`${crypto.randomUUID()}\``; },
-
+ 
     respondGreeting() {
       const h = new Date().getHours();
       const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
@@ -199,7 +199,7 @@
     respondCreator() { return "Built by the x0s.link team. Runs entirely in your browser."; },
     respondThanks() { return "Anytime. 🎯"; },
     respondStatus() { return `All systems nominal. Uptime: ${Math.floor((Date.now() - State.context.sessionStart) / 1000)}s.`; },
-
+ 
     respondGeneralKnowledge(lower) {
       const kb = [
         { keys:['capital','india'], answer:'New Delhi' },
@@ -228,7 +228,7 @@
       return s[State.stats.queriesHandled % s.length];
     }
   };
-
+ 
   // ========== MARKDOWN + TYPEWRITER ==========
   function simpleMarkdown(md) {
     return md
@@ -237,7 +237,7 @@
       .replace(/`(.*?)`/g, '<code style="background:#111;padding:2px 7px;border-radius:5px;color:#fff;font-family:monospace;font-size:.88em;border:1px solid #1a1a1a;">$1</code>')
       .replace(/\n/g, '<br>');
   }
-
+ 
   async function typewriteText(container, text) {
     container.innerHTML = '';
     const isHtml = text.trim().startsWith('<');
@@ -258,7 +258,7 @@
       type();
     });
   }
-
+ 
   // ========== KCET PREDICTOR — Nothing × X Design ==========
   function inp(id, placeholder, max) {
     return `<input type="number" id="in-${id}" min="0" max="${max}" placeholder="${placeholder}"
@@ -267,7 +267,7 @@
       -moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"
       onfocus="this.style.borderColor='#fff'" onblur="this.style.borderColor='#222'">`;
   }
-
+ 
   function subjectRow(id, label, max) {
     return `
       <div style="display:flex;align-items:center;justify-content:space-between;
@@ -280,13 +280,13 @@
           onfocus="this.style.borderColor='#fff'" onblur="this.style.borderColor='#333'">
       </div>`;
   }
-
+ 
   function computeRank(boardPct, kcetPct) {
     const index = (boardPct * 0.5) + (kcetPct * 0.5);
     let rank = Math.round(Math.pow(101 - index, 2.6) * 4.8);
     return Math.max(1, Math.min(rank, 250000));
   }
-
+ 
   function rankBand(rank) {
     if (rank <= 500)   return { label:'Elite', color:'#fff' };
     if (rank <= 2000)  return { label:'Excellent', color:'#e5e5e5' };
@@ -294,7 +294,7 @@
     if (rank <= 25000) return { label:'Average', color:'#777' };
     return { label:'Below Avg', color:'#555' };
   }
-
+ 
   function resultBlock(title, rank) {
     const band = rankBand(rank);
     return `
@@ -304,17 +304,17 @@
         <div style="font-size:.65rem;font-weight:600;color:${band.color};margin-top:6px;letter-spacing:.08em;text-transform:uppercase;">${band.label}</div>
       </div>`;
   }
-
+ 
   function launchKcetPredictor() {
     const container = document.getElementById('es-messages');
     if (!container) return;
     const uid = 'k' + Date.now();
-
+ 
     const card = document.createElement('div');
     card.className = 'es-bubble-sys';
     card.innerHTML = `
     <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:24px;overflow:hidden;width:100%;max-width:420px;">
-
+ 
       <!-- header -->
       <div style="padding:20px 22px 16px;border-bottom:1px solid #111;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -328,7 +328,7 @@
           </div>
         </div>
       </div>
-
+ 
       <!-- mode toggle -->
       <div style="display:flex;border-bottom:1px solid #111;">
         <div id="tab-eng-${uid}" onclick="switchKcetTab('${uid}','eng')"
@@ -344,18 +344,18 @@
           Non-Engineering
         </div>
       </div>
-
+ 
       <!-- ENGINEERING PANEL -->
       <div id="eng-${uid}" style="padding:22px;">
-
+ 
         <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:16px;">Board Marks — PCM</div>
         ${subjectRow('e-phy-'+uid, 'Physics', 100)}
         ${subjectRow('e-che-'+uid, 'Chemistry', 100)}
         ${subjectRow('e-mat-'+uid, 'Mathematics', 100)}
-
+ 
         <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 16px;">KCET Marks — out of 180</div>
         ${inp('e-kcet-'+uid, '0 – 180', 180)}
-
+ 
         <button onclick="calcEng('${uid}')"
           style="width:100%;margin-top:18px;padding:14px;
           background:#fff;color:#000;border:none;border-radius:12px;
@@ -364,25 +364,25 @@
           onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
           PREDICT RANK →
         </button>
-
+ 
         <div id="eng-result-${uid}" style="display:none;margin-top:18px;"></div>
       </div>
-
+ 
       <!-- NON-ENGINEERING PANEL -->
       <div id="non-${uid}" style="padding:22px;display:none;">
-
+ 
         <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:16px;">Board Marks — PCMB</div>
         ${subjectRow('n-phy-'+uid, 'Physics', 100)}
         ${subjectRow('n-che-'+uid, 'Chemistry', 100)}
         ${subjectRow('n-mat-'+uid, 'Mathematics', 100)}
         ${subjectRow('n-bio-'+uid, 'Biology', 100)}
-
+ 
         <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 16px;">KCET Marks — each out of 60</div>
         ${subjectRow('n-kphy-'+uid, 'Physics', 60)}
         ${subjectRow('n-kche-'+uid, 'Chemistry', 60)}
         ${subjectRow('n-kmat-'+uid, 'Mathematics', 60)}
         ${subjectRow('n-kbio-'+uid, 'Biology', 60)}
-
+ 
         <button onclick="calcNon('${uid}')"
           style="width:100%;margin-top:18px;padding:14px;
           background:#fff;color:#000;border:none;border-radius:12px;
@@ -391,28 +391,28 @@
           onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
           PREDICT BOTH RANKS →
         </button>
-
+ 
         <div id="non-result-${uid}" style="display:none;margin-top:18px;"></div>
       </div>
-
+ 
       <!-- footer -->
       <div style="padding:12px 22px;border-top:1px solid #111;display:flex;align-items:center;gap:6px;">
         <div style="width:5px;height:5px;border-radius:50%;background:#333;"></div>
         <div style="font-size:.58rem;color:#333;letter-spacing:.06em;text-transform:uppercase;">Estimated · Not official KEA data</div>
       </div>
-
+ 
     </div>`;
-
+ 
     container.appendChild(card);
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   }
-
+ 
   window.switchKcetTab = (uid, tab) => {
     const engTab = document.getElementById(`tab-eng-${uid}`);
     const nonTab = document.getElementById(`tab-non-${uid}`);
     const engPanel = document.getElementById(`eng-${uid}`);
     const nonPanel = document.getElementById(`non-${uid}`);
-
+ 
     if (tab === 'eng') {
       engTab.style.color = '#fff'; engTab.style.borderBottomColor = '#fff';
       nonTab.style.color = '#444'; nonTab.style.borderBottomColor = 'transparent';
@@ -423,9 +423,9 @@
       nonPanel.style.display = 'block'; engPanel.style.display = 'none';
     }
   };
-
+ 
   function getVal(id) { return parseFloat(document.getElementById(`in-${id}`)?.value) || 0; }
-
+ 
   window.calcEng = (uid) => {
     const phy = getVal(`e-phy-${uid}`), che = getVal(`e-che-${uid}`), mat = getVal(`e-mat-${uid}`);
     const kcet = getVal(`e-kcet-${uid}`);
@@ -454,7 +454,7 @@
       </div>`;
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
-
+ 
   window.calcNon = (uid) => {
     const phy = getVal(`n-phy-${uid}`), che = getVal(`n-che-${uid}`), mat = getVal(`n-mat-${uid}`), bio = getVal(`n-bio-${uid}`);
     const kphy = getVal(`n-kphy-${uid}`), kche = getVal(`n-kche-${uid}`), kmat = getVal(`n-kmat-${uid}`), kbio = getVal(`n-kbio-${uid}`);
@@ -482,7 +482,7 @@
       </div>`;
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
-
+ 
   // ========== HOOK INTO DISHA SEARCH ==========
   document.addEventListener("DOMContentLoaded", () => {
     if (typeof window.doEsSearch === "function") {
@@ -491,11 +491,11 @@
         if (!val || !val.trim()) return;
         const query = val.trim();
         const lower = query.toLowerCase();
-
+ 
         const container = document.getElementById('es-messages');
         const greet = document.getElementById('es-greeting');
         if (greet) greet.style.display = 'none';
-
+ 
         if (typeof window.appendEsBubbleUser === 'function') {
           window.appendEsBubbleUser(query);
         } else {
@@ -504,17 +504,17 @@
           b.textContent = query;
           if (container) container.appendChild(b);
         }
-
+ 
         const inputEl = document.getElementById('es-input');
         if (inputEl) inputEl.value = '';
         document.getElementById('es-send')?.classList.remove('visible');
-
+ 
         // KCET trigger
         if (lower.includes('kcet') || lower.includes('predict') || lower.includes('rank predictor')) {
           setTimeout(launchKcetPredictor, 280);
           return;
         }
-
+ 
         // AI response
         const sysBubble = document.createElement('div');
         sysBubble.className = 'es-bubble-sys';
@@ -524,7 +524,7 @@
         sysBubble.appendChild(contentDiv);
         if (container) container.appendChild(sysBubble);
         contentDiv.innerHTML = '<span style="color:#007aff;">▌</span>';
-
+ 
         try {
           const answer = await LocalAI.respond(query);
           if (answer.includes("Not in local DB") || answer.includes("Try:") || answer.includes("not in local")) {
@@ -540,5 +540,6 @@
       };
     }
   });
-
+ 
 })();
+ 
