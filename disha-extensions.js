@@ -560,6 +560,45 @@
     };
   }
 
-  hookDisha();
+  // Direct override — bypasses local scope resolution issue
+window._dishaSearch = async function(val) {
+  if (!val || !val.trim()) return;
+  const query = val.trim();
+  const lower = query.toLowerCase();
 
+  const container = document.getElementById('es-messages');
+  const greet = document.getElementById('es-greeting');
+  if (greet) greet.style.display = 'none';
+
+  appendEsBubbleUser(query);
+
+  const inputEl = document.getElementById('es-input');
+  if (inputEl) inputEl.value = '';
+  document.getElementById('es-send')?.classList.remove('visible');
+  document.getElementById('es-suggestions').style.display = 'none';
+
+  // KCET trigger
+  if (lower.includes('kcet') || lower.includes('predict') || lower.includes('rank predictor')) {
+    setTimeout(launchKcetPredictor, 280);
+    return;
+  }
+
+  // AI response
+  const sysBubble = document.createElement('div');
+  sysBubble.className = 'es-bubble-sys';
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'ai-response-content';
+  contentDiv.style.cssText = 'font-size:.88rem;color:var(--text);line-height:1.6;';
+  sysBubble.appendChild(contentDiv);
+  if (container) container.appendChild(sysBubble);
+  contentDiv.innerHTML = '<span style="color:#007aff;">▌</span>';
+
+  try {
+    const answer = await LocalAI.respond(query);
+    await typewriteText(contentDiv, answer);
+  } catch (err) {
+    contentDiv.innerHTML = `<span style="color:#ef4444;">⚠️ ${err.message}</span>`;
+  }
+  if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
+};
 })();
