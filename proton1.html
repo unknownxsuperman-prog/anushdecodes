@@ -301,6 +301,8 @@
             color: var(--text-main);
             cursor: pointer;
             flex-shrink: 0;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
         .action-btn.pill-mode {
@@ -324,18 +326,151 @@
             height: 40px;
         }
 
-        /* Microphone listening animation */
-        .mic-listening {
-            animation: micPulse 1.2s infinite ease-in-out;
-            color: var(--accent-dot) !important;
-            background: rgba(255, 0, 0, 0.15) !important;
-            border-radius: 50%;
+        /* Advanced Microphone Styles */
+        #micButton {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        @keyframes micPulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.5); }
-            50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        #micButton.mic-listening {
+            color: var(--accent-dot) !important;
+            background: rgba(255, 0, 0, 0.12) !important;
+            animation: micPulseAdvanced 2s infinite ease-in-out;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+        }
+
+        /* Ripple effect rings */
+        #micButton.mic-listening::before,
+        #micButton.mic-listening::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 0, 0, 0.4);
+            animation: micRipple 2s infinite ease-out;
+            pointer-events: none;
+        }
+
+        #micButton.mic-listening::before {
+            animation-delay: 0s;
+        }
+
+        #micButton.mic-listening::after {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes micPulseAdvanced {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+            }
+            25% { 
+                transform: scale(1.05); 
+                box-shadow: 0 0 0 6px rgba(255, 0, 0, 0.1);
+            }
+            50% { 
+                transform: scale(1.08); 
+                box-shadow: 0 0 0 12px rgba(255, 0, 0, 0);
+            }
+            75% { 
+                transform: scale(1.03); 
+                box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.2);
+            }
+        }
+
+        @keyframes micRipple {
+            0% {
+                width: 40px;
+                height: 40px;
+                opacity: 1;
+                top: -2px;
+                left: -2px;
+            }
+            100% {
+                width: 70px;
+                height: 70px;
+                opacity: 0;
+                top: -17px;
+                left: -17px;
+            }
+        }
+
+        /* Voice visualization bars */
+        .voice-bars {
+            display: none;
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            gap: 2px;
+            z-index: 20;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 8px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        #micButton.mic-listening .voice-bars {
+            display: flex;
+        }
+
+        .voice-bar {
+            width: 3px;
+            height: 12px;
+            background: var(--accent-dot);
+            border-radius: 2px;
+            animation: voiceBarAnim 0.8s infinite ease-in-out;
+        }
+
+        .voice-bar:nth-child(1) { animation-delay: 0s; }
+        .voice-bar:nth-child(2) { animation-delay: 0.1s; }
+        .voice-bar:nth-child(3) { animation-delay: 0.2s; }
+        .voice-bar:nth-child(4) { animation-delay: 0.3s; }
+        .voice-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes voiceBarAnim {
+            0%, 100% { height: 4px; }
+            25% { height: 16px; }
+            50% { height: 8px; }
+            75% { height: 20px; }
+        }
+
+        /* Listening overlay */
+        .mic-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .mic-overlay.active {
+            display: block;
+        }
+
+        /* Toast notification */
+        .mic-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .mic-toast.show {
+            opacity: 1;
         }
 
         .sidebar-overlay {
@@ -456,6 +591,12 @@
 </head>
 <body>
 
+    <!-- Mic Toast -->
+    <div class="mic-toast" id="micToast"></div>
+    
+    <!-- Mic Overlay -->
+    <div class="mic-overlay" id="micOverlay"></div>
+
     <div class="phone-frame">
         
         <!-- Sidebar Drawer Overlay Modules -->
@@ -554,6 +695,13 @@
                     <div class="action-right" style="display: flex; gap: 4px; align-items: center;">
                         <button class="action-btn" id="micButton" aria-label="Audio Translation System Input">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                            <div class="voice-bars">
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                            </div>
                         </button>
                         <button class="action-btn submit" id="es-send" aria-label="Push Vector Instruction Matrix">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
@@ -571,7 +719,281 @@
     <script src="disha-extensions.js" defer></script>
 
     <script>
-        // Setup base UI functions and fallback search handler
+        // ====== ADVANCED MICROPHONE SYSTEM ======
+        const micButton = document.getElementById('micButton');
+        const micToast = document.getElementById('micToast');
+        const micOverlay = document.getElementById('micOverlay');
+        const matrixField = document.getElementById('es-input');
+        
+        let recognition = null;
+        let isListening = false;
+        let silenceTimer = null;
+        let restartAttempts = 0;
+        const MAX_RESTART_ATTEMPTS = 5;
+        const SILENCE_DELAY = 2200; // 2.2 seconds
+        const RESTART_DELAY = 300; // ms before restarting
+
+        // Toast helper
+        function showToast(msg, duration = 2000) {
+            micToast.textContent = msg;
+            micToast.classList.add('show');
+            setTimeout(() => micToast.classList.remove('show'), duration);
+        }
+
+        // Setup Speech Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            console.log('✅ Speech Recognition API available');
+            
+            function createRecognition() {
+                const rec = new SpeechRecognition();
+                rec.continuous = true;
+                rec.interimResults = true;
+                rec.lang = 'en-US';
+                rec.maxAlternatives = 1;
+                
+                rec.onstart = function() {
+                    console.log('🎤 Microphone ACTIVE - listening...');
+                    isListening = true;
+                    restartAttempts = 0;
+                    micButton.classList.add('mic-listening');
+                    micOverlay.classList.add('active');
+                    if (matrixField) {
+                        matrixField.placeholder = '🎤 Listening... speak now';
+                    }
+                    showToast('🎤 Listening...');
+                };
+
+                rec.onresult = function(event) {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const result = event.results[i];
+                        if (result.isFinal) {
+                            finalTranscript += result[0].transcript + ' ';
+                        } else {
+                            interimTranscript += result[0].transcript;
+                        }
+                    }
+
+                    const currentText = (finalTranscript || interimTranscript).trim();
+                    
+                    if (matrixField) {
+                        matrixField.value = currentText;
+                    }
+
+                    // Reset silence timer on any speech
+                    if (silenceTimer) {
+                        clearTimeout(silenceTimer);
+                        silenceTimer = null;
+                    }
+
+                    // Start silence countdown if we have text
+                    if (currentText.length > 0) {
+                        silenceTimer = setTimeout(() => {
+                            if (isListening && matrixField.value.trim() !== '') {
+                                console.log('⏰ Silence detected - auto-sending...');
+                                showToast('✅ Message captured!');
+                                stopListeningAndSend();
+                            }
+                        }, SILENCE_DELAY);
+                    }
+                };
+
+                rec.onerror = function(event) {
+                    console.error('❌ Speech error:', event.error);
+                    
+                    switch(event.error) {
+                        case 'not-allowed':
+                            showToast('🚫 Microphone access denied');
+                            stopListening();
+                            break;
+                        case 'no-speech':
+                            // No speech detected - keep trying
+                            console.log('🔇 No speech detected, continuing...');
+                            break;
+                        case 'audio-capture':
+                            showToast('🔌 No microphone found');
+                            stopListening();
+                            break;
+                        case 'network':
+                            showToast('🌐 Network error, retrying...');
+                            // Will attempt restart via onend
+                            break;
+                        default:
+                            console.log('⚠️ Speech error:', event.error);
+                            // Will attempt restart
+                    }
+                };
+
+                rec.onend = function() {
+                    console.log('🛑 Speech recognition ended. isListening:', isListening);
+                    
+                    if (isListening && restartAttempts < MAX_RESTART_ATTEMPTS) {
+                        restartAttempts++;
+                        console.log(`🔄 Restart attempt ${restartAttempts}/${MAX_RESTART_ATTEMPTS}`);
+                        
+                        setTimeout(() => {
+                            if (isListening) {
+                                try {
+                                    rec.start();
+                                    console.log('✅ Restarted successfully');
+                                } catch (e) {
+                                    console.error('Restart failed:', e);
+                                    restartAttempts++;
+                                    if (restartAttempts >= MAX_RESTART_ATTEMPTS) {
+                                        showToast('⚠️ Mic disconnected');
+                                        stopListening();
+                                    }
+                                }
+                            }
+                        }, RESTART_DELAY);
+                    } else if (restartAttempts >= MAX_RESTART_ATTEMPTS) {
+                        showToast('⚠️ Max retries reached');
+                        stopListening();
+                    }
+                };
+
+                return rec;
+            }
+
+            recognition = createRecognition();
+        } else {
+            console.warn('⚠️ Speech Recognition NOT supported');
+        }
+
+        function startListening() {
+            if (!recognition) {
+                showToast('❌ Speech not supported in this browser');
+                return;
+            }
+
+            if (isListening) {
+                console.log('Already listening, ignoring...');
+                return;
+            }
+
+            console.log('▶️ Starting microphone...');
+            
+            // Reset state
+            restartAttempts = 0;
+            if (matrixField) {
+                matrixField.value = '';
+                matrixField.focus();
+            }
+
+            // Clear any existing timer
+            if (silenceTimer) {
+                clearTimeout(silenceTimer);
+                silenceTimer = null;
+            }
+
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error('Start error:', e);
+                // Recognition might be already started - stop and retry
+                try {
+                    recognition.stop();
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch (e2) {
+                            showToast('⚠️ Please try again');
+                            stopListening();
+                        }
+                    }, 200);
+                } catch (e2) {
+                    showToast('⚠️ Mic busy, try again');
+                }
+            }
+        }
+
+        function stopListening() {
+            console.log('⏹️ Stopping microphone...');
+            isListening = false;
+            restartAttempts = MAX_RESTART_ATTEMPTS; // Prevent restart
+            
+            micButton.classList.remove('mic-listening');
+            micOverlay.classList.remove('active');
+            
+            if (matrixField) {
+                matrixField.placeholder = 'Message Proton...';
+            }
+
+            if (silenceTimer) {
+                clearTimeout(silenceTimer);
+                silenceTimer = null;
+            }
+
+            try {
+                if (recognition) {
+                    recognition.stop();
+                }
+            } catch (e) {
+                console.error('Stop error:', e);
+            }
+        }
+
+        function stopListeningAndSend() {
+            const val = matrixField ? matrixField.value.trim() : '';
+            stopListening();
+            
+            if (val) {
+                console.log('📤 Auto-sending:', val);
+                showToast('📤 Sending message...');
+                // Small delay to let the stop complete
+                setTimeout(() => {
+                    window.doEsSearch(val);
+                }, 100);
+            } else {
+                showToast('👋 Listening stopped');
+            }
+        }
+
+        // Mic button click handler
+        micButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🎙️ Mic clicked. isListening:', isListening);
+            
+            if (isListening) {
+                // Manual stop and send
+                stopListeningAndSend();
+            } else {
+                startListening();
+            }
+        });
+
+        // Long press support for continuous listening
+        let longPressTimer = null;
+        
+        micButton.addEventListener('mousedown', function() {
+            longPressTimer = setTimeout(() => {
+                if (!isListening) {
+                    startListening();
+                }
+            }, 300);
+        });
+
+        micButton.addEventListener('mouseup', function() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        });
+
+        micButton.addEventListener('mouseleave', function() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        });
+
+        // ====== BASE UI FUNCTIONS ======
         window.scrollEsToBottom = function() {
             const viewport = document.getElementById('es-messages');
             if (viewport) viewport.scrollTop = viewport.scrollHeight;
@@ -596,7 +1018,6 @@
             window.scrollEsToBottom();
         };
 
-        // Original search handler – used as fallback
         window.doEsSearch = function(val) {
             const query = val.trim();
             if (!query) return;
@@ -618,7 +1039,7 @@
             if (inp) inp.value = '';
         };
 
-        // UI interactions
+        // ====== UI INTERACTIONS ======
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const openSidebar = document.getElementById('openSidebar');
         const closeSidebar = document.getElementById('closeSidebar');
@@ -639,7 +1060,7 @@
             setTimeout(() => { inputDockContainer.classList.remove('highlight-focus'); }, 800);
         });
 
-        // Dark Mode Toggle
+        // ====== DARK MODE ======
         const darkModeToggle = document.getElementById('darkModeToggle');
         const darkModeSwitch = document.getElementById('darkModeSwitch');
         const darkModeKnob = document.getElementById('darkModeKnob');
@@ -671,7 +1092,7 @@
             setDarkMode(!isCurrentlyDark);
         });
 
-        const matrixField = document.getElementById('es-input');
+        // ====== SEND MESSAGE ======
         const sendStream = document.getElementById('es-send');
 
         function executeLocalPipeline() {
@@ -683,173 +1104,7 @@
         sendStream.addEventListener('click', executeLocalPipeline);
         matrixField.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeLocalPipeline(); });
 
-        // ====== SPEECH TO TEXT WITH ANIMATION & AUTO-SEND (FIXED) ======
-        const micButton = document.getElementById('micButton');
-        let recognition = null;
-        let isListening = false;
-        let silenceTimer = null;
-        const SILENCE_DELAY = 2000; // 2 seconds of silence before auto-send
-
-        // Check for browser support
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
-        if (SpeechRecognition) {
-            console.log('✅ Speech Recognition is supported');
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-
-            recognition.onstart = function() {
-                console.log('🎤 Speech recognition started');
-                isListening = true;
-                micButton.classList.add('mic-listening');
-                if (matrixField) {
-                    matrixField.placeholder = 'Listening...';
-                }
-            };
-
-            recognition.onresult = function(event) {
-                let interimTranscript = '';
-                let finalTranscript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript;
-                    if (event.results[i].isFinal) {
-                        finalTranscript += transcript + ' ';
-                    } else {
-                        interimTranscript += transcript;
-                    }
-                }
-
-                // Update input field with current speech
-                const currentText = (finalTranscript || interimTranscript).trim();
-                if (matrixField) {
-                    matrixField.value = currentText;
-                }
-
-                // Reset silence timer on any speech detected
-                if (silenceTimer) {
-                    clearTimeout(silenceTimer);
-                    silenceTimer = null;
-                }
-
-                // If we have text, start silence countdown to auto-send
-                if (currentText !== '') {
-                    silenceTimer = setTimeout(() => {
-                        if (isListening && matrixField.value.trim() !== '') {
-                            console.log('⏰ Silence detected, auto-sending...');
-                            stopListeningAndSend();
-                        }
-                    }, SILENCE_DELAY);
-                }
-            };
-
-            recognition.onerror = function(event) {
-                console.error('❌ Speech recognition error:', event.error);
-                if (event.error === 'not-allowed') {
-                    alert('Microphone access denied. Please allow microphone access in your browser settings.');
-                }
-                stopListening();
-            };
-
-            recognition.onend = function() {
-                console.log('🛑 Speech recognition ended');
-                // If still flagged as listening, restart
-                if (isListening) {
-                    try {
-                        recognition.start();
-                        console.log('🔄 Restarting recognition...');
-                    } catch (e) {
-                        console.error('Failed to restart:', e);
-                        stopListening();
-                    }
-                } else {
-                    // Clean up UI
-                    micButton.classList.remove('mic-listening');
-                    if (matrixField) {
-                        matrixField.placeholder = 'Message Proton...';
-                    }
-                }
-            };
-        } else {
-            console.warn('⚠️ Speech Recognition NOT supported in this browser');
-        }
-
-        function startListening() {
-            if (!recognition) {
-                alert('Speech recognition is not supported in this browser. Please use Chrome or Edge on desktop, or Chrome on Android.');
-                return;
-            }
-
-            if (isListening) return;
-
-            console.log('▶️ Starting to listen...');
-            
-            // Clear any existing input
-            if (matrixField) {
-                matrixField.value = '';
-            }
-
-            try {
-                recognition.start();
-            } catch (e) {
-                console.error('Error starting recognition:', e);
-                // If already started, stop and restart
-                try {
-                    recognition.stop();
-                    setTimeout(() => recognition.start(), 100);
-                } catch (e2) {
-                    console.error('Failed to restart:', e2);
-                }
-            }
-        }
-
-        function stopListening() {
-            if (!isListening) return;
-            
-            console.log('⏹️ Stopping listening');
-            isListening = false;
-            micButton.classList.remove('mic-listening');
-            
-            if (matrixField) {
-                matrixField.placeholder = 'Message Proton...';
-            }
-
-            if (silenceTimer) {
-                clearTimeout(silenceTimer);
-                silenceTimer = null;
-            }
-
-            try {
-                recognition.stop();
-            } catch (e) {
-                console.error('Error stopping recognition:', e);
-            }
-        }
-
-        function stopListeningAndSend() {
-            const val = matrixField.value.trim();
-            stopListening();
-            
-            // Execute the search with whatever is in the input
-            if (val) {
-                console.log('📤 Sending:', val);
-                window.doEsSearch(val);
-            }
-        }
-
-        micButton.addEventListener('click', function() {
-            console.log('🎙️ Mic button clicked, isListening:', isListening);
-            if (isListening) {
-                // If already listening, manual stop and send
-                stopListeningAndSend();
-            } else {
-                startListening();
-            }
-        });
-
-        // ====== USER NAME & GREETING SYSTEM ======
+        // ====== USER NAME & GREETING ======
         function getTimeGreeting() {
             const hour = new Date().getHours();
             if (hour < 12) return 'good morning';
@@ -936,10 +1191,7 @@
 
         askUserName();
 
-        // Log to confirm script loaded
-        console.log('✅ DISHA X-BIT PROTON initialized');
-        console.log('🎤 Mic button:', micButton ? 'found' : 'NOT FOUND');
-        console.log('🔍 Speech Recognition available:', !!SpeechRecognition);
+        console.log('✅ DISHA X-BIT PROTON - Advanced Mic System Ready');
     </script>
 </body>
 </html>
