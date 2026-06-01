@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DISHA // X-BIT PROTON</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-base: #000000;
+            --bg-card: #0a0a0a;
+            --bg-glass: rgba(15, 15, 15, 0.85);
+            --text-main: #ffffff;
+            --text-dim: #88929a;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: #ffffff;
+            --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --accent-dot: #ff0000;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        :root.light-theme {
+            --bg-base: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --text-main: #000000;
+            --text-dim: #6c737a;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --border-accent: #000000;
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color var(--transition-smooth);
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 400px;
+            height: 100%;
+            background-color: var(--bg-base);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            padding-top: env(safe-area-inset-top, 24px); 
+            transition: background-color var(--transition-smooth);
+        }
+
+        .top-nav {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav-square {
+            width: 42px;
+            height: 42px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-main);
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s ease, background-color var(--transition-smooth);
+        }
+
+        .nav-square:active { transform: scale(0.95); }
+
+        .app-brand {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .brand-dot {
+            width: 5px;
+            height: 5px;
+            background-color: var(--accent-dot);
+            border-radius: 50%;
+        }
+
+        .search-container {
+            padding: 0 16px;
+            margin-bottom: 12px;
+            z-index: 10;
+        }
+
+        .premium-pill {
+            background: var(--bg-card);
+            border-radius: 28px;
+            height: 54px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color var(--transition-smooth), border-color var(--transition-smooth);
+        }
+
+        .premium-pill:active { transform: scale(0.98); }
+
+        .premium-pill.pulse-shift {
+            animation: shiftPulse 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @keyframes shiftPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.95); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .search-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .search-right {
+            font-size: 12px;
+            color: var(--text-dim);
+            padding-left: 14px;
+        }
+
+        .display-viewport {
+            flex: 1;
+            padding: 0 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .display-viewport::-webkit-scrollbar { display: none; }
+
+        .empty-view {
+            margin: auto;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 24px;
+        }
+
+        .empty-circle {
+            width: 84px;
+            height: 84px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-subtle);
+            transition: background-color var(--transition-smooth);
+        }
+
+        .empty-title {
+            font-size: 19px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtitle {
+            font-size: 13px;
+            color: var(--text-dim);
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        .msg-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+        
+        .msg-row.user-align { justify-content: flex-end; }
+        .msg-row.system-align { justify-content: flex-start; }
+
+        /* Modified: Supports extension-injected structures alongside clean raw bubbles */
+        .msg-capsule, .es-bubble-user, .es-bubble-sys {
+            width: max-content;
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-subtle);
+            transform: translateY(12px);
+            transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), background-color var(--transition-smooth);
+        }
+
+        .msg-row.user-align .msg-capsule, .es-bubble-user {
+            background: var(--text-main);
+            color: var(--bg-base);
+            border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            margin-left: auto;
+            margin-bottom: 8px;
+        }
+
+        .msg-row.system-align .msg-capsule, .es-bubble-sys {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            margin-right: auto;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+
+        .dock-anchor {
+            padding: 8px 16px calc(34px + env(safe-area-inset-bottom, 16px)) 16px;
+            z-index: 10;
+            background: linear-gradient(to top, var(--bg-base) 60%, rgba(0,0,0,0));
+        }
+
+        .glass-dock {
+            background: var(--bg-glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 32px;
+            padding: 10px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+        }
+
+        .glass-dock.highlight-focus {
+            border-color: var(--text-main);
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
+        }
+
+        .input-row { padding: 4px 12px 0 12px; }
+
+        .input-row input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: var(--font-sans);
+            font-size: 15px;
+            color: var(--text-main);
+        }
+
+        .input-row input::placeholder { color: var(--text-dim); opacity: 0.6; }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-left { display: flex; gap: 4px; }
+
+        .action-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .action-btn.pill-mode {
+            background: var(--bg-card);
+            border-radius: 18px;
+            padding: 0 14px;
+            width: auto;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            gap: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .action-btn.submit {
+            background: var(--text-main);
+            color: var(--bg-base);
+            width: 36px;
+            height: 36px;
+        }
+
+        .sidebar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar-slider {
+            position: absolute;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-subtle);
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            padding: calc(24px + env(safe-area-inset-top, 24px)) 20px calc(24px + env(safe-area-inset-bottom, 24px)) 20px;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .sidebar-overlay.active .sidebar-slider { transform: translateX(280px); }
+
+        .slider-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .slider-title { font-size: 15px; font-weight: 600; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+
+        .slider-menu-list { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-item:hover, .menu-item.active { background-color: var(--bg-base); }
+
+        .slider-footer {
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .toggle-pill {
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            height: 32px;
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .toggle-btn.active { color: var(--text-main); }
+
+        .pill-capsule {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: calc(50% - 6px);
+            height: 32px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-subtle);
+            z-index: 1;
+            transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        :root.light-theme .pill-capsule { transform: translateX(100%); }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+        
+        <!-- Sidebar Drawer Overlay Modules -->
+        <div class="sidebar-overlay" id="sidebarOverlay">
+            <div class="sidebar-slider">
+                <div class="slider-header">
+                    <span class="slider-title">Workspaces</span>
+                    <button class="action-btn" id="closeSidebar">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                
+                <div class="slider-menu-list">
+                    <div class="menu-item active">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <span>x-bit proton</span>
+                    </div>
+                    <div class="menu-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        <span>global topology</span>
+                    </div>
+                </div>
+
+                <div class="slider-footer">
+                    <div class="toggle-pill">
+                        <div class="pill-capsule"></div>
+                        <button class="toggle-btn active" id="setDark">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                            <span>Dark</span>
+                        </button>
+                        <button class="toggle-btn" id="setLight">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>
+                            <span>Light</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Panel Navigation -->
+        <nav class="top-nav">
+            <button class="nav-square" id="openSidebar" aria-label="Open Sidebar Menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="app-brand">
+                <span>x-bit proton</span>
+                <span class="brand-dot"></span>
+            </div>
+            <button class="nav-square" aria-label="Create Thread Context">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+        </nav>
+
+        <!-- Search Dashboard Pill -->
+        <div class="search-container">
+            <div class="premium-pill" id="dashboardSearchPill">
+                <div class="search-left">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:0.8;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span>x-bit proton</span>
+                </div>
+                <div class="search-right">
+                    <span>Powered by x0s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scrollable Thread Core Display Area Mapping to Extension ID targets -->
+        <main id="es-messages" class="display-viewport">
+            <div class="empty-view" id="emptyState">
+                <div class="empty-circle">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <h2 class="empty-title">x-bit 2.0.1</h2>
+                <p class="empty-subtitle">We couldn't find anything matching your local matrix query. Initiate system pipeline stream.</p>
+            </div>
+        </main>
+
+        <!-- Fixed Glassmorphic Input Dock Module Mapping to Extension ID targets -->
+        <div class="dock-anchor">
+            <div class="glass-dock" id="inputDockContainer">
+                <div class="input-row">
+                    <input type="text" id="es-input" placeholder="Message Proton..." autocomplete="off">
+                </div>
+                <div class="action-row">
+                    <div class="action-left">
+                        <button class="action-btn" aria-label="Append Media Context">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        </button>
+                        <button class="action-btn pill-mode" aria-label="Inline Search Execution Engine Switch">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                            <span>Search</span>
+                        </button>
+                        <button class="action-btn" aria-label="Extended Directives">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                        </button>
+                    </div>
+                    <div class="action-right" style="display: flex; gap: 4px; align-items: center;">
+                        <button class="action-btn" aria-label="Audio Translation System Input">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                        </button>
+                        <button class="action-btn submit" id="es-send" aria-label="Push Vector Instruction Matrix">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========== DATA & BRAIN ========== -->
+    <!-- Required data files for KCET predictor & college matches -->
+    <script src="colleges.js"></script>
+    <script src="Dishabase.js"></script>
+    <!-- Disha AI engine (overrides doEsSearch) -->
+    <script src="disha-extensions.js" defer></script>
+
+    <script>
+        // Setup base UI functions and a fallback search handler.
+        // This stub will be captured by disha-extensions.js as '_orig'
+        // and called only for queries Disha doesn't understand.
+        window.scrollEsToBottom = function() {
+            const viewport = document.getElementById('es-messages');
+            if (viewport) viewport.scrollTop = viewport.scrollHeight;
+        };
+
+        window.appendEsBubbleUser = function(query) {
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState && emptyState.parentNode) emptyState.remove();
+            
+            const viewport = document.getElementById('es-messages');
+            const row = document.createElement('div');
+            row.className = 'msg-row user-align';
+            
+            const capsule = document.createElement('div');
+            capsule.className = 'msg-capsule';
+            capsule.textContent = query;
+            
+            row.appendChild(capsule);
+            viewport.appendChild(row);
+            
+            setTimeout(() => { capsule.style.transform = 'translateY(0)'; }, 10);
+            window.scrollEsToBottom();
+        };
+
+        // Original search handler – used as fallback for unrecognized queries.
+        window.doEsSearch = function(val) {
+            const query = val.trim();
+            if (!query) return;
+
+            // Show user bubble
+            window.appendEsBubbleUser(query);
+
+            // Show a helpful fallback message
+            const viewport = document.getElementById('es-messages');
+            const sysRow = document.createElement('div');
+            sysRow.className = 'msg-row system-align';
+            const sysCapsule = document.createElement('div');
+            sysCapsule.className = 'msg-capsule';
+            sysCapsule.innerHTML = `⚠️ I'm not sure how to help with that.<br><span style="font-size:0.75rem; color:var(--text-dim);">Try: <strong>kcet predict</strong>, <strong>weather in Mumbai</strong>, <strong>calc 2+2</strong>, or <strong>help</strong>.</span>`;
+            sysRow.appendChild(sysCapsule);
+            viewport.appendChild(sysRow);
+            setTimeout(() => { sysCapsule.style.transform = 'translateY(0)'; }, 10);
+            window.scrollEsToBottom();
+
+            // Clear input
+            const inp = document.getElementById('es-input');
+            if (inp) inp.value = '';
+        };
+
+        // UI interactions
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const openSidebar = document.getElementById('openSidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const dashboardSearchPill = document.getElementById('dashboardSearchPill');
+        const inputDockContainer = document.getElementById('inputDockContainer');
+        
+        const setDark = document.getElementById('setDark');
+        const setLight = document.getElementById('setLight');
+        const rootElement = document.documentElement;
+
+        openSidebar.addEventListener('click', () => sidebarOverlay.classList.add('active'));
+        closeSidebar.addEventListener('click', () => sidebarOverlay.classList.remove('active'));
+        sidebarOverlay.addEventListener('click', (e) => { if(e.target === sidebarOverlay) sidebarOverlay.classList.remove('active'); });
+
+        dashboardSearchPill.addEventListener('click', () => {
+            dashboardSearchPill.classList.add('pulse-shift');
+            inputDockContainer.classList.add('highlight-focus');
+            document.getElementById('es-input').focus();
+            
+            setTimeout(() => { dashboardSearchPill.classList.remove('pulse-shift'); }, 400);
+            setTimeout(() => { inputDockContainer.classList.remove('highlight-focus'); }, 800);
+        });
+
+        setLight.addEventListener('click', () => {
+            rootElement.classList.add('light-theme');
+            setDark.classList.remove('active');
+            setLight.classList.add('active');
+        });
+        setDark.addEventListener('click', () => {
+            rootElement.classList.remove('light-theme');
+            setLight.classList.remove('active');
+            setDark.classList.add('active');
+        });
+
+        const matrixField = document.getElementById('es-input');
+        const sendStream = document.getElementById('es-send');
+
+        function executeLocalPipeline() {
+            const val = matrixField.value.trim();
+            if (!val) return;
+            window.doEsSearch(val);
+        }
+
+        sendStream.addEventListener('click', executeLocalPipeline);
+        matrixField.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeLocalPipeline(); });
+    </script>
+</body>
+</html>
