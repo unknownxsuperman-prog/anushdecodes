@@ -72,6 +72,20 @@ async function dishaRespond(query) {
     return dishaPassword(lower);
   if (/\buuid\b/i.test(lower))
     return `🆔 **UUID v4**:\n\`${crypto.randomUUID()}\``;
+ if (/\b(open|launch|go to|visit)\s+instagram\b/i.test(lower))
+  return dishaRenderAppPill({ name:'Instagram', url:'https://instagram.com', faIcon:'fa-instagram', iconBg:'radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285aeb 90%)', sub:'instagram.com' });
+
+if (/\b(open|launch|go to|visit)\s+youtube\b/i.test(lower))
+  return dishaRenderAppPill({ name:'YouTube', url:'https://youtube.com', faIcon:'fa-youtube', iconBg:'#ff0000', sub:'youtube.com' });
+
+if (/\b(open|launch|go to|visit)\s+(twitter|x)\b/i.test(lower))
+  return dishaRenderAppPill({ name:'X / Twitter', url:'https://x.com', faIcon:'fa-x-twitter', iconBg:'#000', sub:'x.com' });
+
+if (/\b(open|launch|go to|visit)\s+github\b/i.test(lower))
+  return dishaRenderAppPill({ name:'GitHub', url:'https://github.com', faIcon:'fa-github', iconBg:'#161b22', sub:'github.com' });
+
+if (/\b(open|launch|go to|visit)\s+spotify\b/i.test(lower))
+  return dishaRenderAppPill({ name:'Spotify', url:'https://open.spotify.com', faIcon:'fa-spotify', iconBg:'#1db954', sub:'open.spotify.com' });
   if (/^(hi|hello|hey|yo|good morning|good afternoon|good evening)/i.test(q))
     return dishaGreet();
   if (/\b(bye|goodbye|see you)\b/i.test(lower))
@@ -196,6 +210,33 @@ function dishaPassword(lower) {
   let pwd=''; const arr=new Uint32Array(len); crypto.getRandomValues(arr);
   for(let i=0;i<len;i++) pwd+=chars[arr[i]%chars.length];
   return `🔐 **Password** (${len} chars):\n\`${pwd}\``;
+}
+
+function dishaRenderAppPill({ name, url, faIcon, iconBg, sub }) {
+  return `<a href="${url}" target="_blank" rel="noopener"
+    style="display:inline-flex;align-items:center;gap:10px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.13);
+      border-radius:999px;padding:10px 18px 10px 10px;
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      box-shadow:0 4px 24px rgba(0,0,0,.4),inset 0 .5px 0 rgba(255,255,255,.15);
+      text-decoration:none;transition:transform .18s cubic-bezier(.32,.72,0,1);"
+    onmouseover="this.style.transform='scale(1.035)'"
+    onmouseout="this.style.transform='scale(1)'">
+    <div style="width:38px;height:38px;border-radius:50%;
+      background:${iconBg};display:flex;align-items:center;
+      justify-content:center;flex-shrink:0;">
+      <i class="fa-brands ${faIcon}" style="font-size:1.1rem;color:#fff;"></i>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:.88rem;
+        font-weight:700;color:#fff;letter-spacing:-.01em;">${name}</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:.62rem;
+        font-weight:500;color:rgba(255,255,255,.38);letter-spacing:.06em;
+        text-transform:uppercase;">${sub}</span>
+    </div>
+    <span style="margin-left:4px;opacity:.35;font-size:.75rem;color:#fff;">↗</span>
+  </a>`;
 }
  
 function dishaGreet() {
