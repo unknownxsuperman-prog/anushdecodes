@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
@@ -41,7 +42,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* FIXED: Using dvh for dynamic viewport height to account for mobile bars */
         html, body {
             background-color: var(--bg-base);
             color: var(--text-main);
@@ -154,6 +154,7 @@
             padding-left: 14px;
         }
 
+        /* Message Stream Viewport Layout */
         .display-viewport {
             flex: 1;
             padding: 0 16px;
@@ -201,6 +202,7 @@
             line-height: 1.5;
         }
 
+        /* Micro-message inline alignment styling blocks */
         .msg-row {
             display: flex;
             width: 100%;
@@ -210,6 +212,7 @@
         .msg-row.user-align { justify-content: flex-end; }
         .msg-row.system-align { justify-content: flex-start; }
 
+        /* Custom dynamic container configuration built exclusively to isolate parameters like "hi" */
         .msg-capsule {
             width: max-content;
             max-width: 85%;
@@ -236,8 +239,7 @@
             border-bottom-left-radius: 4px;
         }
 
-        /* FIXED: Increased explicit padding bottom to 34px to clear Android/iOS nav pills
-        */
+        /* Surgical Fix: Hardware layout padding parameters preventing webview navigation block tracking collisions */
         .dock-anchor {
             padding: 8px 16px calc(34px + env(safe-area-inset-bottom, 16px)) 16px;
             z-index: 10;
@@ -317,6 +319,7 @@
             height: 36px;
         }
 
+        /* Sidebar Sliders Drawer System Layout */
         .sidebar-overlay {
             position: absolute;
             top: 0;
@@ -436,6 +439,7 @@
 
     <div class="phone-frame">
         
+        <!-- Sidebar Drawer Overlay Modules -->
         <div class="sidebar-overlay" id="sidebarOverlay">
             <div class="sidebar-slider">
                 <div class="slider-header">
@@ -472,6 +476,7 @@
             </div>
         </div>
 
+        <!-- Header Panel Navigation -->
         <nav class="top-nav">
             <button class="nav-square" id="openSidebar" aria-label="Open Sidebar Menu">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -485,6 +490,7 @@
             </button>
         </nav>
 
+        <!-- Search Dashboard Pill -->
         <div class="search-container">
             <div class="premium-pill" id="dashboardSearchPill">
                 <div class="search-left">
@@ -497,7 +503,8 @@
             </div>
         </div>
 
-        <main class="display-viewport" id="viewport">
+        <!-- Intermediate wrapper context linking disha-extensions mapping elements -->
+        <div id="es-messages" class="display-viewport">
             <div class="empty-view" id="emptyState">
                 <div class="empty-circle">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -505,12 +512,13 @@
                 <h2 class="empty-title">x-bit 2.0.1</h2>
                 <p class="empty-subtitle">We couldn't find anything matching your local matrix query. Initiate system pipeline stream.</p>
             </div>
-        </main>
+        </div>
 
+        <!-- Fixed Glassmorphic Input Dock Module -->
         <div class="dock-anchor">
             <div class="glass-dock" id="inputDockContainer">
                 <div class="input-row">
-                    <input type="text" id="matrixField" placeholder="Message Proton..." autocomplete="off">
+                    <input type="text" id="es-input" placeholder="Message Proton..." autocomplete="off">
                 </div>
                 <div class="action-row">
                     <div class="action-left">
@@ -529,7 +537,7 @@
                         <button class="action-btn" aria-label="Audio Translation System Input">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
                         </button>
-                        <button class="action-btn submit" id="sendStream" aria-label="Push Vector Instruction Matrix">
+                        <button class="action-btn submit" id="es-send" aria-label="Push Vector Instruction Matrix">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
                         </button>
                     </div>
@@ -539,6 +547,7 @@
 
     </div>
 
+    <!-- Background Layer Connection Linkage Engine -->
     <script src="disha-extensions.js" defer></script>
 
     <script>
@@ -552,10 +561,10 @@
         const setLight = document.getElementById('setLight');
         const rootElement = document.documentElement;
 
-        const viewport = document.getElementById('viewport');
+        const viewport = document.getElementById('es-messages');
         const emptyState = document.getElementById('emptyState');
-        const matrixField = document.getElementById('matrixField');
-        const sendStream = document.getElementById('sendStream');
+        const matrixField = document.getElementById('es-input');
+        const sendStream = document.getElementById('es-send');
 
         // Sidebar Controller Actions
         openSidebar.addEventListener('click', () => sidebarOverlay.classList.add('active'));
@@ -584,46 +593,43 @@
             setDark.classList.add('active');
         });
 
-        // Dynamic Sizing Content Stream Architecture
-        window.DishaCore = {
-            clearScreen: () => { viewport.innerHTML = ''; },
-            pushMessageBlock: (content, sender = 'system') => {
-                if (emptyState && viewport.contains(emptyState)) emptyState.remove();
-                
-                const row = document.createElement('div');
-                row.classList.add('msg-row');
-                row.classList.add(sender === 'user' ? 'user-align' : 'system-align');
-
-                const capsule = document.createElement('div');
-                capsule.classList.add('msg-capsule');
-                capsule.innerHTML = content;
-                
-                row.appendChild(capsule);
-                viewport.appendChild(row);
-                
-                setTimeout(() => { capsule.style.transform = 'translateY(0)'; }, 10);
-                viewport.scrollTop = viewport.scrollHeight;
-            }
+        // Interface Bridge Hooks matching the exact DOM layout elements of the loaded disha-extensions file
+        window.scrollEsToBottom = function() {
+            viewport.scrollTop = viewport.scrollHeight;
         };
 
-        function processStream() {
-            const data = matrixField.value.trim();
-            if(!data) return;
+        window.appendEsBubbleUser = function(query) {
+            if (emptyState && viewport.contains(emptyState)) emptyState.remove();
+            
+            const row = document.createElement('div');
+            row.classList.add('msg-row', 'user-align');
 
-            window.DishaCore.pushMessageBlock(data, 'user');
-            matrixField.value = '';
+            const capsule = document.createElement('div');
+            capsule.classList.add('msg-capsule');
+            capsule.textContent = query;
+            
+            row.appendChild(capsule);
+            viewport.appendChild(row);
+            
+            setTimeout(() => { capsule.style.transform = 'translateY(0)'; }, 10);
+            window.scrollEsToBottom();
+        };
 
-            if (window.DishaExtensions && typeof window.DishaExtensions.process === 'function') {
-                window.DishaExtensions.process(data);
+        // Execution trigger mapping directly to the hooked window.doEsSearch route inside extensions script
+        function executeLocalPipeline() {
+            const val = matrixField.value;
+            if (window.doEsSearch) {
+                window.doEsSearch(val);
             } else {
-                setTimeout(() => {
-                    window.DishaCore.pushMessageBlock(`<div>Instruction array parsed completely inside system pipeline context.</div>`, 'system');
-                }, 400);
+                // Fallback rendering structure if extensions array loads with delay latency
+                if(!val.trim()) return;
+                window.appendEsBubbleUser(val.trim());
+                matrixField.value = '';
             }
         }
 
-        sendStream.addEventListener('click', processStream);
-        matrixField.addEventListener('keypress', (e) => { if (e.key === 'Enter') processStream(); });
+        sendStream.addEventListener('click', executeLocalPipeline);
+        matrixField.addEventListener('keypress', (e) => { if (e.key === 'Enter') executeLocalPipeline(); });
     </script>
 </body>
 </html>
