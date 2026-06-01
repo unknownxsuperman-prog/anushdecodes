@@ -154,7 +154,6 @@
             padding-left: 14px;
         }
 
-        /* Message Stream Viewport Layout */
         .display-viewport {
             flex: 1;
             padding: 0 16px;
@@ -202,7 +201,6 @@
             line-height: 1.5;
         }
 
-        /* Micro-message inline alignment styling blocks */
         .msg-row {
             display: flex;
             width: 100%;
@@ -212,8 +210,8 @@
         .msg-row.user-align { justify-content: flex-end; }
         .msg-row.system-align { justify-content: flex-start; }
 
-        /* Custom dynamic container configuration built exclusively to isolate parameters like "hi" */
-        .msg-capsule {
+        /* Modified: Supports extension-injected structures alongside clean raw bubbles */
+        .msg-capsule, .es-bubble-user, .es-bubble-sys {
             width: max-content;
             max-width: 85%;
             padding: 12px 18px;
@@ -227,19 +225,25 @@
             transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), background-color var(--transition-smooth);
         }
 
-        .msg-row.user-align .msg-capsule {
+        .msg-row.user-align .msg-capsule, .es-bubble-user {
             background: var(--text-main);
             color: var(--bg-base);
             border-bottom-right-radius: 4px;
+            align-self: flex-end;
+            margin-left: auto;
+            margin-bottom: 8px;
         }
 
-        .msg-row.system-align .msg-capsule {
+        .msg-row.system-align .msg-capsule, .es-bubble-sys {
             background: var(--bg-card);
             color: var(--text-main);
             border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            margin-right: auto;
+            margin-bottom: 8px;
+            width: 100%;
         }
 
-        /* Surgical Fix: Hardware layout padding parameters preventing webview navigation block tracking collisions */
         .dock-anchor {
             padding: 8px 16px calc(34px + env(safe-area-inset-bottom, 16px)) 16px;
             z-index: 10;
@@ -319,7 +323,6 @@
             height: 36px;
         }
 
-        /* Sidebar Sliders Drawer System Layout */
         .sidebar-overlay {
             position: absolute;
             top: 0;
@@ -503,8 +506,8 @@
             </div>
         </div>
 
-        <!-- Intermediate wrapper context linking disha-extensions mapping elements -->
-        <div id="es-messages" class="display-viewport">
+        <!-- Scrollable Thread Core Display Area Mapping to Extension ID targets -->
+        <main id="es-messages" class="display-viewport">
             <div class="empty-view" id="emptyState">
                 <div class="empty-circle">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -512,9 +515,9 @@
                 <h2 class="empty-title">x-bit 2.0.1</h2>
                 <p class="empty-subtitle">We couldn't find anything matching your local matrix query. Initiate system pipeline stream.</p>
             </div>
-        </div>
+        </main>
 
-        <!-- Fixed Glassmorphic Input Dock Module -->
+        <!-- Fixed Glassmorphic Input Dock Module Mapping to Extension ID targets -->
         <div class="dock-anchor">
             <div class="glass-dock" id="inputDockContainer">
                 <div class="input-row">
@@ -547,10 +550,17 @@
 
     </div>
 
-    <!-- Background Layer Connection Linkage Engine -->
     <script src="disha-extensions.js" defer></script>
 
     <script>
+        // Setup base stub function before disha-extensions triggers its loading lifecycle sequence
+        window.doEsSearch = function(val) {
+            const query = val.trim();
+            if (!query) return;
+            window.appendEsBubbleUser(query);
+            matrixField.value = '';
+        };
+
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const openSidebar = document.getElementById('openSidebar');
         const closeSidebar = document.getElementById('closeSidebar');
@@ -562,16 +572,15 @@
         const rootElement = document.documentElement;
 
         const viewport = document.getElementById('es-messages');
-        const emptyState = document.getElementById('emptyState');
         const matrixField = document.getElementById('es-input');
         const sendStream = document.getElementById('es-send');
 
-        // Sidebar Controller Actions
+        // Sidebar Actions
         openSidebar.addEventListener('click', () => sidebarOverlay.classList.add('active'));
         closeSidebar.addEventListener('click', () => sidebarOverlay.classList.remove('active'));
         sidebarOverlay.addEventListener('click', (e) => { if(e.target === sidebarOverlay) sidebarOverlay.classList.remove('active'); });
 
-        // Smooth Focus Redirection Animation Sequence
+        // Smooth Focus Shifts
         dashboardSearchPill.addEventListener('click', () => {
             dashboardSearchPill.classList.add('pulse-shift');
             inputDockContainer.classList.add('highlight-focus');
@@ -581,7 +590,7 @@
             setTimeout(() => { inputDockContainer.classList.remove('highlight-focus'); }, 800);
         });
 
-        // Theme Toggle
+        // Theme Configuration Toggles
         setLight.addEventListener('click', () => {
             rootElement.classList.add('light-theme');
             setDark.classList.remove('active');
@@ -593,19 +602,20 @@
             setDark.classList.add('active');
         });
 
-        // Interface Bridge Hooks matching the exact DOM layout elements of the loaded disha-extensions file
+        // Global Infrastructure hooks required explicitly by disha-extensions pipeline execution loop
         window.scrollEsToBottom = function() {
             viewport.scrollTop = viewport.scrollHeight;
         };
 
         window.appendEsBubbleUser = function(query) {
-            if (emptyState && viewport.contains(emptyState)) emptyState.remove();
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.remove();
             
             const row = document.createElement('div');
-            row.classList.add('msg-row', 'user-align');
-
+            row.className = 'msg-row user-align';
+            
             const capsule = document.createElement('div');
-            capsule.classList.add('msg-capsule');
+            capsule.className = 'msg-capsule';
             capsule.textContent = query;
             
             row.appendChild(capsule);
@@ -615,17 +625,10 @@
             window.scrollEsToBottom();
         };
 
-        // Execution trigger mapping directly to the hooked window.doEsSearch route inside extensions script
         function executeLocalPipeline() {
-            const val = matrixField.value;
-            if (window.doEsSearch) {
-                window.doEsSearch(val);
-            } else {
-                // Fallback rendering structure if extensions array loads with delay latency
-                if(!val.trim()) return;
-                window.appendEsBubbleUser(val.trim());
-                matrixField.value = '';
-            }
+            const val = matrixField.value.trim();
+            if (!val) return;
+            window.doEsSearch(val);
         }
 
         sendStream.addEventListener('click', executeLocalPipeline);
