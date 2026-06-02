@@ -279,14 +279,6 @@ function dishaKB(lower) {
 
 // ========== KCET — Branch + College Matches ==========
 
-function getDynamicBranches() {
-  const set = new Set();
-  (window.XOS_CUTOFF || []).forEach(c => {
-    if (c.branches) Object.keys(c.branches).forEach(b => set.add(b));
-  });
-  return Array.from(set).sort();
-}
-
 function dishaInp(id, ph, max) {
   return `<input type="number" id="in-${id}" min="0" max="${max}" placeholder="${ph}"
     style="width:100%;background:#000;border:1px solid #222;border-radius:10px;padding:12px 14px;
@@ -345,7 +337,7 @@ window.dishaBranchFilter = function(uid) {
   const box = document.getElementById(`branch-suggest-${uid}`);
   if (!inp||!box) return;
   const q = inp.value.trim().toUpperCase();
-  const branches = (window.XOS_CUTOFF && window.XOS_CUTOFF.length) ? getDynamicBranches() : (window.XOS_BRANCHES || []);
+  const branches = window.XOS_BRANCHES || [];
   if (!q) { box.style.display='none'; return; }
   const matches = branches.filter(b=>b.toUpperCase().includes(q)).slice(0,3);
   if (!matches.length) { box.style.display='none'; return; }
