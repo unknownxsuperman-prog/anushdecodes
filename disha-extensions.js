@@ -3,20 +3,20 @@
  * NO IIFE — all functions global so xos-feed can call them directly
  * Load order: colleges.js → Dishabase.js → disha-extensions.js
  */
- 
+
 // ========== CONFIG ==========
 const DISHA_CONFIG = {
   weatherApiKey: '0222762e4fd7dc746123423914f0dca7',
   defaultCity: 'Mumbai',
   typingSpeed: 12,
 };
- 
+
 const DISHA_STATE = {
   history: [],
   stats: { queriesHandled: 0 },
   sessionStart: Date.now(),
 };
- 
+
 // ========== MARKDOWN ==========
 function dishaMarkdown(md) {
   return md
@@ -25,7 +25,7 @@ function dishaMarkdown(md) {
     .replace(/`(.*?)`/g, '<code style="background:#111;padding:2px 7px;border-radius:5px;color:#fff;font-family:monospace;font-size:.88em;border:1px solid #1a1a1a;">$1</code>')
     .replace(/\n/g, '<br>');
 }
- 
+
 async function dishaTypewrite(container, text) {
   const isHtml = text.trim().startsWith('<');
   if (isHtml) { container.innerHTML = text; return; }
@@ -45,14 +45,14 @@ async function dishaTypewrite(container, text) {
     type();
   });
 }
- 
+
 // ========== LOCAL AI ENGINE ==========
 async function dishaRespond(query) {
   const q = query.trim();
   if (!q) return "I didn't catch that.";
   const lower = q.toLowerCase();
   DISHA_STATE.stats.queriesHandled++;
- 
+
   // intent detection
   if (/^(calc|calculate|compute|what is|what's)\s+[\d\s+\-*/().^%]/i.test(q) || /^[\d\s+\-*/().^%]+$/.test(q))
     return dishaCalc(q);
@@ -91,9 +91,9 @@ if (/\b(open|launch|go to|visit)\s+spotify\b/i.test(lower))
   if (/\b(bye|goodbye|see you)\b/i.test(lower))
     return `Goodbye! 👋 Queries: ${DISHA_STATE.stats.queriesHandled}`;
   if (/\b(who are you|your name|what are you)\b/i.test(lower))
-    return "I'm **Disha**, x0s.link's on-device intelligence. KCET predictions, weather, math, and more — no cloud AI.";
-   if (/\b(power(s|ed|ing)?\s+disha|what\s+(api|model|engine|ai|llm)\s+(run(s|ning)?\s+)?behind|who\s+(run(s|ning)?|power(s|ed|ing)?|made|built|develop(s|ed)?)\s+disha|disha\s+(is\s+)?powered\s+(by|with)|which\s+(api|model|engine|ai|llm)|no\s+api|local\s+model|x-bit|proton)\b/i.test(lower))
-    return "Disha is powered by **x-bit Proton**, a local model developed by **Nikhil**. No external API is used — everything runs on-device.";
+    return "I'm **Proton**, on-device intelligence. KCET predictions, weather, math, and more — no cloud AI.";
+   if (/\b(power(s|ed|ing)?\s+xbitproton|what\s+(api|model|engine|ai|llm)\s+(run(s|ning)?\s+)?behind|who\s+(run(s|ning)?|power(s|ed|ing)?|made|built|develop(s|ed)?)\s+disha|disha\s+(is\s+)?powered\s+(by|with)|which\s+(api|model|engine|ai|llm)|no\s+api|local\s+model|x-bit|proton)\b/i.test(lower))
+    return "Proton is powered by **x-bit 2.0.1**, a local model developed by **Nikhil**. No external API is used — everything runs on-device.";
   if (/\b(what can you|help|commands)\b/i.test(lower))
     return dishaCaps();
   if (/\b(thank|thanks|thx)\b/i.test(lower))
@@ -102,10 +102,10 @@ if (/\b(open|launch|go to|visit)\s+spotify\b/i.test(lower))
     return `All systems nominal. Uptime: ${Math.floor((Date.now()-DISHA_STATE.sessionStart)/1000)}s`;
   if (/\bhostel\b/i.test(lower))
     return dishaHostel();
- 
+
   return dishaKB(lower);
 }
- 
+
 function dishaCalc(q) {
   let expr = q.replace(/^(calc|calculate|compute|what is|what's)\s+/i,'').trim();
   expr = expr.replace(/\^/g,'**').replace(/×/g,'*').replace(/÷/g,'/');
@@ -116,7 +116,7 @@ function dishaCalc(q) {
     return `**${expr}** = **${r.toLocaleString('en-IN')}**`;
   } catch { return `⚠️ Invalid expression. Try: \`calc 15 * 23.5\``; }
 }
- 
+
 function dishaConvert(q) {
   const m = q.match(/(\d+(?:\.\d+)?)\s*(km|mi|kg|lb|°?c|°?f|usd|eur|inr|gbp)\s*(?:to|in|=)\s*(km|mi|kg|lb|°?c|°?f|usd|eur|inr|gbp)/i);
   if (!m) return 'Usage: `convert 100 km to mi` or `25 c to f`';
@@ -134,7 +134,7 @@ function dishaConvert(q) {
   if (!fn) return `Conversion ${from}→${to} not supported.`;
   return `**${v} ${from.toUpperCase()}** = **${fn(v).toFixed(2)} ${to.toUpperCase()}**`;
 }
- 
+
 async function dishaWeather(lower) {
   const m = lower.match(/(?:weather|temperature|forecast)\s+(?:in|for|at)?\s*([a-z\s]+?)(?:\s+(?:today|now))?$|([a-z\s]+?)\s+(?:weather|temperature)/i);
   const city = (m?.[1]||m?.[2]||DISHA_CONFIG.defaultCity).trim();
@@ -155,7 +155,7 @@ async function dishaWeather(lower) {
     </div>`;
   } catch(e) { return `Weather unavailable for "${city}": ${e.message}`; }
 }
- 
+
 function dishaTime(lower) {
   const tzMap = {'london':'Europe/London','new york':'America/New_York','tokyo':'Asia/Tokyo',
     'sydney':'Australia/Sydney','dubai':'Asia/Dubai','singapore':'Asia/Singapore',
@@ -164,13 +164,13 @@ function dishaTime(lower) {
   const tz = (m && tzMap[m[1].trim().toLowerCase()]) || 'Asia/Kolkata';
   return `🕐 **${new Date().toLocaleString('en-IN',{timeZone:tz,weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'short'})}**`;
 }
- 
+
 function dishaDate() {
   const now = new Date();
   const left = Math.ceil((new Date(now.getFullYear(),11,31)-now)/86400000);
   return `📅 **${now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}**\n\n${left} days left in ${now.getFullYear()}.`;
 }
- 
+
 function dishaTimer(lower) {
   const m = lower.match(/(\d+)\s*(min|minute|sec|second|hour|hr)s?/i);
   if (!m) return 'Usage: `timer 5 minutes`';
@@ -181,7 +181,7 @@ function dishaTimer(lower) {
   setTimeout(()=>{ if(typeof window.showToast==='function') window.showToast(`⏰ ${val} ${unit}s up!`); }, ms);
   return `⏱️ Timer set for **${val} ${unit}${val>1?'s':''}**.`;
 }
- 
+
 function dishaDef(lower) {
   const term = lower.replace(/(what\s(is|are|does)\s+|define\s+|meaning\sof\s+|explain\s+)/i,'').replace(/\?/g,'').trim();
   const key = term.replace(/\s+/g,'_');
@@ -202,7 +202,7 @@ function dishaDef(lower) {
   if (p) return `**${p.replace(/_/g,' ')}**: ${defs[p]}`;
   return `"${term}" not in local knowledge base.`;
 }
- 
+
 function dishaPassword(lower) {
   const m = lower.match(/(\d+)\s*(char|digit|length)/i);
   const len = m ? Math.min(parseInt(m[1]),64) : 16;
@@ -238,21 +238,21 @@ function dishaRenderAppPill({ name, url, faIcon, iconBg, sub }) {
     <span style="margin-left:4px;opacity:.35;font-size:.75rem;color:#fff;">↗</span>
   </a>`;
 }
- 
+
 function dishaGreet() {
   const h=new Date().getHours();
   const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
   return `${g}! 👋 Ready when you are.`;
 }
- 
+
 function dishaCaps() {
   return `**Disha can handle:**\n• \`calc 15 * 23\` — Math\n• \`weather in Bangalore\` — Weather\n• \`convert 100 km to mi\` — Units\n• \`time in Tokyo\` — World clock\n• \`define API\` — Definitions\n• \`password 20\` — Secure password\n• \`timer 5 minutes\` — Countdown\n• \`kcet predict\` — KCET rank predictor\n• \`hostel essentials\` — Packing list`;
 }
- 
+
 function dishaHostel() {
   return `**Hostel Essentials Checklist** 🎒\n\n**Clothing**\n• 5–7 sets (formal + casual)\n• Innerwear & socks (7 pairs)\n• Sleepwear · Flip flops · Rain jacket\n\n**Toiletries**\n• Toothbrush, toothpaste · Shampoo, soap, face wash\n• Deodorant · Trimmer · Nail cutter · Comb\n\n**Bedding**\n• Bedsheet (2 sets) · Pillow + pillowcase\n• Light blanket · Towel (2 sets)\n\n**Study & Work**\n• Laptop + charger · Earphones · Stationery\n• Power bank · Extension cord\n\n**Food**\n• Water bottle · Electric kettle · Snacks · Plate & mug\n\n**Documents**\n• Aadhar (original + 5 copies) · Admission letter\n• Passport photos (10+) · ATM card\n\n**Health**\n• Paracetamol · Band-aids · Antacid · Cold tablets\n\n**Misc**\n• Lock · Clothesline + clips · Hangers`;
 }
- 
+
 function dishaKB(lower) {
   const kb = [
     {k:['capital','india'],a:'New Delhi'},
@@ -276,9 +276,17 @@ function dishaKB(lower) {
   const s=['Try: weather, calc, convert, define, kcet predict, hostel essentials.','Ask me: weather in Mumbai, calc 2^10, define algorithm.'];
   return s[DISHA_STATE.stats.queriesHandled%s.length];
 }
- 
+
 // ========== KCET — Branch + College Matches ==========
- 
+
+function getDynamicBranches() {
+  const set = new Set();
+  (window.XOS_CUTOFF || []).forEach(c => {
+    if (c.branches) Object.keys(c.branches).forEach(b => set.add(b));
+  });
+  return Array.from(set).sort();
+}
+
 function dishaInp(id, ph, max) {
   return `<input type="number" id="in-${id}" min="0" max="${max}" placeholder="${ph}"
     style="width:100%;background:#000;border:1px solid #222;border-radius:10px;padding:12px 14px;
@@ -286,7 +294,7 @@ function dishaInp(id, ph, max) {
     -moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"
     onfocus="this.style.borderColor='#fff'" onblur="this.style.borderColor='#222'">`;
 }
- 
+
 function dishaSubRow(id, label, max) {
   return `<div style="display:flex;align-items:center;justify-content:space-between;padding:0 0 14px;border-bottom:1px solid #111;margin-bottom:14px;">
     <div style="font-size:.78rem;font-weight:500;color:#888;letter-spacing:.04em;text-transform:uppercase;">${label}</div>
@@ -297,7 +305,7 @@ function dishaSubRow(id, label, max) {
       onfocus="this.style.borderColor='#fff'" onblur="this.style.borderColor='#333'">
   </div>`;
 }
- 
+
 function dishaBranchField(uid) {
   return `<div style="position:relative;">
     <input id="branch-input-${uid}" type="text" placeholder="Type branch name…" autocomplete="off"
@@ -314,25 +322,66 @@ function dishaBranchField(uid) {
   </div>
   <div id="branch-label-${uid}" style="margin-top:7px;font-size:.7rem;color:#555;min-height:16px;"></div>`;
 }
- 
+
+function dishaCategoryField(uid) {
+  return `<div style="position:relative;margin-top:12px;">
+    <input id="cat-input-${uid}" type="text" placeholder="Type category…" autocomplete="off"
+      style="width:100%;background:#000;border:1px solid #222;border-radius:10px;
+      padding:12px 14px;color:#fff;font-family:'Space Grotesk',sans-serif;
+      font-size:.88rem;outline:none;transition:border-color .2s;"
+      onfocus="this.style.borderColor='#fff';dishaCategoryShow('${uid}')"
+      onblur="setTimeout(()=>dishaCategoryHide('${uid}'),220)"
+      oninput="dishaCategoryFilter('${uid}')">
+    <div id="cat-suggest-${uid}"
+      style="display:none;position:absolute;top:calc(100%+4px);left:0;right:0;z-index:21;
+      background:#0a0a0a;border:1px solid #222;border-radius:12px;overflow:hidden;
+      box-shadow:0 12px 32px rgba(0,0,0,.9);"></div>
+  </div>
+  <div id="cat-label-${uid}" style="margin-top:7px;font-size:.7rem;color:#555;min-height:16px;"></div>`;
+}
+
 window.dishaBranchFilter = function(uid) {
   const inp = document.getElementById(`branch-input-${uid}`);
   const box = document.getElementById(`branch-suggest-${uid}`);
   if (!inp||!box) return;
   const q = inp.value.trim().toUpperCase();
-  const branches = window.XOS_BRANCHES||[];
+  const branches = (window.XOS_CUTOFF && window.XOS_CUTOFF.length) ? getDynamicBranches() : (window.XOS_BRANCHES || []);
   if (!q) { box.style.display='none'; return; }
-  const matches = branches.filter(b=>b.includes(q)).slice(0,3);
+  const matches = branches.filter(b=>b.toUpperCase().includes(q)).slice(0,3);
   if (!matches.length) { box.style.display='none'; return; }
   box.innerHTML = matches.map(b=>`
     <div onclick="dishaBranchSelect('${uid}','${b.replace(/'/g,"\\'")}')"
+      class="xos-suggestion-item"
       style="padding:11px 14px;font-size:.78rem;font-weight:500;cursor:pointer;
       border-bottom:1px solid #111;color:#ccc;"
       onmouseover="this.style.background='rgba(255,255,255,.05)'"
-      onmouseout="this.style.background=''">${b}</div>`).join('');
+      onmouseout="this.style.background=''">
+      <div class="xos-marquee-wrap"><span class="xos-marquee-text">${b} &nbsp;&nbsp;&nbsp; ${b}</span></div>
+    </div>`).join('');
   box.style.display='block';
 };
- 
+
+window.dishaCategoryFilter = function(uid) {
+  const inp = document.getElementById(`cat-input-${uid}`);
+  const box = document.getElementById(`cat-suggest-${uid}`);
+  if (!inp||!box) return;
+  const q = inp.value.trim().toUpperCase();
+  const cats = window.XOS_CATEGORIES || [];
+  if (!q) { box.style.display='none'; return; }
+  const matches = cats.filter(c=>c.toUpperCase().includes(q)).slice(0,3);
+  if (!matches.length) { box.style.display='none'; return; }
+  box.innerHTML = matches.map(c=>`
+    <div onclick="dishaCategorySelect('${uid}','${c.replace(/'/g,"\\'")}')"
+      class="xos-suggestion-item"
+      style="padding:11px 14px;font-size:.78rem;font-weight:500;cursor:pointer;
+      border-bottom:1px solid #111;color:#ccc;"
+      onmouseover="this.style.background='rgba(255,255,255,.05)'"
+      onmouseout="this.style.background=''">
+      <div class="xos-marquee-wrap"><span class="xos-marquee-text">${c} &nbsp;&nbsp;&nbsp; ${c}</span></div>
+    </div>`).join('');
+  box.style.display='block';
+};
+
 window.dishaBranchSelect = function(uid, branch) {
   const inp=document.getElementById(`branch-input-${uid}`);
   const box=document.getElementById(`branch-suggest-${uid}`);
@@ -343,12 +392,23 @@ window.dishaBranchSelect = function(uid, branch) {
 };
 window.dishaBranchShow = function(uid){const i=document.getElementById(`branch-input-${uid}`);if(i&&i.value.trim())dishaBranchFilter(uid);};
 window.dishaBranchHide = function(uid){const b=document.getElementById(`branch-suggest-${uid}`);if(b)b.style.display='none';};
- 
+
+window.dishaCategorySelect = function(uid, cat) {
+  const inp=document.getElementById(`cat-input-${uid}`);
+  const box=document.getElementById(`cat-suggest-${uid}`);
+  const lbl=document.getElementById(`cat-label-${uid}`);
+  if(inp){inp.value=cat;inp._sel=cat;}
+  if(box) box.style.display='none';
+  if(lbl) lbl.textContent='✓ '+cat;
+};
+window.dishaCategoryShow = function(uid){const i=document.getElementById(`cat-input-${uid}`);if(i&&i.value.trim())dishaCategoryFilter(uid);};
+window.dishaCategoryHide = function(uid){const b=document.getElementById(`cat-suggest-${uid}`);if(b)b.style.display='none';};
+
 function dishaComputeRank(boardPct,kcetPct){
   const idx=(boardPct*0.5)+(kcetPct*0.5);
   return Math.max(1,Math.min(Math.round(Math.pow(101-idx,2.6)*4.8),250000));
 }
- 
+
 function dishaRankBand(rank){
   if(rank<=500)  return{label:'Elite',    color:'#fff'};
   if(rank<=2000) return{label:'Excellent',color:'#e5e5e5'};
@@ -356,7 +416,7 @@ function dishaRankBand(rank){
   if(rank<=25000)return{label:'Average',  color:'#777'};
   return                {label:'Below Avg',color:'#555'};
 }
- 
+
 function dishaResultBlock(title,rank){
   const b=dishaRankBand(rank);
   return `<div style="flex:1;background:#000;border:1px solid #1a1a1a;border-radius:16px;padding:18px 16px;text-align:center;">
@@ -365,27 +425,36 @@ function dishaResultBlock(title,rank){
     <div style="font-size:.65rem;font-weight:600;color:${b.color};margin-top:6px;letter-spacing:.08em;text-transform:uppercase;">${b.label}</div>
   </div>`;
 }
- 
-function dishaFindMatches(rank, branchQ){
+
+function dishaFindMatches(rank, branchQ, categoryQ){
   const data=window.XOS_CUTOFF||[];
   if(!data.length||!branchQ.trim()) return[];
   const q=branchQ.toUpperCase().trim();
+  const cat=categoryQ ? categoryQ.toUpperCase().trim() : '';
   const W=2000, matches=[];
   data.forEach(college=>{
-    Object.keys(college.branches).forEach(bn=>{
-      if(!bn.toUpperCase().includes(q)) return;
-      const cuts=Object.entries(college.branches[bn]).filter(([,v])=>v!==null);
+    const branches=college.branches||{};
+    const bnKey=Object.keys(branches).find(k=>k.toUpperCase()===q);
+    if(!bnKey) return;
+    if(cat){
+      const cutoff=branches[bnKey][cat];
+      if(cutoff===null||cutoff===undefined) return;
+      const diff=cutoff-rank;
+      if(diff<-W||diff>W) return;
+      matches.push({college:college.name,id:college.id,location:college.location,branch:bnKey,category:cat,cutoff:cutoff,diff});
+    } else {
+      const cuts=Object.entries(branches[bnKey]).filter(([,v])=>v!==null);
       if(!cuts.length) return;
       const closest=cuts.reduce((best,cur)=>Math.abs(cur[1]-rank)<Math.abs(best[1]-rank)?cur:best,cuts[0]);
       const diff=closest[1]-rank;
-      if(diff>=-W&&diff<=W) matches.push({college:college.name,id:college.id,location:college.location,branch:bn,category:closest[0],cutoff:closest[1],diff});
-    });
+      if(diff>=-W&&diff<=W) matches.push({college:college.name,id:college.id,location:college.location,branch:bnKey,category:closest[0],cutoff:closest[1],diff});
+    }
   });
   return matches.sort((a,b)=>Math.abs(a.diff)-Math.abs(b.diff)).slice(0,10);
 }
- 
+
 function dishaRenderMatches(matches){
-  if(!matches.length) return `<div style="color:#444;font-size:.75rem;padding:10px 0;text-align:center;">No colleges in ±2000 range for this branch.<br><span style="font-size:.65rem;">Try adding your college via the Add College option in search.</span></div>`;
+  if(!matches.length) return `<div style="color:#444;font-size:.75rem;padding:10px 0;text-align:center;">No colleges in ±2000 range for this branch/category.<br><span style="font-size:.65rem;">Try adding your college via the Add College option in search.</span></div>`;
   return matches.map(m=>`
     <div style="background:#000;border:1px solid #1a1a1a;border-radius:14px;padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:50%;right:10px;transform:translateY(-50%);font-size:2.8rem;font-weight:700;color:rgba(255,255,255,.025);pointer-events:none;">${m.id}</div>
@@ -404,10 +473,11 @@ function dishaRenderMatches(matches){
       </div>
     </div>`).join('');
 }
- 
+
 function dishaGetVal(id){return parseFloat(document.getElementById(`in-${id}`)?.value)||0;}
 function dishaGetBranch(uid){const i=document.getElementById(`branch-input-${uid}`);return i?._sel||i?.value?.trim()||'';}
- 
+function dishaGetCategory(uid){const i=document.getElementById(`cat-input-${uid}`);return i?._sel||i?.value?.trim()||'';}
+
 window.launchKcetPredictor = function() {
   const container=document.getElementById('es-messages');
   if(!container) return;
@@ -415,6 +485,24 @@ window.launchKcetPredictor = function() {
   const card=document.createElement('div');
   card.className='es-bubble-sys';
   card.innerHTML=`
+  <style>
+    @keyframes xos-marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .xos-marquee-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .xos-marquee-text {
+      display: inline-block;
+      animation: xos-marquee 10s linear infinite;
+    }
+    .xos-suggestion-item:hover .xos-marquee-text {
+      animation-play-state: paused;
+    }
+  </style>
   <div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:24px;overflow:visible;width:100%;max-width:420px;">
     <div style="padding:20px 22px 16px;border-bottom:1px solid #111;display:flex;align-items:center;justify-content:space-between;">
       <div>
@@ -441,6 +529,8 @@ window.launchKcetPredictor = function() {
       ${dishaInp('e-kcet-'+uid,'0 – 180',180)}
       <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 12px;">Branch Preference <span style="color:#333;font-weight:400;text-transform:none;">(optional)</span></div>
       ${dishaBranchField(uid)}
+      <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 12px;">Category Preference <span style="color:#333;font-weight:400;text-transform:none;">(optional)</span></div>
+      ${dishaCategoryField(uid)}
       <button onclick="dishaCalcEng('${uid}')"
         style="width:100%;margin-top:18px;padding:14px;background:#fff;color:#000;border:none;border-radius:12px;font-size:.82rem;font-weight:700;font-family:'Space Grotesk',sans-serif;letter-spacing:.04em;cursor:pointer;">PREDICT RANK →</button>
       <div id="eng-result-${uid}" style="display:none;margin-top:18px;"></div>
@@ -459,6 +549,8 @@ window.launchKcetPredictor = function() {
       ${dishaSubRow('n-kbio-'+uid,'Biology',60)}
       <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 12px;">Branch Preference <span style="color:#333;font-weight:400;text-transform:none;">(optional)</span></div>
       ${dishaBranchField('n'+uid)}
+      <div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin:18px 0 12px;">Category Preference <span style="color:#333;font-weight:400;text-transform:none;">(optional)</span></div>
+      ${dishaCategoryField('n'+uid)}
       <button onclick="dishaCalcNon('${uid}')"
         style="width:100%;margin-top:18px;padding:14px;background:#fff;color:#000;border:none;border-radius:12px;font-size:.82rem;font-weight:700;font-family:'Space Grotesk',sans-serif;letter-spacing:.04em;cursor:pointer;">PREDICT BOTH RANKS →</button>
       <div id="non-result-${uid}" style="display:none;margin-top:18px;"></div>
@@ -471,20 +563,21 @@ window.launchKcetPredictor = function() {
   container.appendChild(card);
   if(typeof window.scrollEsToBottom==='function') window.scrollEsToBottom();
 };
- 
+
 window.dishaKcetTab = function(uid,tab){
   const et=document.getElementById(`tab-eng-${uid}`),nt=document.getElementById(`tab-non-${uid}`);
   const ep=document.getElementById(`eng-${uid}`),np=document.getElementById(`non-${uid}`);
   if(tab==='eng'){et.style.color='#fff';et.style.borderBottomColor='#fff';nt.style.color='#444';nt.style.borderBottomColor='transparent';ep.style.display='block';np.style.display='none';}
   else{nt.style.color='#fff';nt.style.borderBottomColor='#fff';et.style.color='#444';et.style.borderBottomColor='transparent';np.style.display='block';ep.style.display='none';}
 };
- 
+
 window.dishaCalcEng = function(uid){
   const phy=dishaGetVal(`e-phy-${uid}`),che=dishaGetVal(`e-che-${uid}`),mat=dishaGetVal(`e-mat-${uid}`),kcet=dishaGetVal(`e-kcet-${uid}`);
   const branch=dishaGetBranch(uid);
+  const category=dishaGetCategory(uid);
   const boardPct=((phy+che+mat)/300)*100, kcetPct=(kcet/180)*100;
   const rank=dishaComputeRank(boardPct,kcetPct), band=dishaRankBand(rank);
-  const matches=dishaFindMatches(rank,branch);
+  const matches=dishaFindMatches(rank,branch,category);
   const res=document.getElementById(`eng-result-${uid}`);
   res.style.display='block';
   res.innerHTML=`
@@ -496,43 +589,44 @@ window.dishaCalcEng = function(uid){
         <span>BOARD ${boardPct.toFixed(1)}%</span><span>KCET ${kcetPct.toFixed(1)}%</span>
       </div>
     </div>
-    ${branch?`<div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:12px;">Colleges · ${branch} · Rank ±2000</div>${dishaRenderMatches(matches)}`:''}
+    ${branch?`<div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:12px;">Colleges · ${branch}${category?' · '+category:''} · Rank ±2000</div>${dishaRenderMatches(matches)}`:''}
     <div onclick="launchKcetPredictor()" style="text-align:center;margin-top:12px;font-size:.65rem;color:#444;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:8px;">⟳ NEW PREDICTION</div>`;
   if(typeof window.scrollEsToBottom==='function') window.scrollEsToBottom();
 };
- 
+
 window.dishaCalcNon = function(uid){
   const phy=dishaGetVal(`n-phy-${uid}`),che=dishaGetVal(`n-che-${uid}`),mat=dishaGetVal(`n-mat-${uid}`),bio=dishaGetVal(`n-bio-${uid}`);
   const kphy=dishaGetVal(`n-kphy-${uid}`),kche=dishaGetVal(`n-kche-${uid}`),kmat=dishaGetVal(`n-kmat-${uid}`),kbio=dishaGetVal(`n-kbio-${uid}`);
   const branch=dishaGetBranch('n'+uid);
+  const category=dishaGetCategory('n'+uid);
   const boardPct=((phy+che+mat+bio)/400)*100;
   const pharmaRank=dishaComputeRank(boardPct,((kphy+kche+kbio)/180)*100);
   const engRank=dishaComputeRank(boardPct,((kphy+kche+kmat)/180)*100);
-  const matches=dishaFindMatches(engRank,branch);
+  const matches=dishaFindMatches(engRank,branch,category);
   const res=document.getElementById(`non-result-${uid}`);
   res.style.display='block';
   res.innerHTML=`
     <div style="display:flex;gap:10px;margin-bottom:${branch?'16px':'0'};">${dishaResultBlock('Pharma Rank',pharmaRank)}${dishaResultBlock('Engg Rank',engRank)}</div>
-    ${branch?`<div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:12px;">Colleges · ${branch} · Rank ±2000</div>${dishaRenderMatches(matches)}`:''}
+    ${branch?`<div style="font-size:.6rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#444;margin-bottom:12px;">Colleges · ${branch}${category?' · '+category:''} · Rank ±2000</div>${dishaRenderMatches(matches)}`:''}
     <div onclick="launchKcetPredictor()" style="text-align:center;margin-top:12px;font-size:.65rem;color:#444;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:8px;">⟳ NEW PREDICTION</div>`;
   if(typeof window.scrollEsToBottom==='function') window.scrollEsToBottom();
 };
- 
+
 // ========== HOOK — override doEsSearch ==========
 // Use a small delay so xos-feed.html's inline script finishes first
 setTimeout(function() {
   if (typeof window.doEsSearch !== 'function') return;
   const _orig = window.doEsSearch;
- 
+
   window.doEsSearch = async function(val) {
     if (!val || !val.trim()) return;
     const query = val.trim();
     const lower = query.toLowerCase();
- 
+
     const container = document.getElementById('es-messages');
     const greet = document.getElementById('es-greeting');
     if (greet) greet.style.display = 'none';
- 
+
     // user bubble
     if (typeof window.appendEsBubbleUser === 'function') {
       window.appendEsBubbleUser(query);
@@ -542,18 +636,18 @@ setTimeout(function() {
       b.textContent = query;
       if (container) container.appendChild(b);
     }
- 
+
     // clear input
     const inp = document.getElementById('es-input');
     if (inp) inp.value = '';
     document.getElementById('es-send')?.classList.remove('visible');
- 
+
     // KCET
     if (/\b(kcet|rank predictor|predict rank)\b/i.test(lower)) {
       setTimeout(launchKcetPredictor, 280);
       return;
     }
- 
+
     // AI response bubble
     const sys = document.createElement('div');
     sys.className = 'es-bubble-sys';
@@ -562,7 +656,7 @@ setTimeout(function() {
     sys.appendChild(content);
     if (container) container.appendChild(sys);
     content.innerHTML = '<span style="color:#007aff;">▌</span>';
- 
+
     try {
       const answer = await dishaRespond(query);
       // fallback to original college/people search for short unknown queries
@@ -578,4 +672,3 @@ setTimeout(function() {
     if (typeof window.scrollEsToBottom === 'function') window.scrollEsToBottom();
   };
 }, 300);
- 
