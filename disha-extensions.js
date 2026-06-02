@@ -53,7 +53,6 @@ async function dishaRespond(query) {
   const lower = q.toLowerCase();
   DISHA_STATE.stats.queriesHandled++;
 
-  // intent detection
   if (/^(calc|calculate|compute|what is|what's)\s+[\d\s+\-*/().^%]/i.test(q) || /^[\d\s+\-*/().^%]+$/.test(q))
     return dishaCalc(q);
   if (/\b(convert|km to|mi to|kg to|lb to|°c|°f|usd to|inr to|eur to)\b/i.test(lower))
@@ -72,27 +71,23 @@ async function dishaRespond(query) {
     return dishaPassword(lower);
   if (/\buuid\b/i.test(lower))
     return `🆔 **UUID v4**:\n\`${crypto.randomUUID()}\``;
- if (/\b(open|launch|go to|visit)\s+instagram\b/i.test(lower))
-  return dishaRenderAppPill({ name:'Instagram', url:'https://instagram.com', faIcon:'fa-instagram', iconBg:'radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285aeb 90%)', sub:'instagram.com' });
-
-if (/\b(open|launch|go to|visit)\s+youtube\b/i.test(lower))
-  return dishaRenderAppPill({ name:'YouTube', url:'https://youtube.com', faIcon:'fa-youtube', iconBg:'#ff0000', sub:'youtube.com' });
-
-if (/\b(open|launch|go to|visit)\s+(twitter|x)\b/i.test(lower))
-  return dishaRenderAppPill({ name:'X / Twitter', url:'https://x.com', faIcon:'fa-x-twitter', iconBg:'#000', sub:'x.com' });
-
-if (/\b(open|launch|go to|visit)\s+github\b/i.test(lower))
-  return dishaRenderAppPill({ name:'GitHub', url:'https://github.com', faIcon:'fa-github', iconBg:'#161b22', sub:'github.com' });
-
-if (/\b(open|launch|go to|visit)\s+spotify\b/i.test(lower))
-  return dishaRenderAppPill({ name:'Spotify', url:'https://open.spotify.com', faIcon:'fa-spotify', iconBg:'#1db954', sub:'open.spotify.com' });
+  if (/\b(open|launch|go to|visit)\s+instagram\b/i.test(lower))
+    return dishaRenderAppPill({ name:'Instagram', url:'https://instagram.com', faIcon:'fa-instagram', iconBg:'radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285aeb 90%)', sub:'instagram.com' });
+  if (/\b(open|launch|go to|visit)\s+youtube\b/i.test(lower))
+    return dishaRenderAppPill({ name:'YouTube', url:'https://youtube.com', faIcon:'fa-youtube', iconBg:'#ff0000', sub:'youtube.com' });
+  if (/\b(open|launch|go to|visit)\s+(twitter|x)\b/i.test(lower))
+    return dishaRenderAppPill({ name:'X / Twitter', url:'https://x.com', faIcon:'fa-x-twitter', iconBg:'#000', sub:'x.com' });
+  if (/\b(open|launch|go to|visit)\s+github\b/i.test(lower))
+    return dishaRenderAppPill({ name:'GitHub', url:'https://github.com', faIcon:'fa-github', iconBg:'#161b22', sub:'github.com' });
+  if (/\b(open|launch|go to|visit)\s+spotify\b/i.test(lower))
+    return dishaRenderAppPill({ name:'Spotify', url:'https://open.spotify.com', faIcon:'fa-spotify', iconBg:'#1db954', sub:'open.spotify.com' });
   if (/^(hi|hello|hey|yo|good morning|good afternoon|good evening)/i.test(q))
     return dishaGreet();
   if (/\b(bye|goodbye|see you)\b/i.test(lower))
     return `Goodbye! 👋 Queries: ${DISHA_STATE.stats.queriesHandled}`;
   if (/\b(who are you|your name|what are you)\b/i.test(lower))
     return "I'm **Proton**, on-device intelligence. KCET predictions, weather, math, and more — no cloud AI.";
-   if (/\b(power(s|ed|ing)?\s+xbitproton|what\s+(api|model|engine|ai|llm)\s+(run(s|ning)?\s+)?behind|who\s+(run(s|ning)?|power(s|ed|ing)?|made|built|develop(s|ed)?)\s+disha|disha\s+(is\s+)?powered\s+(by|with)|which\s+(api|model|engine|ai|llm)|no\s+api|local\s+model|x-bit|proton)\b/i.test(lower))
+  if (/\b(power(s|ed|ing)?\s+xbitproton|what\s+(api|model|engine|ai|llm)\s+(run(s|ning)?\s+)?behind|who\s+(run(s|ning)?|power(s|ed|ing)?|made|built|develop(s|ed)?)\s+disha|disha\s+(is\s+)?powered\s+(by|with)|which\s+(api|model|engine|ai|llm)|no\s+api|local\s+model|x-bit|proton)\b/i.test(lower))
     return "Proton is powered by **x-bit 2.0.1**, a local model developed by **Nikhil**. No external API is used — everything runs on-device.";
   if (/\b(what can you|help|commands)\b/i.test(lower))
     return dishaCaps();
@@ -102,7 +97,6 @@ if (/\b(open|launch|go to|visit)\s+spotify\b/i.test(lower))
     return `All systems nominal. Uptime: ${Math.floor((Date.now()-DISHA_STATE.sessionStart)/1000)}s`;
   if (/\bhostel\b/i.test(lower))
     return dishaHostel();
-
   return dishaKB(lower);
 }
 
@@ -299,102 +293,127 @@ function dishaSubRow(id, label, max) {
 }
 
 function dishaBranchField(uid) {
-  return `<div style="position:relative;">
+  return `<div style="position:relative;" class="disha-dropdown-wrap">
     <input id="branch-input-${uid}" type="text" placeholder="Type branch name…" autocomplete="off"
       style="width:100%;background:#000;border:1px solid #222;border-radius:10px;
       padding:12px 14px;color:#fff;font-family:'Space Grotesk',sans-serif;
       font-size:.88rem;outline:none;transition:border-color .2s;"
       onfocus="this.style.borderColor='#fff';dishaBranchShow('${uid}')"
-      onblur="setTimeout(()=>dishaBranchHide('${uid}'),220)"
       oninput="dishaBranchFilter('${uid}')">
     <div id="branch-suggest-${uid}"
-      style="display:none;position:absolute;top:calc(100%+4px);left:0;right:0;z-index:20;
-      background:#0a0a0a;border:1px solid #222;border-radius:12px;overflow:hidden;
-      box-shadow:0 12px 32px rgba(0,0,0,.9);"></div>
+      style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:99999;
+      background:#0a0a0a;border:1px solid #333;border-radius:12px;overflow:hidden;
+      box-shadow:0 16px 40px rgba(0,0,0,.95);max-height:200px;overflow-y:auto;">
+    </div>
   </div>
   <div id="branch-label-${uid}" style="margin-top:7px;font-size:.7rem;color:#555;min-height:16px;"></div>`;
 }
 
 function dishaCategoryField(uid) {
-  return `<div style="position:relative;margin-top:12px;">
+  return `<div style="position:relative;margin-top:12px;" class="disha-dropdown-wrap">
     <input id="cat-input-${uid}" type="text" placeholder="Type category…" autocomplete="off"
       style="width:100%;background:#000;border:1px solid #222;border-radius:10px;
       padding:12px 14px;color:#fff;font-family:'Space Grotesk',sans-serif;
       font-size:.88rem;outline:none;transition:border-color .2s;"
       onfocus="this.style.borderColor='#fff';dishaCategoryShow('${uid}')"
-      onblur="setTimeout(()=>dishaCategoryHide('${uid}'),220)"
       oninput="dishaCategoryFilter('${uid}')">
     <div id="cat-suggest-${uid}"
-      style="display:none;position:absolute;top:calc(100%+4px);left:0;right:0;z-index:21;
-      background:#0a0a0a;border:1px solid #222;border-radius:12px;overflow:hidden;
-      box-shadow:0 12px 32px rgba(0,0,0,.9);"></div>
+      style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:99999;
+      background:#0a0a0a;border:1px solid #333;border-radius:12px;overflow:hidden;
+      box-shadow:0 16px 40px rgba(0,0,0,.95);max-height:200px;overflow-y:auto;">
+    </div>
   </div>
   <div id="cat-label-${uid}" style="margin-top:7px;font-size:.7rem;color:#555;min-height:16px;"></div>`;
 }
 
 window.dishaBranchFilter = function(uid) {
-  const inp = document.getElementById(`branch-input-${uid}`);
-  const box = document.getElementById(`branch-suggest-${uid}`);
-  if (!inp||!box) return;
+  const inp = document.getElementById('branch-input-'+uid);
+  const box = document.getElementById('branch-suggest-'+uid);
+  if (!inp || !box) return;
   const q = inp.value.trim().toUpperCase();
   const branches = window.XOS_BRANCHES || [];
   if (!q) { box.style.display='none'; return; }
-  const matches = branches.filter(b=>b.toUpperCase().includes(q)).slice(0,3);
+  const matches = branches.filter(function(b){ return b.toUpperCase().indexOf(q) !== -1; }).slice(0,3);
   if (!matches.length) { box.style.display='none'; return; }
-  box.innerHTML = matches.map(b=>`
-    <div onclick="dishaBranchSelect('${uid}','${b.replace(/'/g,"\\'")}')"
-      class="xos-suggestion-item"
-      style="padding:11px 14px;font-size:.78rem;font-weight:500;cursor:pointer;
-      border-bottom:1px solid #111;color:#ccc;"
-      onmouseover="this.style.background='rgba(255,255,255,.05)'"
-      onmouseout="this.style.background=''">
-      <div class="xos-marquee-wrap"><span class="xos-marquee-text">${b} &nbsp;&nbsp;&nbsp; ${b}</span></div>
-    </div>`).join('');
-  box.style.display='block';
+  box.innerHTML = matches.map(function(b){
+    var safeBranch = b.replace(/'/g, "\\'");
+    return '<div onclick="dishaBranchSelect(\''+uid+'\',\''+safeBranch+'\')" '+
+      'class="xos-suggestion-item" '+
+      'style="padding:11px 14px;font-size:.78rem;font-weight:500;cursor:pointer;border-bottom:1px solid #1a1a1a;color:#ccc;" '+
+      'onmouseover="this.style.background=\'rgba(255,255,255,.06)\'" '+
+      'onmouseout="this.style.background=\'\'">'+
+      '<div class="xos-marquee-wrap"><span class="xos-marquee-text">'+b+' &nbsp;&nbsp;&nbsp; '+b+'</span></div>'+
+      '</div>';
+  }).join('');
+  box.style.display = 'block';
 };
 
 window.dishaCategoryFilter = function(uid) {
-  const inp = document.getElementById(`cat-input-${uid}`);
-  const box = document.getElementById(`cat-suggest-${uid}`);
-  if (!inp||!box) return;
+  const inp = document.getElementById('cat-input-'+uid);
+  const box = document.getElementById('cat-suggest-'+uid);
+  if (!inp || !box) return;
   const q = inp.value.trim().toUpperCase();
   const cats = window.XOS_CATEGORIES || [];
   if (!q) { box.style.display='none'; return; }
-  const matches = cats.filter(c=>c.toUpperCase().includes(q)).slice(0,3);
+  const matches = cats.filter(function(c){ return c.toUpperCase().indexOf(q) !== -1; }).slice(0,3);
   if (!matches.length) { box.style.display='none'; return; }
-  box.innerHTML = matches.map(c=>`
-    <div onclick="dishaCategorySelect('${uid}','${c.replace(/'/g,"\\'")}')"
-      class="xos-suggestion-item"
-      style="padding:11px 14px;font-size:.78rem;font-weight:500;cursor:pointer;
-      border-bottom:1px solid #111;color:#ccc;"
-      onmouseover="this.style.background='rgba(255,255,255,.05)'"
-      onmouseout="this.style.background=''">
-      <div class="xos-marquee-wrap"><span class="xos-marquee-text">${c} &nbsp;&nbsp;&nbsp; ${c}</span></div>
-    </div>`).join('');
-  box.style.display='block';
+  box.innerHTML = matches.map(function(c){
+    var safeCat = c.replace(/'/g, "\\'");
+    return '<div onclick="dishaCategorySelect(\''+uid+'\',\''+safeCat+'\')" '+
+      'class="xos-suggestion-item" '+
+      'style="padding:11px 14px;font-size:.78rem;font-weight:500;cursor:pointer;border-bottom:1px solid #1a1a1a;color:#ccc;" '+
+      'onmouseover="this.style.background=\'rgba(255,255,255,.06)\'" '+
+      'onmouseout="this.style.background=\'\'">'+
+      '<div class="xos-marquee-wrap"><span class="xos-marquee-text">'+c+' &nbsp;&nbsp;&nbsp; '+c+'</span></div>'+
+      '</div>';
+  }).join('');
+  box.style.display = 'block';
 };
 
 window.dishaBranchSelect = function(uid, branch) {
-  const inp=document.getElementById(`branch-input-${uid}`);
-  const box=document.getElementById(`branch-suggest-${uid}`);
-  const lbl=document.getElementById(`branch-label-${uid}`);
+  var inp=document.getElementById('branch-input-'+uid);
+  var box=document.getElementById('branch-suggest-'+uid);
+  var lbl=document.getElementById('branch-label-'+uid);
   if(inp){inp.value=branch;inp._sel=branch;}
   if(box) box.style.display='none';
   if(lbl) lbl.textContent='✓ '+branch;
 };
-window.dishaBranchShow = function(uid){const i=document.getElementById(`branch-input-${uid}`);if(i&&i.value.trim())dishaBranchFilter(uid);};
-window.dishaBranchHide = function(uid){const b=document.getElementById(`branch-suggest-${uid}`);if(b)b.style.display='none';};
+window.dishaBranchShow = function(uid){
+  var i=document.getElementById('branch-input-'+uid);
+  if(i && i.value.trim()) dishaBranchFilter(uid);
+};
+window.dishaBranchHide = function(uid){
+  var b=document.getElementById('branch-suggest-'+uid);
+  if(b) b.style.display='none';
+};
 
 window.dishaCategorySelect = function(uid, cat) {
-  const inp=document.getElementById(`cat-input-${uid}`);
-  const box=document.getElementById(`cat-suggest-${uid}`);
-  const lbl=document.getElementById(`cat-label-${uid}`);
+  var inp=document.getElementById('cat-input-'+uid);
+  var box=document.getElementById('cat-suggest-'+uid);
+  var lbl=document.getElementById('cat-label-'+uid);
   if(inp){inp.value=cat;inp._sel=cat;}
   if(box) box.style.display='none';
   if(lbl) lbl.textContent='✓ '+cat;
 };
-window.dishaCategoryShow = function(uid){const i=document.getElementById(`cat-input-${uid}`);if(i&&i.value.trim())dishaCategoryFilter(uid);};
-window.dishaCategoryHide = function(uid){const b=document.getElementById(`cat-suggest-${uid}`);if(b)b.style.display='none';};
+window.dishaCategoryShow = function(uid){
+  var i=document.getElementById('cat-input-'+uid);
+  if(i && i.value.trim()) dishaCategoryFilter(uid);
+};
+window.dishaCategoryHide = function(uid){
+  var b=document.getElementById('cat-suggest-'+uid);
+  if(b) b.style.display='none';
+};
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  var wraps = document.querySelectorAll('.disha-dropdown-wrap');
+  wraps.forEach(function(wrap) {
+    if (!wrap.contains(e.target)) {
+      var box = wrap.querySelector('[id^="branch-suggest-"], [id^="cat-suggest-"]');
+      if (box) box.style.display = 'none';
+    }
+  });
+});
 
 function dishaComputeRank(boardPct,kcetPct){
   const idx=(boardPct*0.5)+(kcetPct*0.5);
@@ -466,9 +485,9 @@ function dishaRenderMatches(matches){
     </div>`).join('');
 }
 
-function dishaGetVal(id){return parseFloat(document.getElementById(`in-${id}`)?.value)||0;}
-function dishaGetBranch(uid){const i=document.getElementById(`branch-input-${uid}`);return i?._sel||i?.value?.trim()||'';}
-function dishaGetCategory(uid){const i=document.getElementById(`cat-input-${uid}`);return i?._sel||i?.value?.trim()||'';}
+function dishaGetVal(id){return parseFloat(document.getElementById('in-'+id)?.value)||0;}
+function dishaGetBranch(uid){var i=document.getElementById('branch-input-'+uid);return i?._sel||i?.value?.trim()||'';}
+function dishaGetCategory(uid){var i=document.getElementById('cat-input-'+uid);return i?._sel||i?.value?.trim()||'';}
 
 window.launchKcetPredictor = function() {
   const container=document.getElementById('es-messages');
@@ -557,20 +576,20 @@ window.launchKcetPredictor = function() {
 };
 
 window.dishaKcetTab = function(uid,tab){
-  const et=document.getElementById(`tab-eng-${uid}`),nt=document.getElementById(`tab-non-${uid}`);
-  const ep=document.getElementById(`eng-${uid}`),np=document.getElementById(`non-${uid}`);
+  const et=document.getElementById('tab-eng-'+uid),nt=document.getElementById('tab-non-'+uid);
+  const ep=document.getElementById('eng-'+uid),np=document.getElementById('non-'+uid);
   if(tab==='eng'){et.style.color='#fff';et.style.borderBottomColor='#fff';nt.style.color='#444';nt.style.borderBottomColor='transparent';ep.style.display='block';np.style.display='none';}
   else{nt.style.color='#fff';nt.style.borderBottomColor='#fff';et.style.color='#444';et.style.borderBottomColor='transparent';np.style.display='block';ep.style.display='none';}
 };
 
 window.dishaCalcEng = function(uid){
-  const phy=dishaGetVal(`e-phy-${uid}`),che=dishaGetVal(`e-che-${uid}`),mat=dishaGetVal(`e-mat-${uid}`),kcet=dishaGetVal(`e-kcet-${uid}`);
+  const phy=dishaGetVal('e-phy-'+uid),che=dishaGetVal('e-che-'+uid),mat=dishaGetVal('e-mat-'+uid),kcet=dishaGetVal('e-kcet-'+uid);
   const branch=dishaGetBranch(uid);
   const category=dishaGetCategory(uid);
   const boardPct=((phy+che+mat)/300)*100, kcetPct=(kcet/180)*100;
   const rank=dishaComputeRank(boardPct,kcetPct), band=dishaRankBand(rank);
   const matches=dishaFindMatches(rank,branch,category);
-  const res=document.getElementById(`eng-result-${uid}`);
+  const res=document.getElementById('eng-result-'+uid);
   res.style.display='block';
   res.innerHTML=`
     <div style="background:#000;border:1px solid #1a1a1a;border-radius:16px;padding:20px;text-align:center;margin-bottom:${branch?'16px':'0'};">
@@ -587,15 +606,15 @@ window.dishaCalcEng = function(uid){
 };
 
 window.dishaCalcNon = function(uid){
-  const phy=dishaGetVal(`n-phy-${uid}`),che=dishaGetVal(`n-che-${uid}`),mat=dishaGetVal(`n-mat-${uid}`),bio=dishaGetVal(`n-bio-${uid}`);
-  const kphy=dishaGetVal(`n-kphy-${uid}`),kche=dishaGetVal(`n-kche-${uid}`),kmat=dishaGetVal(`n-kmat-${uid}`),kbio=dishaGetVal(`n-kbio-${uid}`);
+  const phy=dishaGetVal('n-phy-'+uid),che=dishaGetVal('n-che-'+uid),mat=dishaGetVal('n-mat-'+uid),bio=dishaGetVal('n-bio-'+uid);
+  const kphy=dishaGetVal('n-kphy-'+uid),kche=dishaGetVal('n-kche-'+uid),kmat=dishaGetVal('n-kmat-'+uid),kbio=dishaGetVal('n-kbio-'+uid);
   const branch=dishaGetBranch('n'+uid);
   const category=dishaGetCategory('n'+uid);
   const boardPct=((phy+che+mat+bio)/400)*100;
   const pharmaRank=dishaComputeRank(boardPct,((kphy+kche+kbio)/180)*100);
   const engRank=dishaComputeRank(boardPct,((kphy+kche+kmat)/180)*100);
   const matches=dishaFindMatches(engRank,branch,category);
-  const res=document.getElementById(`non-result-${uid}`);
+  const res=document.getElementById('non-result-'+uid);
   res.style.display='block';
   res.innerHTML=`
     <div style="display:flex;gap:10px;margin-bottom:${branch?'16px':'0'};">${dishaResultBlock('Pharma Rank',pharmaRank)}${dishaResultBlock('Engg Rank',engRank)}</div>
@@ -605,7 +624,6 @@ window.dishaCalcNon = function(uid){
 };
 
 // ========== HOOK — override doEsSearch ==========
-// Use a small delay so xos-feed.html's inline script finishes first
 setTimeout(function() {
   if (typeof window.doEsSearch !== 'function') return;
   const _orig = window.doEsSearch;
@@ -619,7 +637,6 @@ setTimeout(function() {
     const greet = document.getElementById('es-greeting');
     if (greet) greet.style.display = 'none';
 
-    // user bubble
     if (typeof window.appendEsBubbleUser === 'function') {
       window.appendEsBubbleUser(query);
     } else {
@@ -629,18 +646,15 @@ setTimeout(function() {
       if (container) container.appendChild(b);
     }
 
-    // clear input
     const inp = document.getElementById('es-input');
     if (inp) inp.value = '';
     document.getElementById('es-send')?.classList.remove('visible');
 
-    // KCET
     if (/\b(kcet|rank predictor|predict rank)\b/i.test(lower)) {
       setTimeout(launchKcetPredictor, 280);
       return;
     }
 
-    // AI response bubble
     const sys = document.createElement('div');
     sys.className = 'es-bubble-sys';
     const content = document.createElement('div');
@@ -651,7 +665,6 @@ setTimeout(function() {
 
     try {
       const answer = await dishaRespond(query);
-      // fallback to original college/people search for short unknown queries
       if (answer.startsWith('Try:') || answer.startsWith('Ask me:')) {
         if (container && sys.parentNode) container.removeChild(sys);
         _orig(val);
