@@ -189,7 +189,7 @@
         <h2 style="margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em;">Disha Match Engine</h2>
         <div style="font-size: 0.65rem; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Local Prediction Data</div>
       </div>
-      <span class="xos-badge">V2.0.2 LOCAL</span>
+      <span class="xos-badge">V2.0.3 LOCAL</span>
     </div>
 
     <!-- Layout 1: Branch Search -->
@@ -226,16 +226,45 @@
     // System State
     const Engine = { branches: [], categories: [] };
 
-    // 1. DATA SANITIZER: Cleans raw branch names on the fly
+    // 1. DATA SANITIZER: Extremely aggressive cleanup of raw branch names
     function cleanBranchName(name) {
-      return name.toUpperCase()
-        // Strip out "B TECH IN " variations
-        .replace(/^(B\s*TECH\s*IN\s*|BTECH\s*IN\s*|B\.\s*TECH\s*IN\s*)/, '') 
-        // Strip out leading numbers, dashes, and symbols (fixes "75 " and "-- ")
+      let clean = name.toUpperCase()
+        // Remove variations of "B TECH IN "
+        .replace(/^(B\s*TECH\s*IN\s*|BTECH\s*IN\s*|B\.\s*TECH\s*IN\s*|B\s*TECH\s*)/, '') 
+        // Remove leading non-letters (like "75 ", "-- ")
         .replace(/^[^A-Z]+/, '') 
-        // Standardize all "ENGG" to "ENGINEERING"
-        .replace(/\bENGG\b/g, 'ENGINEERING') 
+        // Standardize Ampersands to "AND"
+        .replace(/\s*&\s*/g, ' AND ')
+        // Fix known dataset spacing typos
+        .replace(/DAT A SCIENCE/g, 'DATA SCIENCE')
+        .replace(/CYB ER SECURITY/g, 'CYBER SECURITY')
+        .replace(/ARTI FICAL/g, 'ARTIFICIAL')
+        .replace(/ARTIFICAL/g, 'ARTIFICIAL')
+        .replace(/SOF TWARE/g, 'SOFTWARE')
+        .replace(/VIRUTAL/g, 'VIRTUAL')
+        .replace(/TELECOMMUNICAT ION/g, 'TELECOMMUNICATION')
+        .replace(/IND USTRIAL/g, 'INDUSTRIAL')
+        .replace(/INTEGTATED/g, 'INTEGRATED')
+        .replace(/EXC LUSIVELY/g, 'EXCLUSIVELY')
+        .replace(/BLO CK CHAIN/g, 'BLOCK CHAIN')
+        .replace(/SICENCE/g, 'SCIENCE')
+        .replace(/MATHAMATICS/g, 'MATHEMATICS')
+        // Standardize abbreviations
+        .replace(/\bENGG\b/g, 'ENGINEERING')
+        .replace(/\bTECH\b/g, 'TECHNOLOGY')
+        .replace(/\bMGMT\b/g, 'MANAGEMENT')
+        // Clean up weird bracket spacing
+        .replace(/\(/g, ' (')
+        .replace(/\s+/g, ' ')
+        .replace(/\(\s+/g, '(')
+        .replace(/\s+\)/g, ')')
         .trim();
+
+      // Bucket matching (Consolidate variations of the same branch)
+      if (clean === 'COMPUTER SCIENCE') clean = 'COMPUTER SCIENCE AND ENGINEERING';
+      if (clean === 'COMPUTER ENGINEERING') clean = 'COMPUTER SCIENCE AND ENGINEERING';
+
+      return clean;
     }
 
     // 2. Initialize Engine Data on Load
@@ -320,7 +349,7 @@
           // Sanitize the raw branch name before comparing it to the user's input
           const cleanB = cleanBranchName(rawBranch);
           
-          // Broad matching: Does the sanitized branch include the target branch?
+          // Exact matching logic against the cleaned up version
           if (!cleanB.includes(targetBranch)) return;
           
           const cutoff = c.branches[rawBranch][targetCat];
