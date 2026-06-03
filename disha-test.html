@@ -189,7 +189,7 @@
         <h2 style="margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em;">Disha Match Engine</h2>
         <div style="font-size: 0.65rem; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">Local Prediction Data</div>
       </div>
-      <span class="xos-badge">V2.0.1 LOCAL</span>
+      <span class="xos-badge">V2.0.2 LOCAL</span>
     </div>
 
     <!-- Layout 1: Branch Search -->
@@ -226,7 +226,19 @@
     // System State
     const Engine = { branches: [], categories: [] };
 
-    // Initialize Engine Data on Load
+    // 1. DATA SANITIZER: Cleans raw branch names on the fly
+    function cleanBranchName(name) {
+      return name.toUpperCase()
+        // Strip out "B TECH IN " variations
+        .replace(/^(B\s*TECH\s*IN\s*|BTECH\s*IN\s*|B\.\s*TECH\s*IN\s*)/, '') 
+        // Strip out leading numbers, dashes, and symbols (fixes "75 " and "-- ")
+        .replace(/^[^A-Z]+/, '') 
+        // Standardize all "ENGG" to "ENGINEERING"
+        .replace(/\bENGG\b/g, 'ENGINEERING') 
+        .trim();
+    }
+
+    // 2. Initialize Engine Data on Load
     function bootEngine() {
       // Failsafe check
       if (!window.XOS_CUTOFF) {
@@ -239,9 +251,10 @@
       
       window.XOS_CUTOFF.forEach(college => {
         if (!college.branches) return;
-        Object.keys(college.branches).forEach(branch => {
-          bSet.add(branch);
-          Object.keys(college.branches[branch]).forEach(cat => cSet.add(cat));
+        Object.keys(college.branches).forEach(rawBranch => {
+          // Pass the raw branch through the sanitizer before adding to UI list
+          bSet.add(cleanBranchName(rawBranch));
+          Object.keys(college.branches[rawBranch]).forEach(cat => cSet.add(cat));
         });
       });
 
@@ -254,7 +267,7 @@
         Engine.categories.map(c => `<option value="${c}">${c}</option>`).join('');
     }
 
-    // Branch Autocomplete Logic
+    // 3. Branch Autocomplete Logic
     const branchInput = document.getElementById('inputBranch');
     const suggestBox = document.getElementById('branchSuggestBox');
 
@@ -282,7 +295,7 @@
       suggestBox.style.display = 'none';
     };
 
-    // Execution Core (Find ±2000 Matches)
+    // 4. Execution Core (Find ±2000 Matches)
     window.executeEngine = function() {
       const targetBranch = branchInput.value.trim().toUpperCase();
       const targetCat = document.getElementById('inputCategory').value;
@@ -302,14 +315,20 @@
 
       window.XOS_CUTOFF.forEach(c => {
         if (!c.branches) return;
-        Object.keys(c.branches).forEach(b => {
-          if (!b.toUpperCase().includes(targetBranch)) return;
-          const cutoff = c.branches[b][targetCat];
+        Object.keys(c.branches).forEach(rawBranch => {
+          
+          // Sanitize the raw branch name before comparing it to the user's input
+          const cleanB = cleanBranchName(rawBranch);
+          
+          // Broad matching: Does the sanitized branch include the target branch?
+          if (!cleanB.includes(targetBranch)) return;
+          
+          const cutoff = c.branches[rawBranch][targetCat];
           if (cutoff == null || cutoff === undefined) return;
 
           const diff = cutoff - userRank;
           if (Math.abs(diff) <= RANGE) {
-            matches.push({ id: c.id, name: c.name, loc: c.location, branch: b, cutoff, diff });
+            matches.push({ id: c.id, name: c.name, loc: c.location, branch: cleanB, cutoff, diff });
           }
         });
       });
