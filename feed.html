@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual">
+<title>x0s.link</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#000;--card:#0a0a0a;--border:#1a1a1a;--border2:rgba(255,255,255,.06);
+  --accent:#007aff;--text:#fff;--muted:#666;--muted2:#333;
+  --glass:rgba(10,10,10,.85);--ease:cubic-bezier(.4,0,.2,1);
+  --font:'Space Grotesk',sans-serif;
+  --nav-h:62px;--top-h:54px;
+}
+.light{--bg:#fff;--card:#f5f5f7;--border:#e5e5e5;--border2:rgba(0,0,0,.06);--text:#000;--muted:#888;--muted2:#ddd;--glass:rgba(255,255,255,.9);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:100%;overflow:hidden;}
+::-webkit-scrollbar{display:none;}
+
+/* ── TOP BAR ── */
+.top-bar{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  height:var(--top-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+}
+.light .top-bar{background:rgba(255,255,255,.75);}
+.top-left{display:flex;align-items:center;gap:10px;}
+.top-pfp{width:32px;height:32px;border-radius:8px;object-fit:cover;border:1px solid var(--border);cursor:pointer;transition:opacity .18s;flex-shrink:0;}
+.top-pfp:active{opacity:.7;}
+.top-brand{font-size:1.38rem;font-weight:700;letter-spacing:-.03em;color:var(--text);position:absolute;left:50%;transform:translateX(-50%);}
+.top-right{display:flex;align-items:center;gap:6px;}
+.top-dots{
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:.9rem;cursor:pointer;border-radius:8px;
+  transition:background .15s;position:relative;
+}
+.top-dots:active{background:rgba(255,255,255,.08);}
+
+/* floating dropdown from three dot */
+.top-dropdown{
+  position:absolute;top:42px;right:0;
+  background:rgba(15,15,15,.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  padding:6px;
+  min-width:180px;
+  box-shadow:0 12px 40px rgba(0,0,0,.7);
+  display:none;z-index:300;
+  animation:fadeInDrop .18s var(--ease);
+}
+.light .top-dropdown{background:rgba(245,245,247,.95);border-color:rgba(0,0,0,.1);}
+.top-dropdown.open{display:block;}
+@keyframes fadeInDrop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.top-dd-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  font-size:.78rem;font-weight:600;color:var(--text);
+  cursor:pointer;transition:background .15s;
+  white-space:nowrap;
+}
+.top-dd-item:active{background:rgba(255,255,255,.08);}
+.light .top-dd-item:active{background:rgba(0,0,0,.06);}
+.top-dd-item i{font-size:.85rem;width:16px;text-align:center;color:var(--muted);}
+.top-dd-badge i.fa-certificate{background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-dd-divider{height:1px;background:rgba(255,255,255,.07);margin:4px 0;}
+.light .top-dd-divider{background:rgba(0,0,0,.07);}
+
+/* ── TABS ── */
+.tabs{
+  position:fixed;top:var(--top-h);left:0;right:0;z-index:59;
+  display:flex;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+}
+.light .tabs{background:rgba(255,255,255,.7);}
+.tab{flex:1;text-align:center;padding:13px 0 11px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;position:relative;transition:color .2s;}
+.tab.active{color:var(--text);}
+.tab.active::after{content:'';position:absolute;bottom:0;left:25%;right:25%;height:2px;background:var(--accent);border-radius:2px;}
+
+/* ── FEED ── */
+.feed{
+  position:fixed;top:calc(var(--top-h) + 44px);bottom:var(--nav-h);
+  left:0;right:0;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  z-index:1;
+}
+
+/* closed overlays must not block touches */
+.es-overlay:not(.open):not(.closing),
+.search-overlay:not(.open),
+.zynx-overlay:not(.open):not(.closing),
+.college-profile:not(.open),
+.drawer-backdrop:not(.open){
+  pointer-events:none !important;
+}
+
+/* ── POST ── */
+.post{
+  padding:14px 16px 0;border-bottom:1px solid var(--border2);
+  cursor:default;
+  transition:background .15s;
+}
+.post:active{background:rgba(255,255,255,.02);}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.post-avatar-wrap{position:relative;flex-shrink:0;width:40px;height:40px;}
+.post-avatar{width:40px;height:40px;border-radius:10px;object-fit:cover;border:1px solid var(--border);display:block;}
+
+/* gold badge — flush bottom-right corner of avatar */
+@keyframes shimmer{0%{left:-100%}100%{left:100%}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.75;transform:scale(.92)}}
+.post-verified{
+  position:absolute;
+  bottom:-4px;right:-4px;
+  width:17px;height:17px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  border-radius:50%;
+  overflow:hidden;
+  z-index:2;
+  animation:pulse 3s infinite ease-in-out;
+}
+.post-verified .fa-certificate{
+  font-size:17px;position:absolute;
+  background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
+}
+.post-verified .fa-check{
+  font-size:6.5px;color:#000;
+  position:relative;z-index:6;font-weight:900;
+  margin-top:0;
+}
+.post-verified::after{
+  content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.85) 50%,transparent 70%);
+  animation:shimmer 2.4s infinite linear;z-index:7;
+}
+
+.post-meta{flex:1;min-width:0;}
+.post-name{
+  font-size:.86rem;font-weight:700;
+  display:flex;align-items:center;gap:5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.post-handle{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.post-time{font-size:.66rem;color:var(--muted);}
+.post-college-row{
+  display:flex;align-items:center;gap:4px;
+  font-size:.62rem;color:var(--accent);font-weight:500;
+  overflow:hidden;max-width:180px;margin-top:2px;
+  white-space:nowrap;
+}
+.post-college-row i{font-size:.58rem;flex-shrink:0;}
+.post-menu{
+  color:var(--muted);font-size:.8rem;
+  padding:6px 4px 6px 8px;
+  cursor:pointer;flex-shrink:0;
+  transition:color .15s;
+}
+.post-menu:active{color:var(--text);}
+
+/* 3:4 media */
+.post-media{
+  width:100%;aspect-ratio:3/4;
+  border-radius:16px;overflow:hidden;
+  background:var(--card);margin-bottom:12px;
+  position:relative;
+}
+.post-media img,.post-media video{width:100%;height:100%;object-fit:cover;display:block;}
+
+.post-caption{
+  font-size:.83rem;line-height:1.55;color:var(--text);
+  margin-bottom:10px;font-weight:300;
+  padding:0 2px;
+}
+
+/* actions */
+.post-actions{
+  display:flex;align-items:center;
+  padding:6px 0 13px;
+  border-top:1px solid var(--border2);
+  margin-top:2px;gap:2px;
+}
+.post-action{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 10px 6px 0;
+  font-size:.72rem;color:var(--muted);font-weight:500;
+  cursor:pointer;transition:color .18s;user-select:none;
+}
+.post-action i{font-size:1rem;transition:transform .18s,color .18s;}
+.post-action:active i{transform:scale(.82);}
+.post-action.liked{color:#ff3b5c;}
+.post-action.liked i{color:#ff3b5c;}
+.post-action-spacer{flex:1;}
+.post-action.saved i{color:var(--accent);}
+@keyframes heartPop{0%{transform:scale(1)}30%{transform:scale(1.5)}60%{transform:scale(.9)}100%{transform:scale(1)}}
+.post-action.liked i{animation:heartPop .38s var(--ease);}
+
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:70;
+  height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-around;
+  background:rgba(0,0,0,.8);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid var(--border2);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.light .bottom-nav{background:rgba(255,255,255,.88);}
+
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:6px 14px;cursor:pointer;
+  color:var(--muted);font-size:1.18rem;
+  transition:color .18s,transform .14s;
+  position:relative;
+}
+.nav-item.active{color:var(--text);}
+.nav-item:active{transform:scale(.88);}
+.nav-notif-dot{
+  position:absolute;top:4px;right:10px;
+  width:7px;height:7px;background:#ff3b5c;border-radius:50%;
+  border:1.5px solid var(--bg);
+}
+
+/* ── SLIDE DRAWER ── */
+.drawer-backdrop{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0);
+  pointer-events:none;
+  transition:background .32s var(--ease);
+}
+.drawer-backdrop.open{background:rgba(0,0,0,.6);pointer-events:all;}
+
+.drawer{
+  position:fixed;top:0;bottom:0;left:0;z-index:201;
+  width:68vw;max-width:260px;
+  background:var(--bg);
+  transform:translateX(-100%);
+  transition:transform .36s cubic-bezier(.32,.72,0,1);
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+}
+.drawer-backdrop.open .drawer{transform:translateX(0);}
+
+.drawer-top{padding:20px 16px 14px;}
+.drawer-pfp-wrap{position:relative;width:54px;height:54px;margin-bottom:10px;cursor:pointer;}
+.drawer-pfp{width:100%;height:100%;border-radius:14px;object-fit:cover;border:1.5px solid var(--border);}
+.drawer-pfp-badge{
+  position:absolute;bottom:-2px;right:-2px;
+  width:20px;height:20px;
+  background:var(--bg);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;border:2px solid var(--bg);
+  animation:pulse 3s infinite ease-in-out;
+}
+.drawer-pfp-badge .fa-certificate{font-size:20px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.drawer-pfp-badge .fa-check{font-size:8px;color:#000;position:relative;z-index:6;font-weight:900;}
+.drawer-pfp-badge::after{
+  content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);
+  animation:shimmer 2s infinite linear;z-index:7;
+}
+.drawer-name{font-size:.92rem;font-weight:700;margin-bottom:2px;cursor:pointer;}
+.drawer-handle{font-size:.68rem;color:var(--muted);margin-bottom:10px;cursor:pointer;}
+.drawer-stats{display:flex;gap:14px;font-size:.68rem;color:var(--muted);margin-bottom:14px;}
+.drawer-stats b{color:var(--text);font-weight:700;}
+
+/* drawer brand top-right */
+.drawer-brand{
+  position:absolute;top:22px;right:16px;
+  font-size:.82rem;font-weight:700;letter-spacing:-.02em;color:var(--muted);
+}
+.drawer-divider{height:1px;background:var(--border);margin:0 0 6px;}
+.drawer-nav-item{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 16px;font-size:.88rem;font-weight:600;
+  cursor:pointer;color:var(--text);
+  transition:background .15s;
+}
+.drawer-nav-item:active{background:rgba(255,255,255,.05);}
+.drawer-nav-item i{font-size:1rem;width:20px;text-align:center;color:var(--text);}
+.drawer-spacer{flex:1;}
+.drawer-bottom{padding:16px 20px;border-top:1px solid var(--border);}
+
+/* dark mode toggle */
+.dm-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 6px;
+  border-top:1px solid var(--border);
+  margin-top:8px;
+}
+.dm-toggle-label{font-size:.8rem;font-weight:600;color:var(--text);}
+.dm-pill{
+  width:46px;height:26px;border-radius:13px;
+  background:var(--muted2);
+  position:relative;cursor:pointer;
+  transition:background .25s;border:none;
+  flex-shrink:0;
+}
+.dm-pill::after{
+  content:'';position:absolute;
+  width:20px;height:20px;border-radius:50%;background:#fff;
+  top:3px;left:3px;
+  transition:transform .25s cubic-bezier(.32,.72,0,1);
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+}
+.dm-pill.on{background:var(--accent);}
+.dm-pill.on::after{transform:translateX(20px);}
+.drawer-footer-brand{
+  padding:6px 16px 20px;
+  font-size:.62rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* ══════════════════════════
+   ESSENTIAL SEARCH (AI)
+══════════════════════════ */
+@keyframes esUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes esDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sparkSpin{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.15)}100%{transform:rotate(360deg) scale(1)}}
+
+.es-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  z-index:62;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  overflow:hidden;
+}
+.es-overlay.open{display:flex;animation:esUp .4s cubic-bezier(.32,.72,0,1) forwards;}
+.es-overlay.closing{display:flex;animation:esDown .35s cubic-bezier(.32,.72,0,1) forwards;}
+
+/* messages fills all space above input */
+.es-messages{
+  flex:1;overflow-y:auto;
+  padding:24px 16px 16px;
+  display:flex;flex-direction:column;gap:16px;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  min-height:0;
+}
+
+/* suggestions sits just above input */
+.es-suggestions{
+  padding:8px 16px;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;
+  border-top:1px solid var(--border2);
+  background:rgba(0,0,0,.95);
+}
+.es-suggestions::-webkit-scrollbar{display:none;}
+
+/* input pinned above nav — uses padding-bottom so keyboard doesn't shift it */
+.es-input-wrap{
+  padding:10px 16px 12px;
+  padding-bottom:calc(12px + var(--nav-h));
+  background:rgba(0,0,0,.97);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--border2);
+  flex-shrink:0;
+  position:relative;
+}
+
+/* top bar */
+.es-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;flex-shrink:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+}
+.es-back{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:.82rem;cursor:pointer;
+}
+.es-back:active{background:rgba(255,255,255,.1);}
+.es-brand{
+  display:flex;align-items:center;gap:7px;
+  font-size:1rem;font-weight:700;letter-spacing:-.02em;
+}
+
+/* greeting */
+.es-greeting{
+  display:flex;flex-direction:column;align-items:center;
+  padding:40px 20px 20px;gap:14px;
+}
+.es-greeting-icon{
+  width:62px;height:62px;border-radius:20px;
+  background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;color:var(--accent);
+  overflow:hidden;flex-shrink:0;
+}
+.es-greeting-icon i{animation:sparkSpin 4s linear infinite;}
+.es-greeting-text{text-align:center;}
+.es-hey{font-size:1.35rem;font-weight:700;margin-bottom:6px;}
+.es-sub{font-size:.88rem;color:var(--muted);margin-bottom:2px;}
+.es-sub2{font-size:.78rem;color:var(--muted2,#444);}
+
+/* user bubble */
+.es-bubble-user{
+  align-self:flex-end;
+  background:var(--accent);color:#fff;
+  padding:10px 16px;border-radius:18px 18px 4px 18px;
+  font-size:.84rem;font-weight:500;
+  max-width:75%;
+  animation:msgIn .28s var(--ease);
+}
+
+/* system bubble */
+.es-bubble-sys{
+  align-self:flex-start;
+  max-width:88%;
+  animation:msgIn .28s var(--ease);
+}
+.es-bubble-sys-text{
+  font-size:.82rem;color:var(--muted);
+  margin-bottom:10px;font-weight:400;
+}
+
+/* result card inside bubble */
+.es-result-card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+  cursor:pointer;transition:background .15s;
+}
+.es-result-card:active{background:rgba(255,255,255,.09);}
+.es-result-row{display:flex;align-items:center;gap:12px;}
+.es-result-pfp{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid var(--border);background:var(--card);flex-shrink:0;}
+.es-result-pfp.square{border-radius:11px;}
+.es-result-name{font-size:.88rem;font-weight:700;}
+.es-result-sub{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.es-result-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.es-result-pill{
+  padding:3px 10px;border-radius:99px;
+  font-size:.62rem;font-weight:600;
+  background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);
+  color:var(--accent);
+}
+.es-result-pill.gold{
+  background:rgba(191,149,63,.12);border-color:rgba(191,149,63,.22);
+  background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  border:1px solid rgba(191,149,63,.3);
+}
+
+/* not found bubble */
+.es-bubble-notfound{
+  font-size:.82rem;color:var(--muted);
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border2);
+  border-radius:18px 18px 18px 4px;
+  padding:12px 16px;
+  animation:msgIn .28s var(--ease);
+}
+
+/* input bar */
+.es-suggest-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 13px;border-radius:99px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  font-size:.72rem;font-weight:600;white-space:nowrap;cursor:pointer;
+  transition:background .15s;flex-shrink:0;
+}
+.es-suggest-chip:active{background:rgba(255,255,255,.12);}
+.es-suggest-chip i{font-size:.7rem;color:var(--muted);}
+.es-suggest-chip.college-chip i{color:var(--accent);}
+.es-suggest-chip.user-chip i{color:#30d158;}
+
+/* input bar */
+.es-input-bar{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--border2);border-radius:16px;
+  padding:11px 14px;
+}
+.es-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-size:.88rem;font-family:var(--font);
+  caret-color:var(--accent);
+}
+.es-input::placeholder{color:var(--muted);}
+.es-send{
+  width:28px;height:28px;border-radius:8px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:.72rem;cursor:pointer;
+  opacity:0;transition:opacity .18s;flex-shrink:0;
+}
+.es-send.visible{opacity:1;}
+
+/* nav sparkles toggle */
+.nav-search-es .fa-magnifying-glass{display:none;}
+.nav-search-es .fa-sparkles{display:inline-block !important;color:var(--accent);}
+
+/* ══════════════════════════
+   GUEST PROFILE MODAL
+══════════════════════════ */
+@keyframes guestUp{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes guestDown{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(24px) scale(.97)}}
+
+.guest-backdrop{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.guest-backdrop.open{display:flex;}
+.guest-pill{
+  width:100%;max-width:360px;
+  background:rgba(18,18,20,.82);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:28px;
+  padding:28px 24px 24px;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,.7);
+  animation:guestUp .32s cubic-bezier(.32,.72,0,1) forwards;
+}
+.guest-pill.closing{animation:guestDown .24s var(--ease) forwards;}
+.guest-tag{
+  position:absolute;top:14px;right:16px;
+  font-size:.6rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);
+}
+.guest-pfp-wrap{
+  width:78px;height:78px;border-radius:50%;
+  overflow:hidden;border:1.5px solid rgba(255,255,255,.12);
+  margin-bottom:14px;background:rgba(255,255,255,.07);flex-shrink:0;
+}
+.guest-pfp-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.guest-name{font-size:1rem;font-weight:700;color:#fff;margin-bottom:4px;text-align:center;}
+.guest-sub{font-size:.72rem;color:var(--muted);margin-bottom:22px;text-align:center;line-height:1.5;}
+.guest-cta{
+  width:100%;padding:13px 0;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:14px;
+  font-size:.88rem;font-weight:700;font-family:var(--font);
+  cursor:pointer;letter-spacing:.01em;
+  transition:opacity .18s;margin-bottom:10px;
+}
+.guest-cta:active{opacity:.82;}
+.guest-skip{font-size:.72rem;color:var(--muted);cursor:pointer;padding:6px 0;transition:color .18s;}
+.guest-skip:active{color:#fff;}
+
+/* ══════════════════════════
+   SEARCH OVERLAY
+══════════════════════════ */
+.search-overlay{
+  position:fixed;inset:0;z-index:58;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .38s cubic-bezier(.32,.72,0,1);
+}
+.search-overlay.open{
+  display:flex;transform:translateY(0);
+}
+
+.search-top{
+  padding:14px 16px 10px;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+}
+.search-bar-wrap{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--border2);
+  border-radius:14px;padding:11px 14px;
+}
+.search-icon{font-size:.82rem;color:var(--muted);flex-shrink:0;}
+.search-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-size:.88rem;font-family:var(--font);
+  caret-color:var(--accent);
+}
+.search-input::placeholder{color:var(--muted);}
+.search-clear{
+  color:var(--muted);font-size:.75rem;cursor:pointer;
+  opacity:0;transition:opacity .18s;flex-shrink:0;
+}
+.search-clear.visible{opacity:1;}
+
+.search-body{
+  flex:1;overflow-y:auto;padding:18px 16px 100px;
+}
+
+.explore-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:14px;
+}
+
+/* pill toggle */
+.search-pill-nav{
+  display:flex;gap:8px;margin-bottom:6px;
+}
+.spill{
+  padding:8px 22px;border-radius:99px;
+  font-size:.78rem;font-weight:600;cursor:pointer;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--muted);transition:all .2s;
+}
+.spill.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+
+.search-tab-hint{
+  font-size:.62rem;color:var(--muted);
+  margin-bottom:18px;padding-left:2px;min-height:16px;
+  transition:opacity .2s;
+}
+
+/* no results */
+.no-results-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 0 20px;
+}
+.no-results-txt{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px;}
+.no-results-sub{font-size:.72rem;color:var(--muted2, #444);}
+
+/* add college button */
+.add-college-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;border-radius:99px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  font-size:.78rem;font-weight:600;color:var(--text);
+  cursor:pointer;transition:.18s;
+}
+.add-college-btn:active{background:rgba(255,255,255,.12);}
+.add-college-btn i{font-size:.72rem;color:var(--accent);}
+
+/* add college modal */
+@keyframes acIn{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes acOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.97)}}
+
+.ac-backdrop{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  display:none;align-items:flex-end;justify-content:center;
+  padding:0 0 env(safe-area-inset-bottom);
+}
+.ac-backdrop.open{display:flex;}
+.ac-sheet{
+  width:100%;max-width:480px;
+  background:#0a0a0a;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px 28px 0 0;
+  padding:28px 22px 36px;
+  animation:acIn .34s cubic-bezier(.32,.72,0,1) forwards;
+}
+.ac-backdrop.closing .ac-sheet{animation:acOut .26s ease forwards;}
+.ac-handle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 24px;}
+.ac-title{font-size:1.05rem;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;}
+.ac-sub{font-size:.72rem;color:var(--muted);margin-bottom:22px;line-height:1.5;}
+.ac-field{margin-bottom:14px;}
+.ac-label{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:block;}
+.ac-input{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.09);border-radius:12px;
+  padding:13px 14px;color:var(--text);font-size:.88rem;
+  font-family:var(--font);outline:none;
+  transition:border-color .18s;
+}
+.ac-input:focus{border-color:rgba(255,255,255,.28);}
+.ac-input::placeholder{color:var(--muted);}
+.ac-submit{
+  width:100%;margin-top:6px;padding:14px 0;
+  background:rgba(255,255,255,.92);color:#000;
+  border:none;border-radius:14px;
+  font-size:.88rem;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:opacity .18s;letter-spacing:.01em;
+}
+.ac-submit:active{opacity:.8;}
+
+/* thank you card */
+.ac-thankyou{
+  text-align:center;padding:10px 0 4px;
+  animation:acIn .32s cubic-bezier(.32,.72,0,1) forwards;
+}
+.ac-ty-icon{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin:0 auto 14px;
+}
+.ac-ty-title{font-size:1rem;font-weight:700;margin-bottom:8px;}
+.ac-ty-msg{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:22px;}
+.ac-ty-close{
+  display:inline-block;padding:10px 28px;border-radius:99px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  font-size:.75rem;font-weight:600;color:var(--text);cursor:pointer;
+}
+
+.college-card{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 4px;border-bottom:1px solid var(--border2);
+  cursor:pointer;transition:background .15s;
+  border-radius:12px;
+}
+.college-card:active{background:rgba(255,255,255,.04);}
+.college-pfp-wrap{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--card);border:1px solid var(--border);}
+.college-pfp-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.college-info{flex:1;min-width:0;overflow:hidden;}
+.college-card-name{
+  font-size:.84rem;font-weight:600;
+  white-space:nowrap;overflow:hidden;
+  /* marquee only when overflowing — handled via JS class */
+}
+.college-card-name.marquee{
+  animation:marquee 6s linear infinite;
+  display:inline-block;
+  padding-right:32px;
+}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.college-card-name-wrap{overflow:hidden;max-width:100%;}
+.college-card-sub{font-size:.66rem;color:var(--muted);margin-top:2px;}
+.college-card-pills{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.college-mini-pill{
+  padding:2px 8px;border-radius:99px;
+  font-size:.58rem;font-weight:600;
+  background:rgba(0,122,255,.12);
+  border:1px solid rgba(0,122,255,.2);
+  color:var(--accent);white-space:nowrap;
+}
+.college-card-arrow{color:var(--muted2, #444);font-size:.72rem;flex-shrink:0;}
+
+/* ══════════════════════════
+   COLLEGE PROFILE
+══════════════════════════ */
+.college-profile{
+  position:fixed;inset:0;z-index:59;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .36s cubic-bezier(.32,.72,0,1);
+  overflow-y:auto;
+}
+.college-profile.open{display:flex;transform:translateX(0);}
+.top-back-btn{
+  width:36px;height:36px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:.82rem;cursor:pointer;
+}
+.cp-pill{
+  width:100%;max-width:360px;
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(36px);-webkit-backdrop-filter:blur(36px);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px;padding:28px 22px 24px;
+  position:relative;
+  box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 40px 80px rgba(0,0,0,.6);
+}
+.cp-pfp{width:60px;height:60px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--border);background:var(--card);}
+.cp-name{font-size:.98rem;font-weight:700;margin-bottom:3px;}
+.cp-caption{font-size:.7rem;color:var(--muted);font-weight:300;margin-bottom:8px;}
+.cp-pills-row{display:flex;gap:6px;flex-wrap:wrap;}
+.cp-pill-tag{
+  padding:3px 10px;border-radius:99px;
+  font-size:.62rem;font-weight:600;
+  background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);
+  color:var(--accent);
+}
+.pfp-row{display:flex;align-items:center;gap:14px;}
+.divider{height:1px;background:var(--border);margin-bottom:20px;}
+.cta-btn{
+  width:100%;padding:13px 0;
+  background:rgba(255,255,255,.9);color:#000;
+  border:none;border-radius:30px;
+  font-size:.88rem;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:opacity .18s;
+}
+.cta-btn:active{opacity:.8;}
+.guest-tag{
+  position:absolute;top:15px;right:16px;
+  font-size:.58rem;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* ══════════════════════════
+   ZYNX — full screen reel
+══════════════════════════ */
+@keyframes zynxUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes zynxDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+@keyframes zHeartPop{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}15%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}40%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@keyframes zMuteFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}25%{opacity:1;transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
+@keyframes zDotPulse{0%,100%{transform:scaleX(1)}50%{transform:scaleX(1.35)}}
+
+.zynx-overlay{
+  position:fixed;inset:0;z-index:400;
+  background:#000;
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  will-change:transform;
+}
+.zynx-overlay.open{
+  display:flex;
+  animation:zynxUp .42s cubic-bezier(.32,.72,0,1) forwards;
+}
+.zynx-overlay.closing{
+  display:flex;
+  animation:zynxDown .38s cubic-bezier(.32,.72,0,1) forwards;
+}
+
+.zynx-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:58;
+  background:#000;
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  will-change:transform;
+}
+.zynx-overlay.open{
+  display:flex;
+  animation:zynxUp .42s cubic-bezier(.32,.72,0,1) forwards;
+}
+.zynx-overlay.closing{
+  display:flex;
+  animation:zynxDown .38s cubic-bezier(.32,.72,0,1) forwards;
+}
+
+/* transparent top bar */
+.zynx-top{
+  position:absolute;top:0;left:0;right:0;z-index:10;
+  padding:16px 18px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent);
+  pointer-events:none;
+}
+.zynx-brand{
+  font-size:1.3rem;font-weight:700;letter-spacing:-.03em;color:#fff;
+}
+
+/* reel container — snap scroll vertical */
+.zynx-feed{
+  width:100%;
+  height:calc(100% - var(--nav-h));
+  overflow-y:scroll;overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.zynx-feed::-webkit-scrollbar{display:none;}
+
+/* single reel item — fill the feed container exactly */
+.zynx-item{
+  width:100%;
+  height:100%;
+  flex-shrink:0;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  position:relative;overflow:hidden;background:#000;
+}
+
+/* image carousel inside reel */
+.zynx-carousel{
+  position:absolute;inset:0;
+  display:flex;
+  transition:transform .38s cubic-bezier(.25,.72,.35,1);
+  will-change:transform;
+}
+.zynx-slide{
+  width:100%;height:100%;flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.zynx-slide img,.zynx-slide video{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+
+/* tap zones */
+.zynx-tap-zone{position:absolute;inset:0;z-index:5;cursor:pointer;}
+
+/* mute flash */
+.z-mute-ind{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.6);
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.2rem;
+  pointer-events:none;opacity:0;z-index:20;
+  border:1px solid rgba(255,255,255,.2);
+}
+.z-mute-ind.flash{animation:zMuteFlash .65s ease forwards;}
+
+/* double tap heart */
+.z-heart-ind{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.5);
+  font-size:5rem;color:#ff3b5c;
+  pointer-events:none;opacity:0;z-index:21;
+  filter:drop-shadow(0 2px 16px rgba(255,59,92,.5));
+}
+.z-heart-ind.flash{animation:zHeartPop .7s ease forwards;}
+
+/* bottom info */
+.zynx-info{
+  position:absolute;
+  bottom:0;left:0;right:72px;
+  padding:16px 16px 18px;
+  z-index:8;
+  background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 100%);
+  padding-top:60px;
+}
+.zynx-user-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.zynx-avatar{width:36px;height:36px;border-radius:9px;object-fit:cover;border:1.5px solid rgba(255,255,255,.3);}
+.zynx-name{font-size:.86rem;font-weight:700;color:#fff;line-height:1.2;display:flex;align-items:center;gap:4px;}
+.z-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:13px;height:13px;position:relative;overflow:hidden;
+  border-radius:50%;flex-shrink:0;
+  animation:pulse 3s infinite ease-in-out;
+}
+.z-badge .fa-certificate{font-size:13px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.z-badge .fa-check{font-size:6px;color:#000;position:relative;z-index:6;font-weight:900;}
+.z-badge::after{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);animation:shimmer 2s infinite linear;z-index:7;}
+.zynx-handle{font-size:.66rem;color:rgba(255,255,255,.55);}
+.zynx-caption{font-size:.8rem;color:rgba(255,255,255,.88);line-height:1.5;font-weight:300;margin-bottom:0;}
+
+/* dots indicator for multi-image */
+.zynx-dots{
+  display:flex;gap:4px;margin-top:8px;
+}
+.zynx-dot{
+  height:3px;border-radius:2px;background:rgba(255,255,255,.35);
+  transition:width .25s var(--ease),background .25s;
+  width:18px;
+}
+.zynx-dot.active{background:#fff;width:28px;animation:zDotPulse .4s var(--ease);}
+
+/* right action bar — pinned from bottom, equal gap between items */
+.zynx-actions{
+  position:absolute;right:14px;bottom:18px;
+  z-index:9;
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;
+  justify-content:flex-end;
+}
+.z-action{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;user-select:none;
+  padding:10px 0;
+}
+.z-action i{
+  font-size:1.5rem;color:#fff;
+  filter:drop-shadow(0 1px 4px rgba(0,0,0,.6));
+  transition:transform .18s,color .18s;
+}
+.z-action:active i{transform:scale(.82);}
+.z-action span{font-size:.64rem;color:rgba(255,255,255,.75);font-weight:600;}
+.z-action.liked i{color:#ff3b5c;}
+.z-action.saved i{color:var(--accent);}
+
+/* swipe-up hint */
+.zynx-swipe-hint{
+  position:absolute;bottom:calc(var(--nav-h) + 6px);left:50%;transform:translateX(-50%);
+  font-size:.6rem;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;
+  pointer-events:none;z-index:8;
+}
+
+@keyframes feedIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.post{animation:feedIn .32s var(--ease) both;}
+.post:nth-child(1){animation-delay:.06s}
+.post:nth-child(2){animation-delay:.13s}
+.post:nth-child(3){animation-delay:.2s}
+</style>
+</head>
+<body>
+
+<!-- DRAWER BACKDROP -->
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()">
+  <div class="drawer" onclick="event.stopPropagation()">
+
+    <div class="drawer-top">
+      <div class="drawer-brand">x0s.link</div>
+      <div class="drawer-pfp-wrap" onclick="goGolden()">
+        <img class="drawer-pfp" src="Screenshot_20260418-234611.png" alt="">
+        <div class="drawer-pfp-badge">
+          <i class="fa-solid fa-certificate"></i>
+          <i class="fa-solid fa-check"></i>
+        </div>
+      </div>
+      <div class="drawer-name" onclick="goGolden()">Anush Decodes</div>
+      <div class="drawer-handle" onclick="goGolden()">anush@x0s</div>
+      <div class="drawer-stats">
+        <span><b>350</b> Following</span>
+        <span><b>1.2k</b> Followers</span>
+      </div>
+    </div>
+
+    <div class="drawer-divider"></div>
+
+    <div class="drawer-nav-item" onclick="goGolden()"><i class="fa-regular fa-user"></i> Profile</div>
+    <div class="drawer-nav-item"><i class="fa-regular fa-bookmark"></i> Bookmarks</div>
+    <div class="drawer-nav-item"><i class="fa-regular fa-list-alt"></i> Lists</div>
+    <div class="drawer-nav-item"><i class="fa-solid fa-certificate" style="background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i> Get Badge</div>
+    <div class="drawer-nav-item"><i class="fa-regular fa-circle-question"></i> Help & Support</div>
+
+    <div class="drawer-spacer"></div>
+
+    <div class="dm-toggle-row">
+      <span class="dm-toggle-label">Dark Mode</span>
+      <button class="dm-pill on" id="dm-pill" onclick="toggleDM()"></button>
+    </div>
+    <div class="drawer-footer-brand">x0s India</div>
+
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-left">
+    <img class="top-pfp" src="Screenshot_20260418-234611.png" onclick="openDrawer()" alt="">
+  </div>
+  <div class="top-brand">x0s.link</div>
+  <div class="top-right">
+    <div class="top-dots" id="top-dots" onclick="toggleTopDropdown(event)">
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+      <div class="top-dropdown" id="top-dropdown">
+        <div class="top-dd-item top-dd-badge" onclick="goGolden()">
+          <i class="fa-solid fa-certificate"></i> Get Badge
+        </div>
+        <div class="top-dd-divider"></div>
+        <div class="top-dd-item" onclick="sharePost()">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i> Share
+        </div>
+        <div class="top-dd-item" onclick="toggleDM();closeTopDropdown()">
+          <i class="fa-solid fa-circle-half-stroke"></i> Appearance
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="setTab(this)">For You</div>
+  <div class="tab" onclick="setTab(this)">Following</div>
+</div>
+
+<!-- FEED -->
+<div class="feed" id="feed">
+
+  <!-- POST 1 -->
+  <div class="post" onclick="goGolden()">
+    <div class="post-header">
+      <div class="post-avatar-wrap">
+        <img class="post-avatar" src="Screenshot_20260418-234611.png" alt="">
+        <div class="post-verified">
+          <i class="fa-solid fa-certificate"></i>
+          <i class="fa-solid fa-check"></i>
+        </div>
+      </div>
+      <div class="post-meta">
+        <div class="post-name">Anush Decodes</div>
+        <div class="post-handle">anush@x0s · 2h</div>
+        <div class="post-college-row" id="feed-college-row-0"></div>
+      </div>
+      <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
+    </div>
+
+    <div class="post-media">
+      <img src="file_00000000862871fab1161995ce9f104e.png" alt="" loading="lazy">
+    </div>
+
+    <div class="post-caption">Deep logic toggle. Building the future one commit at a time. 🔧</div>
+
+    <div class="post-actions" onclick="event.stopPropagation()">
+      <div class="post-action" id="like-0" onclick="toggleLike(0)">
+        <i class="fa-regular fa-heart"></i>
+        <span>42</span>
+      </div>
+      <div class="post-action-spacer"></div>
+      <div class="post-action" onclick="sharePost()">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </div>
+      <div class="post-action" id="save-0" onclick="toggleSave(0)" style="margin-left:4px;">
+        <i class="fa-regular fa-bookmark"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST 2 -->
+  <div class="post" onclick="goGolden()">
+    <div class="post-header">
+      <div class="post-avatar-wrap">
+        <img class="post-avatar" src="Screenshot_20260418-234611.png" alt="">
+        <div class="post-verified">
+          <i class="fa-solid fa-certificate"></i>
+          <i class="fa-solid fa-check"></i>
+        </div>
+      </div>
+      <div class="post-meta">
+        <div class="post-name">Anush Decodes</div>
+        <div class="post-handle">anush@x0s · 1d</div>
+      </div>
+      <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
+    </div>
+
+    <div class="post-media">
+      <video src="lv_7587788892909276421_20260417222425.mp4" muted autoplay loop playsinline></video>
+    </div>
+
+    <div class="post-caption">✨✨</div>
+
+    <div class="post-actions" onclick="event.stopPropagation()">
+      <div class="post-action" id="like-1" onclick="toggleLike(1)">
+        <i class="fa-regular fa-heart"></i>
+        <span>128</span>
+      </div>
+      <div class="post-action-spacer"></div>
+      <div class="post-action" onclick="sharePost()">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </div>
+      <div class="post-action" id="save-1" onclick="toggleSave(1)" style="margin-left:4px;">
+        <i class="fa-regular fa-bookmark"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST 3 -->
+  <div class="post" onclick="goGolden()">
+    <div class="post-header">
+      <div class="post-avatar-wrap">
+        <img class="post-avatar" src="Screenshot_20260418-234611.png" alt="">
+        <div class="post-verified">
+          <i class="fa-solid fa-certificate"></i>
+          <i class="fa-solid fa-check"></i>
+        </div>
+      </div>
+      <div class="post-meta">
+        <div class="post-name">Anush Decodes</div>
+        <div class="post-handle">anush@x0s · 2d</div>
+      </div>
+      <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
+    </div>
+
+    <div class="post-media">
+      <video src="Video-784.mp4" muted autoplay loop playsinline></video>
+    </div>
+
+    <div class="post-caption">😇😇</div>
+
+    <div class="post-actions" onclick="event.stopPropagation()">
+      <div class="post-action" id="like-2" onclick="toggleLike(2)">
+        <i class="fa-regular fa-heart"></i>
+        <span>42</span>
+      </div>
+      <div class="post-action-spacer"></div>
+      <div class="post-action" onclick="sharePost()">
+        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      </div>
+      <div class="post-action" id="save-2" onclick="toggleSave(2)" style="margin-left:4px;">
+        <i class="fa-regular fa-bookmark"></i>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /feed -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" style="z-index:70;">
+  <div class="nav-item active" id="nav-home" onclick="handleHomeNav()"><i class="fa-solid fa-house"></i></div>
+  <div class="nav-item" id="nav-search" onclick="handleSearchTap()" style="position:relative;">
+    <i class="fa-solid fa-magnifying-glass" id="nav-search-icon"></i>
+    <i class="fa-solid fa-sparkles" id="nav-es-icon" style="position:absolute;display:none;color:var(--accent);"></i>
+  </div>
+  <div class="nav-item" id="nav-zynx" onclick="handleZynxNav()"><i class="fa-solid fa-play-circle"></i></div>
+  <div class="nav-item" id="nav-rocket" onclick="openGuestProfile()"><i class="fa-solid fa-paper-plane"></i></div>
+  <div class="nav-item" id="nav-notif" onclick="setNav('notif')">
+    <i class="fa-regular fa-bell"></i>
+    <div class="nav-notif-dot"></div>
+  </div>
+</div>
+
+<!-- ADD COLLEGE MODAL -->
+<div class="ac-backdrop" id="ac-backdrop" onclick="closeAddCollege()">
+  <div class="ac-sheet" onclick="event.stopPropagation()">
+    <div class="ac-handle"></div>
+    <div id="ac-form-wrap">
+      <div class="ac-title">Add a College</div>
+      <div class="ac-sub">Help us grow the x0s college directory. Your submission will be reviewed before going live.</div>
+      <div class="ac-field">
+        <label class="ac-label">College Name</label>
+        <input class="ac-input" id="ac-name-input" type="text" placeholder="e.g. RV College of Engineering, Bangalore" autocomplete="off">
+      </div>
+      <div class="ac-field">
+        <label class="ac-label">College Code <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(if known)</span></label>
+        <input class="ac-input" id="ac-code-input" type="text" placeholder="e.g. E042" autocomplete="off" style="text-transform:uppercase;">
+      </div>
+      <button class="ac-submit" onclick="submitAddCollege()">Submit College</button>
+    </div>
+    <div id="ac-thankyou-wrap" style="display:none;">
+      <div class="ac-thankyou">
+        <div class="ac-ty-icon">✦</div>
+        <div class="ac-ty-title">Thank you for contributing</div>
+        <div class="ac-ty-msg">Your college submission has been received. Our team will verify the details and add it to the x0s directory within 24–48 hours. We appreciate you helping build the community.</div>
+        <div class="ac-ty-close" onclick="closeAddCollege()">Done</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     ESSENTIAL SEARCH (AI)
+══════════════════════════ -->
+<div class="es-overlay" id="es-overlay">
+
+  <!-- top bar -->
+  <div class="es-topbar">
+    <div class="es-back" onclick="closeEssential()"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="es-brand">Disha</div>
+    <div style="width:36px;"></div>
+  </div>
+
+  <!-- chat messages area -->
+  <div class="es-messages" id="es-messages">
+      <div class="es-greeting" id="es-greeting">
+        <img src="Dishalogo.png" alt="" id="disha-img"
+          onload="this.style.display='block';document.getElementById('disha-fb-icon').style.display='none';"
+          onerror="this.style.display='none';"
+          style="display:none;width:62px;height:62px;object-fit:cover;border-radius:20px;flex-shrink:0;">
+        <i class="fa-solid fa-sparkles" id="disha-fb-icon" style="font-size:1.6rem;color:var(--accent);flex-shrink:0;"></i>
+        <div class="es-greeting-text">
+          <div class="es-hey">Hey, Guest 👋</div>
+          <div class="es-sub">I am Disha, How can I help you?</div>
+          <div class="es-sub2">Searching someone or something?</div>
+        </div>
+      </div>
+  </div>
+
+  <!-- suggestions strip -->
+  <div class="es-suggestions" id="es-suggestions" style="display:none;"></div>
+
+  <!-- input bar -->
+  <div class="es-input-wrap" id="es-input-wrap-el">
+    <div class="es-input-bar">
+      <i class="fa-solid fa-magnifying-glass" style="color:var(--muted);font-size:.82rem;flex-shrink:0;"></i>
+      <input class="es-input" id="es-input" type="text"
+        placeholder="Search name, @id, college…"
+        autocomplete="off"
+        oninput="onEsInput(this.value)"
+        onkeydown="if(event.key==='Enter')doEsSearch(this.value)">
+      <div class="es-send" id="es-send" onclick="doEsSearch(document.getElementById('es-input').value)">
+        <i class="fa-solid fa-arrow-up"></i>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════
+     SEARCH OVERLAY
+══════════════════════════ -->
+<div class="search-overlay" id="search-overlay">
+
+  <div class="search-top">
+    <div class="search-bar-wrap">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input class="search-input" id="search-input" type="text" placeholder="Search people, colleges…" autocomplete="off" oninput="onSearchInput(this.value)">
+      <div class="search-clear" id="search-clear" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+  </div>
+
+  <div class="search-body" id="search-body">
+
+    <!-- default state -->
+    <div id="search-default">
+      <div class="explore-label">Explore</div>
+      <!-- pill toggle -->
+      <div class="search-pill-nav">
+        <div class="spill active" id="spill-people" onclick="setSearchTab('people')">People</div>
+        <div class="spill" id="spill-colleges" onclick="setSearchTab('colleges')">Colleges</div>
+      </div>
+      <!-- hover label -->
+      <div class="search-tab-hint" id="search-tab-hint"></div>
+
+      <!-- PEOPLE section -->
+      <div id="stab-people">
+        <div class="no-results-wrap">
+          <i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+          <div class="no-results-txt">No profiles yet</div>
+          <div class="no-results-sub">People will show up here</div>
+        </div>
+      </div>
+
+      <!-- COLLEGES section -->
+      <div id="stab-colleges" style="display:none;">
+        <div class="no-results-wrap">
+          <i class="fa-solid fa-building-columns" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+          <div class="no-results-txt">Type a college name</div>
+          <div class="no-results-sub">or type #college to see all</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- results state -->
+    <div id="search-results" style="display:none;">
+      <div id="results-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     COLLEGE PROFILE
+══════════════════════════ -->
+<div class="college-profile" id="college-profile">
+  <div class="top-bar" style="position:sticky;">
+    <div class="top-back-btn" onclick="closeCollegeProfile()"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="top-bar-brand" style="font-size:1.1rem;font-weight:700;letter-spacing:-.02em;">College</div>
+    <!-- three dot -->
+    <div style="position:relative;">
+      <div class="top-back-btn" id="cp-dots-btn" onclick="toggleCpMenu(event)" style="background:transparent;border-color:transparent;">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </div>
+      <div id="cp-dots-menu" style="display:none;position:absolute;top:42px;right:0;background:#0a0a0a;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:6px;min-width:160px;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:10;animation:fadeIn .18s ease;">
+        <div id="cp-link-item" onclick="toggleCollegeLink()" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:.78rem;font-weight:600;cursor:pointer;border-radius:10px;transition:background .15s;">
+          <span id="cp-link-label">Link College</span>
+          <i id="cp-link-icon" class="fa-solid fa-link" style="color:#007aff;font-size:.82rem;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:28px 20px 40px;display:flex;flex-direction:column;align-items:center;">
+    <div class="cp-pill">
+      <div class="guest-tag" id="cp-tag">College</div>
+      <div class="pfp-row" style="margin-bottom:14px;">
+        <img class="cp-pfp" id="cp-pfp" src="" alt="">
+        <div>
+          <div class="cp-name" id="cp-name"></div>
+          <div class="cp-caption" id="cp-caption"></div>
+          <div class="cp-pills-row" id="cp-pills-row"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <button class="cta-btn">Follow College</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     ZYNX OVERLAY
+══════════════════════════ -->
+<div class="zynx-overlay" id="zynx-overlay">
+
+  <!-- transparent top bar -->
+  <div class="zynx-top">
+    <div class="zynx-brand">Zynx</div>
+  </div>
+
+  <!-- vertical snap feed -->
+  <div class="zynx-feed" id="zynx-feed"></div>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   ZYNX DATA
+══════════════════════════════════════ */
+const ZYNX_POSTS = [
+  {
+    id:0,
+    files:['lv_7587788892909276421_20260417222425.mp4'],
+    type:'video',
+    caption:'✨✨',
+    likes:128, comments:14,
+  },
+  {
+    id:1,
+    files:['file_00000000862871fab1161995ce9f104e.png','XOS_STAMP_1776237339190.png'],
+    type:'image',
+    caption:'Deep logic toggle. Building the future one commit at a time. 🔧',
+    likes:42, comments:5,
+  },
+  {
+    id:2,
+    files:['Video-784.mp4'],
+    type:'video',
+    caption:'😇😇',
+    likes:42, comments:5,
+  },
+];
+
+/* ── FEED COLLEGE ROW ── */
+function initFeedCollegeRows(){
+  const stored=localStorage.getItem('xos_linked_college');
+  if(!stored) return;
+  const c=JSON.parse(stored);
+  document.querySelectorAll('[id^="feed-college-row-"]').forEach(el=>{
+    el.innerHTML=`<i class="fa-solid fa-building-columns"></i><span style="overflow:hidden;text-overflow:ellipsis;">${c.name}</span>`;
+  });
+}
+document.addEventListener('DOMContentLoaded', initFeedCollegeRows);
+
+/* ── state ── */
+let zynxOpen=false;
+const zLiked={}, zSaved={}, zMuted={};
+let zCurrentItem=0;
+
+/* ══════════════════════════════════════
+   OPEN / CLOSE
+══════════════════════════════════════ */
+function openZynx(){
+  if(zynxOpen) return;
+  zynxOpen=true;
+  setNav('zynx');
+  buildZynxFeed();
+  document.querySelector('.top-bar').style.display='none';
+  document.querySelector('.tabs').style.display='none';
+  const el=document.getElementById('zynx-overlay');
+  el.style.display='flex';
+  el.classList.remove('closing');
+  el.classList.add('open');
+  history.pushState({modal:'zynx'},'');
+  setTimeout(()=> zPlayCurrent(0), 450);
+}
+
+function closeZynx(fromPop){
+  if(!zynxOpen) return;
+  zynxOpen=false;
+  setNav('home');
+  zPauseAll();
+  document.querySelector('.top-bar').style.display='';
+  document.querySelector('.tabs').style.display='';
+  const el=document.getElementById('zynx-overlay');
+  el.classList.remove('open');
+  el.classList.add('closing');
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; el.classList.remove('closing'); },400);
+}
+
+window.addEventListener('popstate',e=>{
+  if(zynxOpen) closeZynx(true);
+});
+
+/* ══════════════════════════════════════
+   BUILD FEED
+══════════════════════════════════════ */
+function buildZynxFeed(){
+  const feed=document.getElementById('zynx-feed');
+  feed.innerHTML='';
+  ZYNX_POSTS.forEach((p,i)=>{
+    feed.appendChild(makeZynxItem(p,i));
+  });
+  // scroll snap observer
+  feed.onscroll=()=> onZynxScroll();
+}
+
+function makeZynxItem(p,i){
+  const item=document.createElement('div');
+  item.className='zynx-item';
+  item.id=`zi-${i}`;
+
+  const isVid=p.type==='video';
+
+  /* carousel */
+  const carousel=document.createElement('div');
+  carousel.className='zynx-carousel';
+  carousel.id=`zc-${i}`;
+  p.files.forEach(f=>{
+    const slide=document.createElement('div');
+    slide.className='zynx-slide';
+    if(isVid){
+      const v=document.createElement('video');
+      v.src=f; v.loop=true; v.muted=true; v.playsinline=true;
+      v.setAttribute('playsinline','');
+      slide.appendChild(v);
+    } else {
+      const img=document.createElement('img');
+      img.src=f; img.loading='lazy';
+      slide.appendChild(img);
+    }
+    carousel.appendChild(slide);
+  });
+  item.appendChild(carousel);
+
+  /* tap zone */
+  const tap=document.createElement('div');
+  tap.className='zynx-tap-zone';
+  setupZTapZone(tap, i, isVid);
+  item.appendChild(tap);
+
+  /* mute indicator */
+  const muteInd=document.createElement('div');
+  muteInd.className='z-mute-ind'; muteInd.id=`zm-${i}`;
+  muteInd.innerHTML='<i class="fa-solid fa-volume-xmark" id="zmi-'+i+'"></i>';
+  item.appendChild(muteInd);
+
+  /* heart indicator */
+  const heartInd=document.createElement('div');
+  heartInd.className='z-heart-ind'; heartInd.id=`zh-${i}`;
+  heartInd.innerHTML='<i class="fa-solid fa-heart"></i>';
+  item.appendChild(heartInd);
+
+  /* info */
+  const info=document.createElement('div');
+  info.className='zynx-info';
+  info.innerHTML=`
+    <div class="zynx-user-row">
+      <img class="zynx-avatar" src="Screenshot_20260418-234611.png" alt="">
+      <div>
+        <div class="zynx-name">Anush Decodes <span class="z-badge"><i class="fa-solid fa-certificate"></i><i class="fa-solid fa-check"></i></span></div>
+        <div class="zynx-handle">anush@x0s</div>
+      </div>
+    </div>
+    <div class="zynx-caption">${p.caption}</div>
+    ${p.files.length>1 ? `<div class="zynx-dots" id="zdots-${i}">${p.files.map((_,j)=>`<div class="zynx-dot${j===0?' active':''}" id="zdot-${i}-${j}"></div>`).join('')}</div>` : ''}
+  `;
+  item.appendChild(info);
+
+  /* right actions */
+  const actions=document.createElement('div');
+  actions.className='zynx-actions';
+  actions.innerHTML=`
+    <div class="z-action" id="zlike-${i}" onclick="zToggleLike(${i})">
+      <i class="fa-regular fa-heart"></i>
+      <span id="zlc-${i}">${p.likes}</span>
+    </div>
+    <div class="z-action" id="zsave-${i}" onclick="zToggleSave(${i})">
+      <i class="fa-regular fa-bookmark"></i>
+    </div>
+    <div class="z-action" onclick="sharePost()">
+      <i class="fa-solid fa-paper-plane"></i>
+    </div>
+  `;
+  // stop propagation on actions
+  actions.addEventListener('click',e=>e.stopPropagation());
+  item.appendChild(actions);
+
+  if(p.files.length>1){
+    const hint=document.createElement('div');
+    hint.className='zynx-swipe-hint';
+    hint.textContent='swipe →';
+    item.appendChild(hint);
+  }
+
+  /* horizontal swipe for multi-image */
+  if(p.files.length>1) setupZHorizSwipe(item, carousel, i, p);
+
+  return item;
+}
+
+/* ══════════════════════════════════════
+   SCROLL SNAP — detect current item
+══════════════════════════════════════ */
+let zScrollTimer=null;
+function onZynxScroll(){
+  clearTimeout(zScrollTimer);
+  zScrollTimer=setTimeout(()=>{
+    const feed=document.getElementById('zynx-feed');
+    const idx=Math.round(feed.scrollTop / window.innerHeight);
+    if(idx!==zCurrentItem){
+      zPauseItem(zCurrentItem);
+      zCurrentItem=idx;
+      zPlayCurrent(idx);
+    }
+  },80);
+}
+
+function zPlayCurrent(idx){
+  const item=document.getElementById(`zi-${idx}`);
+  if(!item) return;
+  const vid=item.querySelector('video');
+  if(vid){
+    vid.muted=!!zMuted[idx];
+    vid.play().catch(()=>{ vid.muted=true; zMuted[idx]=true; });
+  }
+}
+
+function zPauseItem(idx){
+  const item=document.getElementById(`zi-${idx}`);
+  if(!item) return;
+  const vid=item.querySelector('video');
+  if(vid) vid.pause();
+}
+
+function zPauseAll(){
+  ZYNX_POSTS.forEach((_,i)=> zPauseItem(i));
+}
+
+/* ══════════════════════════════════════
+   TAP ZONE — single=mute, double=like
+══════════════════════════════════════ */
+function setupZTapZone(el, idx, isVid){
+  let lastTap=0, tapTimer=null;
+  el.addEventListener('click',e=>{
+    const now=Date.now(), gap=now-lastTap;
+    lastTap=now;
+    if(gap<300&&gap>0){
+      clearTimeout(tapTimer); lastTap=0;
+      zDoubleTapLike(idx);
+    } else {
+      if(isVid) tapTimer=setTimeout(()=> zToggleMute(idx), 250);
+    }
+  });
+}
+
+function zToggleMute(idx){
+  const item=document.getElementById(`zi-${idx}`);
+  if(!item) return;
+  const vid=item.querySelector('video');
+  if(!vid) return;
+  zMuted[idx]=!zMuted[idx];
+  vid.muted=zMuted[idx];
+  // flash
+  const ind=document.getElementById(`zm-${idx}`);
+  const icon=document.getElementById(`zmi-${idx}`);
+  if(icon) icon.className=zMuted[idx]?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';
+  if(ind){ ind.classList.remove('flash'); void ind.offsetWidth; ind.classList.add('flash'); }
+}
+
+function zDoubleTapLike(idx){
+  if(!zLiked[idx]){
+    zLiked[idx]=true;
+    const btn=document.getElementById(`zlike-${idx}`);
+    const icon=btn?.querySelector('i');
+    const count=document.getElementById(`zlc-${idx}`);
+    if(icon) icon.className='fa-solid fa-heart';
+    if(count) count.textContent=ZYNX_POSTS[idx].likes+1;
+    if(btn) btn.classList.add('liked');
+  }
+  const h=document.getElementById(`zh-${idx}`);
+  if(h){ h.classList.remove('flash'); void h.offsetWidth; h.classList.add('flash'); }
+}
+
+/* ══════════════════════════════════════
+   LIKE / SAVE
+══════════════════════════════════════ */
+function zToggleLike(idx){
+  zLiked[idx]=!zLiked[idx];
+  const btn=document.getElementById(`zlike-${idx}`);
+  const icon=btn?.querySelector('i');
+  const count=document.getElementById(`zlc-${idx}`);
+  if(icon) icon.className=zLiked[idx]?'fa-solid fa-heart':'fa-regular fa-heart';
+  if(count) count.textContent=ZYNX_POSTS[idx].likes+(zLiked[idx]?1:0);
+  if(btn) btn.classList.toggle('liked',zLiked[idx]);
+}
+
+function zToggleSave(idx){
+  zSaved[idx]=!zSaved[idx];
+  const btn=document.getElementById(`zsave-${idx}`);
+  const icon=btn?.querySelector('i');
+  if(icon) icon.className=zSaved[idx]?'fa-solid fa-bookmark':'fa-regular fa-bookmark';
+  if(btn) btn.classList.toggle('saved',zSaved[idx]);
+}
+
+/* ══════════════════════════════════════
+   HORIZONTAL SWIPE — multi-image
+══════════════════════════════════════ */
+function setupZHorizSwipe(item, carousel, itemIdx, p){
+  let curSlide=0;
+  let sx=0, sy=0, isH=null, dragging=false, vel=0, lx=0, lt=0;
+
+  function setCarousel(slide, animate){
+    carousel.style.transition=animate?'transform .32s cubic-bezier(.25,.72,.35,1)':'none';
+    carousel.style.transform=`translateX(${-slide*100}%)`;
+    updateZDots(itemIdx, slide, p.files.length);
+    curSlide=slide;
+  }
+
+  item.addEventListener('touchstart',e=>{
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+    lt=Date.now(); lx=sx; vel=0; isH=null; dragging=true;
+    carousel.style.transition='none';
+  },{passive:true});
+
+  item.addEventListener('touchmove',e=>{
+    if(!dragging) return;
+    const dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
+    if(isH===null){
+      if(Math.abs(dx)<5&&Math.abs(dy)<5) return;
+      isH=Math.abs(dx)>Math.abs(dy);
+      if(!isH){dragging=false;return;}
+    }
+    if(!isH) return;
+    const now=Date.now();
+    vel=(e.touches[0].clientX-lx)/Math.max(now-lt,1);
+    lx=e.touches[0].clientX; lt=now;
+    const pct=((-curSlide*item.offsetWidth)+dx)/item.offsetWidth*100;
+    // clamp at edges
+    const clamped=Math.max(-(p.files.length-1)*100, Math.min(0, pct));
+    carousel.style.transform=`translateX(${clamped}%)`;
+  },{passive:true});
+
+  item.addEventListener('touchend',e=>{
+    if(!dragging||!isH){dragging=false;return;}
+    dragging=false;
+    const dx=e.changedTouches[0].clientX-sx;
+    const fast=Math.abs(vel)>0.3;
+    const threshold=item.offsetWidth*0.22;
+    if((dx<-threshold||( fast&&vel<0))&&curSlide<p.files.length-1){
+      setCarousel(curSlide+1,true);
+    } else if((dx>threshold||(fast&&vel>0))&&curSlide>0){
+      setCarousel(curSlide-1,true);
+    } else {
+      setCarousel(curSlide,true);
+    }
+  },{passive:true});
+}
+
+function updateZDots(itemIdx, slide, total){
+  for(let j=0;j<total;j++){
+    const d=document.getElementById(`zdot-${itemIdx}-${j}`);
+    if(d) d.className='zynx-dot'+(j===slide?' active':'');
+  }
+}
+
+/* ══════════════════════════════════════
+   TOP DROPDOWN
+══════════════════════════════════════ */
+function toggleTopDropdown(e){
+  e.stopPropagation();
+  document.getElementById('top-dropdown').classList.toggle('open');
+}
+function closeTopDropdown(){
+  document.getElementById('top-dropdown').classList.remove('open');
+}
+document.addEventListener('click', ()=> closeTopDropdown());
+
+/* ── NAVIGATION ── */
+function goGolden(){ window.location.href='golden.html'; }
+function setTab(el){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
+function setNav(id){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('nav-'+id);
+  if(el) el.classList.add('active');
+}
+
+/* ── DRAWER ── */
+function openDrawer(){
+  document.getElementById('drawer-backdrop').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+
+let dSx=0, dSy=0, dDragging=false;
+document.addEventListener('touchstart',e=>{
+  dSx=e.touches[0].clientX; dSy=e.touches[0].clientY; dDragging=true;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!dDragging) return; dDragging=false;
+  const dx=e.changedTouches[0].clientX-dSx;
+  const dy=e.changedTouches[0].clientY-dSy;
+  if(Math.abs(dy)>Math.abs(dx)) return;
+  if(dx>55&&dSx<40) openDrawer();
+  if(dx<-55&&document.getElementById('drawer-backdrop').classList.contains('open')) closeDrawer();
+},{passive:true});
+
+/* ── DARK MODE ── */
+let darkOn=true;
+function toggleDM(){
+  darkOn=!darkOn;
+  document.getElementById('dm-pill').classList.toggle('on',darkOn);
+  document.body.classList.toggle('light',!darkOn);
+}
+
+/* ── LIKE / SAVE (feed) ── */
+const likeCounts=[42,128,42];
+const liked=[false,false,false];
+const saved=[false,false,false];
+
+function toggleLike(i){
+  liked[i]=!liked[i];
+  const btn=document.getElementById('like-'+i);
+  const icon=btn.querySelector('i');
+  const count=btn.querySelector('span');
+  icon.className=liked[i]?'fa-solid fa-heart':'fa-regular fa-heart';
+  count.textContent=likeCounts[i]+(liked[i]?1:0);
+  btn.classList.toggle('liked',liked[i]);
+}
+
+function toggleSave(i){
+  saved[i]=!saved[i];
+  const btn=document.getElementById('save-'+i);
+  const icon=btn.querySelector('i');
+  icon.className=saved[i]?'fa-solid fa-bookmark':'fa-regular fa-bookmark';
+  btn.classList.toggle('saved',saved[i]);
+}
+
+/* ── KEYBOARD HANDLER — only shrinks es-overlay, nav stays fixed ── */
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>{
+    const el=document.getElementById('es-overlay');
+    if(!esOpen||!el) return;
+    const keyboardH=window.innerHeight - window.visualViewport.height;
+    el.style.bottom = keyboardH > 50 ? keyboardH + 'px' : '0px';
+  });
+}
+
+
+let esOpen=false, esMode=false; // esMode = sparkles/essential active
+let esTapTimer=null, esTapCount=0;
+
+/* nav double-tap detection */
+function handleHomeNav(){
+  if(esOpen){ closeEssential(); return; }
+  if(searchOpen){ closeSearch(); return; }
+  if(zynxOpen){ closeZynx(); return; }
+  setNav('home');
+}
+
+function handleZynxNav(){
+  if(zynxOpen){ return; } // already open
+  const doOpen=()=> openZynx();
+  if(esOpen){ closeEssential(); setTimeout(doOpen,420); return; }
+  if(searchOpen){ closeSearch(); setTimeout(doOpen,420); return; }
+  doOpen();
+}
+
+
+function handleSearchTap(){
+  esTapCount++;
+  if(esTapCount===1){
+    esTapTimer=setTimeout(()=>{
+      esTapCount=0;
+      if(esMode) openEssential();
+      else openSearch();
+    },300);
+  } else if(esTapCount===2){
+    clearTimeout(esTapTimer);
+    esTapCount=0;
+    toggleEsMode(true);
+    openEssential();
+  }
+}
+
+function openGuestProfile(){
+  window.location.href='guest-profile.html';
+}
+
+function toggleEsMode(forceOn){
+  esMode = forceOn !== undefined ? forceOn : !esMode;
+  document.getElementById('nav-search-icon').style.display = esMode ? 'none' : '';
+  document.getElementById('nav-es-icon').style.display = esMode ? '' : 'none';
+  document.getElementById('nav-es-icon').style.color = 'var(--accent)';
+}
+
+/* open/close */
+function openEssential(){
+  if(esOpen) return;
+  esOpen=true;
+  setNav('search');
+  document.querySelector('.top-bar').style.display='none';
+  document.querySelector('.tabs').style.display='none';
+  const el=document.getElementById('es-overlay');
+  el.style.display='flex';
+  el.classList.remove('closing');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  history.pushState({modal:'essential'},'');
+  setTimeout(()=>document.getElementById('es-input').focus(),450);
+}
+
+function closeEssential(fromPop){
+  if(!esOpen) return;
+  esOpen=false;
+  setNav('home');
+  toggleEsMode(false);
+  // reset keyboard lift
+  const iw=document.getElementById('es-input-wrap-el');
+  if(iw) iw.style.transform='translateY(0)';
+  document.querySelector('.top-bar').style.display='';
+  document.querySelector('.tabs').style.display='';
+  const el=document.getElementById('es-overlay');
+  el.style.bottom='0px';
+  el.classList.remove('open');
+  el.classList.add('closing');
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; el.classList.remove('closing'); },380);
+}
+
+/* popstate — extend existing */
+window.addEventListener('popstate',e=>{
+  if(collegeProfileOpen){ closeCollegeProfile(true); return; }
+  if(esOpen){ closeEssential(true); return; }
+  if(searchOpen){ closeSearch(true); return; }
+  if(zynxOpen){ closeZynx(true); return; }
+});
+
+/* input live suggestions */
+function onEsInput(val){
+  const send=document.getElementById('es-send');
+  send.classList.toggle('visible', val.trim().length>0);
+  buildEsSuggestions(val.trim());
+}
+
+function buildEsSuggestions(q){
+  const strip=document.getElementById('es-suggestions');
+  if(!q){ strip.style.display='none'; return; }
+  const ql=q.toLowerCase().replace(/\s/g,'');
+  const colleges=window.XOS_COLLEGES||[];
+  const profiles=window.XOS_PROFILES||{};
+
+  const matchColleges=colleges.filter(c=>
+    c.name.toLowerCase().replace(/\s/g,'').includes(ql)
+  ).slice(0,2);
+
+  const matchUsers=Object.values(profiles).filter(u=>
+    (u.displayName||'').toLowerCase().includes(ql)||
+    (u.userid||'').toLowerCase().includes(ql)||
+    (u.handle||'').toLowerCase().includes(ql)
+  ).slice(0,2);
+
+  const chips=[
+    ...matchColleges.map(c=>{
+      const displayName=c.name.split(',')[0].trim();
+      return `<div class="es-suggest-chip college-chip" onclick="esSearchCollege(${colleges.indexOf(c)})">
+        <i class="fa-solid fa-building-columns"></i>${displayName}
+      </div>`;
+    }),
+    ...matchUsers.map(u=>`<div class="es-suggest-chip user-chip" onclick="esSearchUser('${u.userid}')">
+        <i class="fa-regular fa-user"></i>${u.displayName}
+      </div>`)
+  ];
+
+  if(chips.length===0){ strip.style.display='none'; return; }
+  strip.innerHTML=chips.join('');
+  strip.style.display='flex';
+}
+
+/* search execution */
+function doEsSearch(val){
+  if(!val.trim()) return;
+  const q=val.trim();
+  const ql=q.toLowerCase().replace(/\s/g,'');
+  document.getElementById('es-input').value='';
+  document.getElementById('es-send').classList.remove('visible');
+  document.getElementById('es-suggestions').style.display='none';
+
+  const greet=document.getElementById('es-greeting');
+  if(greet) greet.style.display='none';
+
+  appendEsBubbleUser(q);
+
+  const colleges=window.XOS_COLLEGES||[];
+  const profiles=window.XOS_PROFILES||{};
+
+  const matchCollege=colleges.find(c=>c.name.toLowerCase().replace(/\s/g,'').includes(ql));
+  const matchUser=Object.values(profiles).find(u=>
+    (u.displayName||'').toLowerCase().includes(ql)||
+    (u.userid||'').toLowerCase().includes(ql)||
+    (u.handle||'').toLowerCase().includes(ql)
+  );
+
+  setTimeout(()=>{
+    if(!matchCollege && !matchUser){
+      appendEsNotFound(q);
+    } else {
+      const sys=document.createElement('div');
+      sys.className='es-bubble-sys';
+      const txt=document.createElement('div');
+      txt.className='es-bubble-sys-text';
+      txt.textContent="Here's what I found";
+      sys.appendChild(txt);
+
+      if(matchCollege){
+        const idx=colleges.indexOf(matchCollege);
+        sys.appendChild(buildEsCollegeCard(matchCollege, idx));
+      }
+      if(matchUser){
+        sys.appendChild(buildEsUserCard(matchUser));
+      }
+      document.getElementById('es-messages').appendChild(sys);
+      scrollEsToBottom();
+    }
+  }, 320);
+}
+
+function esSearchUser(userid){
+  const profiles=window.XOS_PROFILES||{};
+  const u=profiles[userid];
+  if(!u) return;
+  document.getElementById('es-input').value='';
+  document.getElementById('es-suggestions').style.display='none';
+  const greet=document.getElementById('es-greeting');
+  if(greet) greet.style.display='none';
+  appendEsBubbleUser(u.displayName);
+  setTimeout(()=>{
+    const sys=document.createElement('div');
+    sys.className='es-bubble-sys';
+    const txt=document.createElement('div');
+    txt.className='es-bubble-sys-text';
+    txt.textContent="Here's what I found";
+    sys.appendChild(txt);
+    sys.appendChild(buildEsUserCard(u));
+    document.getElementById('es-messages').appendChild(sys);
+    scrollEsToBottom();
+  },320);
+}
+
+/* card builders */
+function buildEsCollegeCard(c, idx){
+  const nameParts=c.name.split(',');
+  const displayName=nameParts[0].trim();
+  const caption=nameParts.slice(1).join(',').trim();
+  const card=document.createElement('div');
+  card.className='es-result-card';
+  card.onclick=()=>openCollegeProfile(idx);
+  card.innerHTML=`
+    <div class="es-result-row">
+      <img class="es-result-pfp" src="${c.pfp||'1000046129.png'}" onerror="this.src='1000046129.png'" alt="">
+      <div>
+        <div class="es-result-name">${displayName} <span style="font-size:.62rem;color:var(--muted);">${c.id}</span></div>
+        <div class="es-result-sub">${caption||'Engineering College'}</div>
+      </div>
+    </div>
+    <div class="es-result-pills">
+      ${c.pill1?`<span class="es-result-pill">${c.pill1}</span>`:''}
+      ${c.pill2?`<span class="es-result-pill">${c.pill2}</span>`:''}
+    </div>`;
+  return card;
+}
+
+function buildEsUserCard(u){
+  const followerCount=(u.followers||[]).length;
+  const followingCount=(u.following||[]).length;
+  // badge HTML
+  const badgeHtml = u.verified==='gold'
+    ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;position:relative;overflow:hidden;border-radius:50%;vertical-align:middle;margin-left:4px;"><i class="fa-solid fa-certificate" style="font-size:13px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i><i class="fa-solid fa-check" style="font-size:6px;color:#000;position:relative;z-index:6;font-weight:900;"></i></span>`
+    : u.verified==='blue'
+    ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;background:#1d9bf0;border-radius:50%;vertical-align:middle;margin-left:4px;"><i class="fa-solid fa-check" style="font-size:7px;color:#fff;font-weight:900;"></i></span>`
+    : '';
+  const card=document.createElement('div');
+  card.className='es-result-card';
+  card.onclick=()=>window.open(`anush-decodes.html?user=${u.userid}`,'_self');
+  card.innerHTML=`
+    <div class="es-result-row">
+      <img class="es-result-pfp square" src="${u.avatar||'1000046129.png'}" onerror="this.src='1000046129.png'" alt=""
+        style="border-radius:10px;width:46px;height:46px;object-fit:cover;flex-shrink:0;">
+      <div style="flex:1;min-width:0;">
+        <div class="es-result-name">${u.displayName}${badgeHtml}</div>
+        <div class="es-result-sub" style="color:var(--accent)">${u.handle}</div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:3px;">
+          <b style="color:var(--text)">${followerCount}</b> followers · <b style="color:var(--text)">${followingCount}</b> following
+        </div>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);flex-shrink:0;"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>`;
+  return card;
+}
+
+function appendEsBubbleUser(text){
+  const b=document.createElement('div');
+  b.className='es-bubble-user';
+  b.textContent=text;
+  document.getElementById('es-messages').appendChild(b);
+  scrollEsToBottom();
+}
+
+function appendEsNotFound(q){
+  const b=document.createElement('div');
+  b.className='es-bubble-notfound';
+  b.textContent=`No results for "${q}". Try a different name or @id.`;
+  document.getElementById('es-messages').appendChild(b);
+  scrollEsToBottom();
+}
+
+function scrollEsToBottom(){
+  const el=document.getElementById('es-messages');
+  setTimeout(()=>el.scrollTo({top:el.scrollHeight,behavior:'smooth'}),50);
+}
+
+
+let searchOpen=false, searchTab='people';
+
+function openSearch(){
+  if(searchOpen) return;
+  searchOpen=true;
+  setNav('search');
+  document.querySelector('.top-bar').style.display='none';
+  document.querySelector('.tabs').style.display='none';
+  const el=document.getElementById('search-overlay');
+  el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  history.pushState({modal:'search'},'');
+  setTimeout(()=>document.getElementById('search-input').focus(),400);
+}
+
+function closeSearch(fromPop){
+  if(!searchOpen) return;
+  searchOpen=false;
+  setNav('home');
+  document.querySelector('.top-bar').style.display='';
+  document.querySelector('.tabs').style.display='';
+  const el=document.getElementById('search-overlay');
+  el.classList.remove('open');
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; },400);
+  clearSearch();
+}
+
+// extend popstate handled in Essential Search JS above
+
+function clearSearch(){
+  const inp=document.getElementById('search-input');
+  inp.value='';
+  document.getElementById('search-clear').classList.remove('visible');
+  showDefaultSearch();
+}
+
+function setSearchTab(tab){
+  searchTab=tab;
+  document.getElementById('spill-people').classList.toggle('active', tab==='people');
+  document.getElementById('spill-colleges').classList.toggle('active', tab==='colleges');
+  document.getElementById('stab-people').style.display=tab==='people'?'':'none';
+  document.getElementById('stab-colleges').style.display=tab==='colleges'?'':'none';
+  document.getElementById('search-tab-hint').textContent=
+    tab==='colleges' ? 'Type #college to see all colleges' : '';
+  // re-run search if there's a query
+  const q=document.getElementById('search-input').value.trim();
+  if(q) onSearchInput(q);
+}
+
+function showDefaultSearch(){
+  document.getElementById('search-default').style.display='';
+  document.getElementById('search-results').style.display='none';
+}
+
+function onSearchInput(val){
+  const clear=document.getElementById('search-clear');
+  clear.classList.toggle('visible', val.length>0);
+  if(!val.trim()){ showDefaultSearch(); return; }
+
+  const q=val.trim().toLowerCase().replace(/\s/g,'');
+
+  // #college = show all
+  const showAll = q==='#college' || q==='#colleges';
+
+  document.getElementById('search-default').style.display='none';
+  document.getElementById('search-results').style.display='';
+  const list=document.getElementById('results-list');
+
+  if(searchTab==='people'){
+    list.innerHTML=`<div class="no-results-wrap">
+      <i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+      <div class="no-results-txt">No profiles yet</div></div>`;
+    return;
+  }
+
+  // colleges search
+  const colleges = window.XOS_COLLEGES || [];
+  let matches;
+  if(showAll){
+    matches = colleges;
+  } else {
+    matches = colleges.filter(c=>{
+      const name=c.name.toLowerCase().replace(/\s/g,'');
+      return name.includes(q);
+    });
+    if(!showAll) matches=matches.slice(0,4);
+  }
+
+  if(matches.length===0){
+    const q_display = document.getElementById('search-input').value.trim();
+    list.innerHTML=`<div class="no-results-wrap">
+      <i class="fa-solid fa-building-columns" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i>
+      <div class="no-results-txt">No colleges found</div>
+      <div class="no-results-sub" style="margin-bottom:18px;">Can't find "${q_display}"?</div>
+      <div class="add-college-btn" onclick="openAddCollege('${q_display.replace(/'/g,"\\'")}')">
+        <i class="fa-solid fa-plus"></i> Add College
+      </div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML=matches.map((c)=>{
+    const originalIdx=colleges.indexOf(c);
+    return buildCollegeCard(c, originalIdx);
+  }).join('');
+
+  // check marquee need
+  requestAnimationFrame(()=>{
+    list.querySelectorAll('.college-card-name').forEach(el=>{
+      const wrap=el.closest('.college-card-name-wrap');
+      if(wrap && el.scrollWidth > wrap.offsetWidth){
+        // duplicate text for seamless loop
+        el.textContent=el.textContent+' · '+el.textContent;
+        el.classList.add('marquee');
+      }
+    });
+  });
+}
+
+function buildCollegeCard(c, i){
+  const nameParts=c.name.split(',');
+  const displayName=nameParts[0].trim();
+  const caption=nameParts.slice(1).join(',').trim();
+  return `<div class="college-card" onclick="openCollegeProfile(${i})">
+    <div class="college-pfp-wrap">
+      <img src="${c.pfp||'1000046129.png'}" alt="" onerror="this.src='1000046129.png'">
+    </div>
+    <div class="college-info">
+      <div class="college-card-name-wrap">
+        <div class="college-card-name" id="ccn-${i}">${displayName}</div>
+      </div>
+    </div>
+    <i class="fa-solid fa-chevron-right college-card-arrow"></i>
+  </div>`;
+}
+
+/* ══════════════════════════
+   COLLEGE PROFILE
+══════════════════════════ */
+let collegeProfileOpen=false;
+let currentCollege=null;
+
+function openCollegeProfile(idx){
+  const colleges=window.XOS_COLLEGES||[];
+  const c=colleges[idx];
+  if(!c) return;
+  currentCollege=c;
+  collegeProfileOpen=true;
+
+  const nameParts=c.name.split(',');
+  const displayName=nameParts[0].trim();
+  const caption=nameParts.slice(1).join(',').trim();
+
+  document.getElementById('cp-pfp').src=c.pfp||'1000046129.png';
+  document.getElementById('cp-pfp').onerror=function(){this.src='1000046129.png';};
+  document.getElementById('cp-name').innerHTML=`${displayName} <span style="font-size:.65rem;font-weight:600;color:var(--muted);letter-spacing:.06em;">${c.id}</span>`;
+  document.getElementById('cp-caption').textContent=caption||'Engineering College';
+  document.getElementById('cp-tag').textContent='College';
+
+  const pillsRow=document.getElementById('cp-pills-row');
+  pillsRow.innerHTML=(c.pill1?`<span class="cp-pill-tag">${c.pill1}</span>`:'')+
+                     (c.pill2?`<span class="cp-pill-tag">${c.pill2}</span>`:'');
+
+  updateCpLinkLabel();
+
+  const el=document.getElementById('college-profile');
+  el.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  history.pushState({modal:'college'},'');
+}
+
+function closeCollegeProfile(fromPop){
+  if(!collegeProfileOpen) return;
+  collegeProfileOpen=false;
+  document.getElementById('cp-dots-menu').style.display='none';
+  const el=document.getElementById('college-profile');
+  el.classList.remove('open');
+  if(!fromPop) history.back();
+  setTimeout(()=>{ el.style.display='none'; },380);
+}
+
+function toggleCpMenu(e){
+  e.stopPropagation();
+  const menu=document.getElementById('cp-dots-menu');
+  menu.style.display=menu.style.display==='block'?'none':'block';
+  updateCpLinkLabel();
+}
+
+function updateCpLinkLabel(){
+  if(!currentCollege) return;
+  const stored=localStorage.getItem('xos_linked_college');
+  const isLinked=stored&&JSON.parse(stored).id===currentCollege.id;
+  document.getElementById('cp-link-label').textContent=isLinked?'Unlink College':'Link College';
+  const icon=document.getElementById('cp-link-icon');
+  icon.className=isLinked?'fa-solid fa-link-slash':'fa-solid fa-link';
+  icon.style.color=isLinked?'#ff3b5c':'#007aff';
+}
+
+function toggleCollegeLink(){
+  document.getElementById('cp-dots-menu').style.display='none';
+  if(!currentCollege) return;
+  const stored=localStorage.getItem('xos_linked_college');
+  const isLinked=stored&&JSON.parse(stored).id===currentCollege.id;
+  if(isLinked){
+    localStorage.removeItem('xos_linked_college');
+  } else {
+    const displayName=currentCollege.name.split(',')[0].trim();
+    localStorage.setItem('xos_linked_college',JSON.stringify({
+      id:currentCollege.id,
+      name:displayName,
+      pfp:currentCollege.pfp||''
+    }));
+  }
+  updateCpLinkLabel();
+  initFeedCollegeRows();
+}
+
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('cp-dots-menu');
+  if(menu&&!menu.contains(e.target)) menu.style.display='none';
+});
+
+/* ── ADD COLLEGE ── */
+function openAddCollege(prefill){
+  const backdrop=document.getElementById('ac-backdrop');
+  document.getElementById('ac-form-wrap').style.display='block';
+  document.getElementById('ac-thankyou-wrap').style.display='none';
+  if(prefill) document.getElementById('ac-name-input').value=prefill;
+  backdrop.classList.add('open');
+  setTimeout(()=>document.getElementById('ac-name-input').focus(),300);
+}
+function closeAddCollege(){
+  const backdrop=document.getElementById('ac-backdrop');
+  backdrop.classList.add('closing');
+  setTimeout(()=>{
+    backdrop.classList.remove('open','closing');
+    document.getElementById('ac-name-input').value='';
+    document.getElementById('ac-code-input').value='';
+    document.getElementById('ac-form-wrap').style.display='block';
+    document.getElementById('ac-thankyou-wrap').style.display='none';
+  },280);
+}
+function submitAddCollege(){
+  const name=document.getElementById('ac-name-input').value.trim();
+  const code=document.getElementById('ac-code-input').value.trim();
+  if(!name){document.getElementById('ac-name-input').focus();return;}
+  const subs=JSON.parse(localStorage.getItem('xos_college_submissions')||'[]');
+  subs.push({name,code,submitted:new Date().toISOString()});
+  localStorage.setItem('xos_college_submissions',JSON.stringify(subs));
+  document.getElementById('ac-form-wrap').style.display='none';
+  document.getElementById('ac-thankyou-wrap').style.display='block';
+}
+</script>
+<script src="colleges.js"></script>
+<script src="Dishabase.js"></script>
+<script src="disha-extensions.js"></script>
+</body>
+</html>
