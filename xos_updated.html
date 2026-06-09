@@ -73,149 +73,36 @@
         .avatar-wrap:active .avatar-img{transform:scale(.94);opacity:.85;}
         .avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:1px solid var(--border);display:block;transition:transform .18s var(--ease),opacity .18s var(--ease);}
 
-        /* ═══════════════════════════════════════════
-           INDUSTRIAL VERIFICATION BADGES — REDESIGNED
-        ═══════════════════════════════════════════ */
+        /* ═══════════════════════════════════════════════════
+           INDUSTRIAL SEAL BADGES — SVG SCALLOPED STAMP STYLE
+           Exactly matching: Standard Green / Blue / Enterprise Gold
+        ═══════════════════════════════════════════════════ */
 
-        /* GOLD / PREMIUM badge */
         .pfp-badge{
-            position:absolute;bottom:-4px;right:-4px;
-            width:22px;height:22px;
+            position:absolute;bottom:-5px;right:-5px;
+            width:24px;height:24px;
             display:flex;align-items:center;justify-content:center;
-            z-index:5;border-radius:50%;
-            cursor:default;
+            z-index:10;cursor:default;
             animation:badgeAppear .5s cubic-bezier(.32,.72,0,1) both;
+            background:none!important;border:none!important;
+            border-radius:0!important;overflow:visible!important;
         }
-        /* Gold ring outer glow */
-        .pfp-badge.badge-gold,
-        .pfp-badge:not(.badge-blue):not(.badge-green):not(.badge-none){
-            background: conic-gradient(
-                #BF953F 0%, #FCF6BA 18%, #B38728 36%,
-                #FBF5B7 52%, #AA771C 68%, #FFD700 84%, #BF953F 100%
-            );
-            border:1.5px solid rgba(255,215,0,.35);
-            animation:goldPulse 2.5s ease-in-out infinite, badgeAppear .5s cubic-bezier(.32,.72,0,1) both;
-            box-shadow:
-                0 0 0 1px rgba(252,209,80,.15),
-                0 0 8px 2px rgba(252,209,80,.22),
-                inset 0 1px 0 rgba(255,255,255,.35);
-        }
-        .pfp-badge.badge-gold::before,
-        .pfp-badge:not(.badge-blue):not(.badge-green):not(.badge-none)::before{
-            content:'';position:absolute;inset:2px;border-radius:50%;
-            background:radial-gradient(circle at 40% 35%,#fffbe6 0%,#e8c24a 55%,#a07020 100%);
-            z-index:0;
-        }
-        .pfp-badge .badge-icon-gold{
-            position:relative;z-index:2;
-            font-size:9px;color:#2a1a00;font-weight:900;
-            text-shadow:0 .5px 0 rgba(255,255,255,.4);
-        }
-        /* Shimmer sweep on gold */
-        .pfp-badge.badge-gold::after,
-        .pfp-badge:not(.badge-blue):not(.badge-green):not(.badge-none)::after{
-            content:'';position:absolute;top:-2px;left:-120%;width:60%;height:calc(100% + 4px);
-            background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.55) 50%,transparent 80%);
-            border-radius:50%;
-            animation:badgeShimmer 2.8s 1s infinite ease-in-out;
-            z-index:3;pointer-events:none;overflow:hidden;
-        }
-
-        /* BLUE / Twitter-style badge */
-        .pfp-badge.badge-blue{
-            background:linear-gradient(145deg,#1da1f2 0%,#0d8bd9 50%,#1a7fc4 100%);
-            border:1.5px solid rgba(29,161,242,.4);
-            animation:bluePulse 2.8s ease-in-out infinite, badgeAppear .5s cubic-bezier(.32,.72,0,1) both;
-            box-shadow:
-                0 0 0 1px rgba(29,155,240,.2),
-                0 0 7px 2px rgba(29,155,240,.28),
-                inset 0 1px 0 rgba(255,255,255,.28);
-        }
-        .pfp-badge.badge-blue::before{
-            content:'';position:absolute;inset:2px;border-radius:50%;
-            background:radial-gradient(circle at 38% 32%,rgba(255,255,255,.22) 0%,transparent 70%);
-            z-index:0;
-        }
-        .pfp-badge.badge-blue .badge-icon-blue{
-            position:relative;z-index:2;
-            font-size:9px;color:#fff;font-weight:900;
-            text-shadow:0 1px 2px rgba(0,0,100,.3);
-        }
-        .pfp-badge.badge-blue::after{
-            content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;
-            background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.4) 50%,transparent 80%);
-            border-radius:50%;
-            animation:badgeShimmer 3.2s 1.5s infinite ease-in-out;
-            z-index:3;pointer-events:none;
-        }
-
-        /* GREEN / WhatsApp-style badge */
-        .pfp-badge.badge-green{
-            background:linear-gradient(145deg,#2dd465 0%,#1da84a 50%,#17913e 100%);
-            border:1.5px solid rgba(37,211,102,.4);
-            animation:greenPulse 2.8s ease-in-out infinite, badgeAppear .5s cubic-bezier(.32,.72,0,1) both;
-            box-shadow:
-                0 0 0 1px rgba(37,211,102,.18),
-                0 0 7px 2px rgba(37,211,102,.24),
-                inset 0 1px 0 rgba(255,255,255,.24);
-        }
-        .pfp-badge.badge-green::before{
-            content:'';position:absolute;inset:2px;border-radius:50%;
-            background:radial-gradient(circle at 38% 32%,rgba(255,255,255,.2) 0%,transparent 70%);
-            z-index:0;
-        }
-        .pfp-badge.badge-green .badge-icon-green{
-            position:relative;z-index:2;
-            font-size:9px;color:#fff;font-weight:900;
-            text-shadow:0 1px 2px rgba(0,60,0,.3);
-        }
-        .pfp-badge.badge-green::after{
-            content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;
-            background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.38) 50%,transparent 80%);
-            border-radius:50%;
-            animation:badgeShimmer 3.6s 2s infinite ease-in-out;
-            z-index:3;pointer-events:none;
-        }
-
         .pfp-badge.badge-none{display:none;}
+        .pfp-badge svg{width:24px;height:24px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.55));}
+        .pfp-badge.badge-blue svg{filter:drop-shadow(0 0 5px rgba(29,155,240,.55)) drop-shadow(0 1px 3px rgba(0,0,0,.5));animation:bluePulse 2.8s ease-in-out infinite;}
+        .pfp-badge.badge-green svg{filter:drop-shadow(0 0 5px rgba(37,180,90,.5)) drop-shadow(0 1px 3px rgba(0,0,0,.5));animation:greenPulse 2.8s ease-in-out infinite;}
+        .pfp-badge:not(.badge-blue):not(.badge-green):not(.badge-none) svg{filter:drop-shadow(0 0 6px rgba(210,160,40,.6)) drop-shadow(0 1px 3px rgba(0,0,0,.5));animation:goldPulse 2.5s ease-in-out infinite;}
 
-        /* Sheet verified inline badges — same industrial system */
+        /* Inline sheet-verified badges */
         .sheet-verified{
             display:inline-flex;align-items:center;justify-content:center;
-            width:14px;height:14px;border-radius:50%;
-            position:relative;overflow:hidden;
-            vertical-align:middle;margin-left:5px;
-            flex-shrink:0;
+            width:16px;height:16px;vertical-align:middle;margin-left:5px;
+            flex-shrink:0;background:none!important;border:none!important;
         }
-        .sheet-verified .badge-icon-gold,.sheet-verified .badge-icon-blue,.sheet-verified .badge-icon-green{
-            font-size:7px;font-weight:900;position:relative;z-index:2;
-        }
-        .sheet-verified:not(.badge-blue):not(.badge-green):not(.badge-none){
-            background: conic-gradient(#BF953F 0%,#FCF6BA 18%,#B38728 36%,#FBF5B7 52%,#AA771C 68%,#FFD700 84%,#BF953F 100%);
-            border:1px solid rgba(255,215,0,.35);
-            box-shadow:0 0 5px 1px rgba(252,209,80,.22);
-            animation:goldPulse 2.5s ease-in-out infinite;
-        }
-        .sheet-verified:not(.badge-blue):not(.badge-green):not(.badge-none)::before{
-            content:'';position:absolute;inset:1.5px;border-radius:50%;
-            background:radial-gradient(circle at 40% 35%,#fffbe6 0%,#e8c24a 55%,#a07020 100%);
-            z-index:0;
-        }
-        .sheet-verified:not(.badge-blue):not(.badge-green):not(.badge-none) .badge-icon-gold{color:#2a1a00;}
-        .sheet-verified.badge-blue{
-            background:linear-gradient(145deg,#1da1f2 0%,#0d8bd9 50%,#1a7fc4 100%);
-            border:1px solid rgba(29,161,242,.4);
-            box-shadow:0 0 5px 1px rgba(29,155,240,.28);
-            animation:bluePulse 2.8s ease-in-out infinite;
-        }
-        .sheet-verified.badge-blue .badge-icon-blue{color:#fff;}
-        .sheet-verified.badge-green{
-            background:linear-gradient(145deg,#2dd465 0%,#1da84a 50%,#17913e 100%);
-            border:1px solid rgba(37,211,102,.4);
-            box-shadow:0 0 5px 1px rgba(37,211,102,.24);
-            animation:greenPulse 2.8s ease-in-out infinite;
-        }
-        .sheet-verified.badge-green .badge-icon-green{color:#fff;}
+        .sheet-verified svg{width:16px;height:16px;}
+        .sheet-verified.badge-blue svg{filter:drop-shadow(0 0 3px rgba(29,155,240,.6));animation:bluePulse 2.8s ease-in-out infinite;}
+        .sheet-verified.badge-green svg{filter:drop-shadow(0 0 3px rgba(37,180,90,.5));animation:greenPulse 2.8s ease-in-out infinite;}
+        .sheet-verified:not(.badge-blue):not(.badge-green):not(.badge-none) svg{filter:drop-shadow(0 0 4px rgba(210,160,40,.55));animation:goldPulse 2.5s ease-in-out infinite;}
         .sheet-verified.badge-none{display:none;}
 
         /* ═══ PROFILE LAYOUT ═══ */
@@ -872,30 +759,86 @@
 
         const POSTS = activeProfile.posts || [];
 
-        /* ─── BUILD BADGE HTML ─── */
+        /* ═══════════════════════════════════════════════════════
+           INDUSTRIAL SEAL BADGE — SVG SCALLOPED STAMP GENERATOR
+           Produces the exact wavy-edge notary seal from the reference image
+        ═══════════════════════════════════════════════════════ */
+
+        /**
+         * Generates a scalloped/wavy-edge seal path (notary stamp shape).
+         * numPoints = number of "teeth" around the edge (12 = reference image)
+         */
+        function sealPath(cx, cy, rOuter, rInner, numPoints) {
+            let d = '';
+            const total = numPoints * 2;
+            for (let i = 0; i < total; i++) {
+                const angle = (Math.PI * 2 * i) / total - Math.PI / 2;
+                const r = i % 2 === 0 ? rOuter : rInner;
+                const x = cx + r * Math.cos(angle);
+                const y = cy + r * Math.sin(angle);
+                d += (i === 0 ? 'M' : 'L') + x.toFixed(3) + ',' + y.toFixed(3);
+            }
+            return d + 'Z';
+        }
+
+        const BADGE_COLORS = {
+            gold:  { fill: '#C8960C', fillDark: '#a07820', fillLight: '#E8B420', checkColor: '#fff' },
+            blue:  { fill: '#2E9FE0', fillDark: '#1a7fc4', fillLight: '#4DBFF0', checkColor: '#fff' },
+            green: { fill: '#1B6B35', fillDark: '#14512A', fillLight: '#27A350', checkColor: '#fff' },
+        };
+
+        // checkmark path scaled to a 32x32 viewbox
+        const CHECK_PATH = 'M8,17 L14,23 L24,11';
+
+        function makeSealSVG(type, size) {
+            const s = size || 32;
+            const cx = s / 2, cy = s / 2;
+            const rO = s * 0.47;   // outer radius of teeth tips
+            const rI = s * 0.38;   // inner radius of teeth valleys
+            const n = 12;          // 12 teeth = reference image
+
+            const col = BADGE_COLORS[type] || BADGE_COLORS.gold;
+            const path = sealPath(cx, cy, rO, rI, n);
+
+            // Checkmark stroke-width scales with size
+            const sw = (s / 32) * 3.5;
+
+            return `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+  <defs>
+    <radialGradient id="sg_${type}" cx="42%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="${col.fillLight}"/>
+      <stop offset="100%" stop-color="${col.fillDark}"/>
+    </radialGradient>
+  </defs>
+  <path d="${path}" fill="url(#sg_${type})" />
+  <polyline points="${(s*0.25)},${(s*0.53)} ${(s*0.44)},${(s*0.72)} ${(s*0.75)},${(s*0.34)}"
+    fill="none"
+    stroke="${col.checkColor}"
+    stroke-width="${sw}"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+</svg>`;
+        }
+
         function buildBadgeHTML(type) {
             if (!type || type === 'none') return '';
-            if (type === 'blue') return `<span class="sheet-verified badge-blue"><i class="fa-solid fa-check badge-icon-blue"></i></span>`;
-            if (type === 'green') return `<span class="sheet-verified badge-green"><i class="fa-solid fa-check badge-icon-green"></i></span>`;
-            // gold / default
-            return `<span class="sheet-verified"><i class="fa-solid fa-check badge-icon-gold"></i></span>`;
+            const t = (type === 'blue' || type === 'green') ? type : 'gold';
+            return `<span class="sheet-verified badge-${t}">${makeSealSVG(t, 16)}</span>`;
         }
 
         function setPfpBadge(type) {
             const el = document.getElementById('pfp-badge');
-            el.innerHTML = '';
-            if (!type || type === 'none') { el.className = 'pfp-badge badge-none'; return; }
-            if (type === 'blue') {
-                el.className = 'pfp-badge badge-blue';
-                el.innerHTML = `<i class="fa-solid fa-check badge-icon-blue"></i>`;
-            } else if (type === 'green') {
-                el.className = 'pfp-badge badge-green';
-                el.innerHTML = `<i class="fa-solid fa-check badge-icon-green"></i>`;
-            } else {
-                // gold
-                el.className = 'pfp-badge';
-                el.innerHTML = `<i class="fa-solid fa-check badge-icon-gold"></i>`;
-            }
+            if (!type || type === 'none') { el.className = 'pfp-badge badge-none'; el.innerHTML = ''; return; }
+            const t = (type === 'blue' || type === 'green') ? type : 'gold';
+            el.className = `pfp-badge badge-${t}`;
+            el.innerHTML = makeSealSVG(t, 24);
+        }
+
+        // Also expose for fo-badge in follow list
+        function makeFoBadge(type) {
+            if (!type || type === 'none') return '';
+            const t = (type === 'blue' || type === 'green') ? type : 'gold';
+            return `<span class="fo-badge ${t}" style="background:none;border:none;box-shadow:none;width:15px;height:15px;">${makeSealSVG(t, 15)}</span>`;
         }
 
         /* ─── RENDER PROFILE ─── */
@@ -1049,12 +992,7 @@
 
             list.innerHTML = users.map((u, i) => {
                 const vType = u.verified || null;
-                const badgeHTML = vType === 'blue' ?
-                    `<span class="fo-badge blue"><i class="fa-solid fa-check"></i></span>` :
-                    vType === 'green' ?
-                    `<span class="fo-badge green"><i class="fa-solid fa-check"></i></span>` :
-                    vType && vType !== 'none' ?
-                    `<span class="fo-badge gold"><i class="fa-solid fa-check"></i></span>` : '';
+                const badgeHTML = (vType && vType !== 'none') ? makeFoBadge(vType) : '';
 
                 const isMutual = Math.random() > 0.6; // replace with real mutual logic
                 const showOnline = Math.random() > 0.7;
