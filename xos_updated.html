@@ -787,7 +787,7 @@
         function lsGet(key, fallback) { const raw = localStorage.getItem(`xos_${key}_${LS_SCOPE}`); if(raw===null) return fallback; try{return JSON.parse(raw);}catch(e){return raw;} }
         function lsSet(key, value) { localStorage.setItem(`xos_${key}_${LS_SCOPE}`, JSON.stringify(value)); }
 
-        const POSTS = activeProfile.posts || [];
+        let POSTS = activeProfile.posts || [];
 
         /* ─── BADGE — SVG placeholders, swap src when files arrive ─── */
         const BADGE_SRC = {
@@ -818,6 +818,8 @@
 
         /* ─── RENDER PROFILE ─── */
         function renderProfile() {
+            POSTS.length = 0;
+            (activeProfile.posts || []).forEach(p => POSTS.push(p));
             const p = activeProfile;
             document.getElementById('page-title').textContent = p.displayName + ' | x0s.link';
             document.title = p.displayName + ' | x0s.link';
@@ -846,6 +848,7 @@
             const linksRow = document.getElementById('links-row');
             linksRow.innerHTML = (p.links || []).map(l => {
                 const iconClass = l.arattai ? null : (l.icon || 'fa-solid fa-link');
+                const colorClass = l.color || 'color-globe';
                 const iconHTML = l.arattai
                     ? `<img src="arattai.png" style="width:14px;height:14px;object-fit:contain;display:block;flex-shrink:0;" alt="arattai">`
                     : `<i class="${iconClass} ${colorClass}"></i>`;
@@ -1011,6 +1014,7 @@
         let gridIntervals = [];
         function renderPosts() {
             const grid = document.getElementById('posts-grid');
+            if (!grid) return;
             gridIntervals.forEach(clearInterval); gridIntervals = [];
             grid.innerHTML = POSTS.map((p,i) => `
             <div class="post-thumb" onclick="openPost(${i})">
