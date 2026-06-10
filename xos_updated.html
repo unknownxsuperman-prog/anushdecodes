@@ -82,42 +82,88 @@
            26px total. bottom-right corner overlapping avatar.
            offset = -8px so ~70% inside, 30% outside
         */
-        .pfp-badge{
-            position:absolute;
-            bottom:-4px;
-            right:-4px;
-            width:26px;
-            height:26px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            z-index:10;
-            background:none;
-            border:none;
-            padding:0;
-            overflow:visible;
-        }
-        .pfp-badge img,
-        .pfp-badge svg{
-            width:26px;
-            height:26px;
-            display:block;
-            object-fit:contain;
-            filter:drop-shadow(0 1px 5px rgba(0,0,0,.55));
-        }
-        .pfp-badge.badge-none{display:none;}
+       /* ===========================
+   Profile Picture Verified Badge
+   Optimized for x0s.link UI
+   =========================== */
 
-        /* Inline verified badge next to name in modal */
-        .sheet-verified{
-            display:inline-flex;align-items:center;justify-content:center;
-            width:14px;height:14px;
-            vertical-align:middle;margin-left:4px;flex-shrink:0;
-        }
-        .sheet-verified img{
-            width:14px;height:14px;
-            object-fit:contain;display:block;
-        }
-        .sheet-verified.badge-none{display:none;}
+.pfp-badge{
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+
+    width: 22px;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 10;
+
+    background: none;
+    border: none;
+    padding: 0;
+
+    overflow: visible;
+
+    transition: transform .18s ease;
+}
+
+.pfp-badge:hover{
+    transform: scale(1.05);
+}
+
+.pfp-badge img,
+.pfp-badge svg{
+    width: 22px;
+    height: 22px;
+
+    display: block;
+    object-fit: contain;
+
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,.5));
+}
+
+.pfp-badge.badge-none{
+    display: none;
+}
+
+
+/* ===========================
+   Inline Verified Badge
+   Beside Username
+   =========================== */
+
+.sheet-verified{
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 16px;
+    height: 16px;
+
+    margin-left: 5px;
+    vertical-align: middle;
+
+    flex-shrink: 0;
+}
+
+.sheet-verified img,
+.sheet-verified svg{
+    width: 16px;
+    height: 16px;
+
+    display: block;
+    object-fit: contain;
+
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
+
+.sheet-verified.badge-none{
+    display: none;
+}
 
         /* ═══ PROFILE LAYOUT ═══ */
         .name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
