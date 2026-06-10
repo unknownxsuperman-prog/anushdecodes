@@ -818,9 +818,8 @@
 
         /* ─── RENDER PROFILE ─── */
         function renderProfile() {
-            POSTS.length = 0;
-            (activeProfile.posts || []).forEach(p => POSTS.push(p));
             const p = activeProfile;
+            POSTS = p.posts || [];
             document.getElementById('page-title').textContent = p.displayName + ' | x0s.link';
             document.title = p.displayName + ' | x0s.link';
             document.getElementById('banner-img').src = p.banner || '';
@@ -850,7 +849,7 @@
                 const iconClass = l.arattai ? null : (l.icon || 'fa-solid fa-link');
                 const colorClass = l.color || 'color-globe';
                 const iconHTML = l.arattai
-                    ? `<img src="arattai.png" style="width:14px;height:14px;object-fit:contain;display:block;flex-shrink:0;" alt="arattai">`
+                    ? `<img src="arattai.png" style="width:13px;height:13px;object-fit:contain;display:block;flex-shrink:0;background:none;" alt="arattai">`
                     : `<i class="${iconClass} ${colorClass}"></i>`;
                 return `<a href="${l.url||'#'}" class="link-pill" target="_blank">${iconHTML}${l.label}</a>`;
             }).join('');
