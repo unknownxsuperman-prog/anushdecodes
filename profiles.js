@@ -112,7 +112,7 @@ window.XOS_PROFILES = {
     userid: 'niranjan',
     handle: 'niranjan@xos',
     displayName: 'Niranjan',
-    verified: 'blue',
+    verified: 'green',
     banner: 'Picsart_26-04-21_09-30-21-870.png',
     avatar: '1770636198936.png',
     bio: "chasing greatness, medico 🇮🇳 ' 🇷🇺",
