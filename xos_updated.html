@@ -845,9 +845,11 @@
 
             const linksRow = document.getElementById('links-row');
             linksRow.innerHTML = (p.links || []).map(l => {
-                const iconClass = l.arattai ? 'fa-arattai' : (l.icon || 'fa-solid fa-link');
-                const colorClass = l.color || 'color-globe';
-                return `<a href="${l.url||'#'}" class="link-pill" target="_blank"><i class="${iconClass} ${colorClass}"></i>${l.label}</a>`;
+                const iconClass = l.arattai ? null : (l.icon || 'fa-solid fa-link');
+                const iconHTML = l.arattai
+                    ? `<img src="arattai.png" style="width:14px;height:14px;object-fit:contain;display:block;flex-shrink:0;" alt="arattai">`
+                    : `<i class="${iconClass} ${colorClass}"></i>`;
+                return `<a href="${l.url||'#'}" class="link-pill" target="_blank">${iconHTML}${l.label}</a>`;
             }).join('');
 
             followerBase = window.xosFollowerCount ? window.xosFollowerCount(activeUsername) : (activeProfile.followerCount || 0);
