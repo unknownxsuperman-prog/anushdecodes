@@ -14,7 +14,6 @@ window.XOS_PROFILES = {
     banner: 'Picsart_26-04-18_23-43-21-546.jpg',
     avatar: 'Screenshot_20260418-234611.png',
     bio: 'Decoding logic at the kernel level.\nBuilding the future one commit at a time.',
-    // followers/following store user IDs — count derived from array length
     followers: ['gemini'],
     following: ['gemini'],
     audioTrack: {
@@ -107,44 +106,41 @@ window.XOS_PROFILES = {
         comments: 9
       }
     ]
+  }, // Added missing comma here
+
+  niranjan: { // Swapped key to lowercase for routing mapping consistency
+    userid: 'niranjan',
+    handle: 'niranjan@xos',
+    displayName: 'Niranjan',
+    verified: 'blue',
+    banner: 'Picsart_26-04-21_09-30-21-870.png',
+    avatar: '1770636198936.png',
+    bio: "chasing greatness, medico 🇮🇳 ' 🇷🇺",
+    followers: ['gemini'],
+    following: ['gemini'],
+    audioTrack: {
+      title: 'Dude-Orchestral Suite',
+      artist: 'abhyankkar',
+      streamUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview112/v4/5e/3c/52/5e3c526f-72e9-63e0-4a16-1cf3a94e7c38/mzaf_5923832917512396829.plus.aac.ep.m4a',
+      artworkUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e5/07/8e/e5078e3b-77fe-1c78-3cb9-d39b6cf8b0f4/22UMGIM77352.rgb.jpg/600x600bb.jpg'
+    },
+    links: [
+      { icon: 'fa-brands fa-snapchat', label: 'Snapchat', url: 'https://www.snapchat.com/add/YOUR_USERNAME', color: 'color-snapchat' },
+      { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
+      { icon: 'fa-brands fa-x-twitter', label: 'X', url: 'https://x.com/Nikhil_X7', color: 'color-twitter' }
+    ],
+    posts: [
+      {
+        files: ['nirup1.mp4'],
+        type: 'video',
+        caption: '🕉️',
+        time: '1d ago',
+        likes: 128,
+        comments: 14
+      }
+    ]
   }
-  Niranjan: {
-  userid: 'niranjan',
-  handle: 'niranjan@xos',
-  displayName: 'Niranjan',
-  verified: 'blue',
-  banner: 'Picsart_26-04-21_09-30-21-870.png',
-  avatar: '1770636198936.png',
-  bio: "chasing greatness, medico 🇮🇳 ' 🇷🇺",
-  followers: ['gemini'],
-  following: ['gemini'],
-  audioTrack: {
-    title: 'Dude-Orchestral Suite',
-    artist: 'abhyankkar',
-    streamUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview112/v4/5e/3c/52/5e3c526f-72e9-63e0-4a16-1cf3a94e7c38/mzaf_5923832917512396829.plus.aac.ep.m4a',
-    artworkUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e5/07/8e/e5078e3b-77fe-1c78-3cb9-d39b6cf8b0f4/22UMGIM77352.rgb.jpg/600x600bb.jpg'
-  },
-  links: [
-    { icon: 'fa-brands fa-snapchat', label: 'Snapchat', url: 'https://www.snapchat.com/add/YOUR_USERNAME', color: 'color-snapchat' },
-    { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
-    { icon: 'fa-brands fa-x-twitter', label: 'X', url: 'https://x.com/Nikhil_X7', color: 'color-twitter' }
-  ],
-  posts: [
-    {
-      files: ['nirup1.mp4'],
-      type: 'video',
-      caption: '🕉️',
-      time: '1d ago',
-      likes: 128,
-      comments: 14
-    }
-  ]
-}
 
-
-  // ── ADD MORE USERS BELOW IN SAME FORMAT ──
-  // username: { userid, handle, displayName, verified, banner, avatar, bio,
-  //             followers:[], following:[], audioTrack:{}, links:[], posts:[] }
 };
 
 /**
