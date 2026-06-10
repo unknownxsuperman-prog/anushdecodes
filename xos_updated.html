@@ -119,7 +119,7 @@
         .follower-stat span:hover{color:var(--text);}
         .follower-stat b{color:var(--text);}
 
-        .bio{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;}
+        .bio{font-size:.82rem;color:rgba(255,255,255,.72);font-weight:400;line-height:1.6;margin-bottom:14px;}
         .bio-music{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;width:fit-content;max-width:100%;}
         .bio-music-play{background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.7rem;flex-shrink:0;cursor:pointer;transition:opacity .15s;padding:0;outline:none;-webkit-appearance:none;}
         .bio-music-play:active{opacity:.5;}
@@ -132,7 +132,35 @@
         .bio-music-eq span:nth-child(4){animation:eqBar .7s .1s infinite alternate ease-in-out;}
         .bio-music-eq.paused span{animation-play-state:paused;opacity:.25;}
         .links-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
-        .link-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:.72rem;font-weight:600;white-space:nowrap;transition:.2s;}
+        /* ── LINK PILLS — reduced visual weight, tighter ── */
+        .link-pill{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:6px 11px;
+            background:rgba(255,255,255,.04);
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:10px;text-decoration:none;
+            color:rgba(255,255,255,.65);
+            font-size:.70rem;font-weight:500;
+            white-space:nowrap;transition:.2s;
+            letter-spacing:.01em;
+        }
+        .link-pill:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);}
+        /* Arattai icon — fix sizing to match FA icons exactly */
+        .link-pill .fa-arattai{
+            font-size:.82rem;
+            line-height:1;
+            width:14px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+        }
+        /* All other icons in pills */
+        .link-pill i{
+            font-size:.78rem;
+            line-height:1;
+            flex-shrink:0;
+        }
         .posts-section{padding:0 16px 100px;}
         .section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);margin-bottom:14px;display:block;}
         .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
