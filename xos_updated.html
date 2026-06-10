@@ -79,15 +79,15 @@
         ═══════════════════════════════════════════════════ */
 
         /* ── PFP BADGE ──
-           28px total. 60% inside avatar (17px), 40% outside (11px).
-           offset = -11px on bottom-right.
+           28px total. ~75% inside avatar, ~25% outside.
+           offset = -(28 × 0.25) = -7px
         */
         .pfp-badge{
             position:absolute;
-            bottom:-11px;
-            right:-11px;
-            width:28px;
-            height:28px;
+            bottom:-5px;
+            right:-5px;
+            width:26px;
+            height:26px;
             display:flex;
             align-items:center;
             justify-content:center;
@@ -99,8 +99,8 @@
         }
         .pfp-badge img,
         .pfp-badge svg{
-            width:28px;
-            height:28px;
+            width:26px;
+            height:26px;
             display:block;
             object-fit:contain;
             filter:drop-shadow(0 1px 5px rgba(0,0,0,.55));
