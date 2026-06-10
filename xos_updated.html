@@ -79,13 +79,13 @@
         ═══════════════════════════════════════════════════ */
 
         /* ── PFP BADGE ──
-           28px total. ~75% inside avatar, ~25% outside.
-           offset = -(28 × 0.25) = -7px
+           26px total. bottom-right corner overlapping avatar.
+           offset = -8px so ~70% inside, 30% outside
         */
         .pfp-badge{
             position:absolute;
-            bottom:-5px;
-            right:-5px;
+            bottom:-4px;
+            right:-4px;
             width:26px;
             height:26px;
             display:flex;
@@ -103,9 +103,23 @@
             height:26px;
             display:block;
             object-fit:contain;
+            mix-blend-mode:screen;
             filter:drop-shadow(0 1px 5px rgba(0,0,0,.55));
         }
         .pfp-badge.badge-none{display:none;}
+
+        /* Inline verified badge next to name in modal */
+        .sheet-verified{
+            display:inline-flex;align-items:center;justify-content:center;
+            width:14px;height:14px;
+            vertical-align:middle;margin-left:4px;flex-shrink:0;
+        }
+        .sheet-verified img{
+            width:14px;height:14px;
+            object-fit:contain;display:block;
+            mix-blend-mode:screen;
+        }
+        .sheet-verified.badge-none{display:none;}
 
         /* ═══ PROFILE LAYOUT ═══ */
         .name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
