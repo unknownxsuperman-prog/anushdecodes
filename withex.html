@@ -990,7 +990,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 @keyframes msgDotPulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 .msgs-overlay{
-  position:fixed;inset:0;z-index:62;
+  position:fixed;inset:0;z-index:9000;
   background:var(--bg);
   display:none;flex-direction:column;
   transform:translateY(100%);
@@ -2630,9 +2630,13 @@ function openMessages(){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-rocket').classList.add('active');
   const el=document.getElementById('msgs-overlay');
+  el.classList.remove('closing','open');
   el.style.display='flex';
-  el.classList.remove('closing');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  el.style.transform='translateY(100%)';
+  requestAnimationFrame(()=>{
+    el.style.transform='';
+    el.classList.add('open');
+  });
   renderMsgsList(MSGS_DATA);
   history.pushState({modal:'messages'},'');
 }
@@ -2684,4 +2688,71 @@ function openChat(id){
   renderMsgsList(MSGS_DATA);
   document.getElementById('chat-top-avatar').src=c.avatar;
   document.getElementById('chat-top-name').textContent=c.name;
-  document.getElementById('chat-top-status').textConten
+  document.getElementById('chat-top-status').textContent=c.online?'● Active now':c.handle;
+  renderChatMsgs(c);
+  chatOpen=true;
+  document.getElementById('chat-view').classList.add('open');
+  history.pushState({modal:'chat',id},'');
+  setTimeout(()=>{const m=document.getElementById('chat-msgs');m.scrollTop=m.scrollHeight;},100);
+}
+
+function closeChat(fromPop){
+  if(!chatOpen) return;
+  chatOpen=false;
+  document.getElementById('chat-view').classList.remove('open');
+  document.getElementById('chat-msg-input').value='';
+  document.getElementById('chat-send-btn').classList.remove('visible');
+  if(!fromPop) history.back();
+}
+
+function renderChatMsgs(c){
+  const el=document.getElementById('chat-msgs');
+  let html=`<div class="msg-date-divider"><span class="msg-date-text">Today</span></div>`;
+  c.messages.forEach((m,i)=>{
+    if(m.img){
+      html+=`<div class="msg-wrap ${m.out?'out':'in'}" style="animation-delay:${i*0.03}s">
+        <div class="msg-img-wrap"><img src="https://picsum.photos/seed/${c.id}${i}/300/200" alt=""></div>
+        <div class="msg-time-label">${m.time}</div></div>`;
+    } else {
+      html+=`<div class="msg-wrap ${m.out?'out':'in'}" style="animation-delay:${i*0.03}s">
+        <div class="msg-bubble">${m.text}</div>
+        <div class="msg-time-label">${m.time}</div></div>`;
+    }
+  });
+  if(c.online) html+=`<div class="msg-wrap in"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
+  el.innerHTML=html;
+}
+
+function onChatInput(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,100)+'px';
+  document.getElementById('chat-send-btn').classList.toggle('visible',el.value.trim().length>0);
+}
+
+function sendChatMsg(){
+  const inp=document.getElementById('chat-msg-input');
+  const text=inp.value.trim();
+  if(!text||!activeMsgConv) return;
+  activeMsgConv.messages.push({text,out:true,time:'now'});
+  activeMsgConv.preview=text;
+  inp.value=''; inp.style.height='auto';
+  document.getElementById('chat-send-btn').classList.remove('visible');
+  renderChatMsgs(activeMsgConv);
+  renderMsgsList(MSGS_DATA);
+  setTimeout(()=>{const m=document.getElementById('chat-msgs');m.scrollTop=m.scrollHeight;},50);
+}
+
+document.getElementById('chat-msg-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMsg();}
+});
+
+// hook into existing popstate
+const _prevPopstate=window.onpopstate;
+window.addEventListener('popstate',e=>{
+  if(chatOpen){closeChat(true);return;}
+  if(msgsOpen){closeMessages(true);return;}
+});
+</script>
+
+</body>
+</html>
