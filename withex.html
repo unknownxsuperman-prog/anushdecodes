@@ -979,6 +979,226 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .post:nth-child(1){animation-delay:.06s}
 .post:nth-child(2){animation-delay:.13s}
 .post:nth-child(3){animation-delay:.2s}
+/* ══════════════════════════════
+   MESSAGES OVERLAY
+══════════════════════════════ */
+@keyframes msgsSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes msgsSlideDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
+@keyframes msgBubbleIn{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes msgConvIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+@keyframes msgConvOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(100%)}}
+@keyframes msgDotPulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.msgs-overlay{
+  position:fixed;inset:0;z-index:62;
+  background:var(--bg);
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  will-change:transform;
+  overflow:hidden;
+}
+.msgs-overlay.open{display:flex;animation:msgsSlideUp .42s cubic-bezier(.32,.72,0,1) forwards;}
+.msgs-overlay.closing{display:flex;animation:msgsSlideDown .36s cubic-bezier(.32,.72,0,1) forwards;}
+
+/* messages top bar */
+.msgs-topbar{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:14px 20px 14px;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.msgs-title{font-size:1.5rem;font-weight:700;letter-spacing:-.04em;}
+.msgs-top-actions{display:flex;gap:8px;}
+.msgs-top-btn{
+  width:34px;height:34px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.6);font-size:.78rem;cursor:pointer;
+  transition:.15s;
+}
+.msgs-top-btn:active{background:rgba(255,255,255,.08);}
+
+/* search */
+.msgs-search-wrap{padding:12px 16px 8px;}
+.msgs-search{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:11px 14px;
+  transition:border-color .2s;
+}
+.msgs-search:focus-within{border-color:rgba(255,255,255,.2);}
+.msgs-search i{color:rgba(255,255,255,.3);font-size:.82rem;flex-shrink:0;}
+.msgs-search-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:#fff;font-family:var(--font);font-size:.86rem;
+  caret-color:#fff;
+}
+.msgs-search-input::placeholder{color:rgba(255,255,255,.22);}
+
+/* conv list */
+.msgs-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+.msgs-row{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 20px;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .12s;
+}
+.msgs-row:active{background:rgba(255,255,255,.04);}
+.msgs-avatar-wrap{position:relative;flex-shrink:0;}
+.msgs-avatar{
+  width:50px;height:50px;border-radius:50%;
+  object-fit:cover;background:#111;
+  border:1px solid rgba(255,255,255,.07);display:block;
+}
+.msgs-online{
+  position:absolute;bottom:1px;right:1px;
+  width:11px;height:11px;border-radius:50%;
+  background:#fff;border:2px solid #000;
+}
+.msgs-info{flex:1;min-width:0;}
+.msgs-name{
+  font-size:.88rem;font-weight:600;letter-spacing:-.01em;
+  margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.msgs-preview{
+  font-size:.72rem;color:rgba(255,255,255,.38);font-weight:300;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.msgs-preview.unread{color:rgba(255,255,255,.7);font-weight:500;}
+.msgs-right{
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;
+}
+.msgs-time{font-size:.6rem;color:rgba(255,255,255,.28);letter-spacing:.02em;}
+.msgs-unread-dot{width:8px;height:8px;border-radius:50%;background:#fff;}
+
+/* ── CHAT VIEW ── */
+.chat-view{
+  position:absolute;inset:0;z-index:10;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .36s cubic-bezier(.32,.72,0,1);
+}
+.chat-view.open{transform:translateX(0);}
+
+.chat-topbar{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.chat-back{
+  width:36px;height:36px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:.82rem;cursor:pointer;flex-shrink:0;
+}
+.chat-back:active{background:rgba(255,255,255,.07);}
+.chat-top-avatar{
+  width:36px;height:36px;border-radius:50%;
+  object-fit:cover;flex-shrink:0;
+  border:1px solid rgba(255,255,255,.07);
+}
+.chat-top-info{flex:1;min-width:0;}
+.chat-top-name{font-size:.9rem;font-weight:700;letter-spacing:-.01em;}
+.chat-top-status{font-size:.6rem;color:rgba(255,255,255,.35);margin-top:2px;}
+.chat-top-more{color:rgba(255,255,255,.4);font-size:.8rem;padding:6px;cursor:pointer;}
+
+/* messages */
+.chat-msgs{
+  flex:1;overflow-y:auto;
+  padding:14px 16px;
+  display:flex;flex-direction:column;gap:8px;
+  -webkit-overflow-scrolling:touch;
+}
+.msg-date-divider{
+  display:flex;align-items:center;gap:10px;padding:4px 0 8px;
+}
+.msg-date-divider::before,.msg-date-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06);}
+.msg-date-text{font-size:.58rem;color:rgba(255,255,255,.22);font-weight:600;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;}
+
+.msg-wrap{display:flex;flex-direction:column;animation:msgBubbleIn .2s cubic-bezier(.32,.72,0,1) both;}
+.msg-wrap.out{align-items:flex-end;}
+.msg-wrap.in{align-items:flex-start;}
+.msg-bubble{
+  max-width:78%;padding:10px 14px;
+  font-size:.82rem;line-height:1.55;font-weight:300;
+  letter-spacing:-.01em;
+}
+.msg-wrap.out .msg-bubble{
+  background:#fff;color:#000;
+  border-radius:18px 18px 4px 18px;
+  font-weight:400;
+}
+.msg-wrap.in .msg-bubble{
+  background:#0f0f0f;color:rgba(255,255,255,.72);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px 18px 18px 4px;
+}
+.msg-time-label{
+  font-size:.56rem;color:rgba(255,255,255,.2);
+  margin-top:3px;padding:0 3px;letter-spacing:.04em;
+}
+.msg-img-wrap{
+  max-width:200px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+}
+.msg-img-wrap img{width:100%;display:block;}
+
+/* typing */
+.typing-indicator{
+  display:flex;align-items:center;gap:4px;
+  padding:11px 14px;
+  background:#0f0f0f;border:1px solid rgba(255,255,255,.07);
+  border-radius:18px 18px 18px 4px;width:fit-content;
+}
+.typing-indicator span{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  animation:msgDotPulse .9s infinite ease-in-out;
+}
+.typing-indicator span:nth-child(2){animation-delay:.2s;}
+.typing-indicator span:nth-child(3){animation-delay:.4s;}
+
+/* input */
+.chat-input-area{
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.chat-input-row{display:flex;align-items:flex-end;gap:10px;}
+.chat-input-wrap{
+  flex:1;display:flex;align-items:center;gap:10px;
+  background:#0a0a0a;border:1px solid rgba(255,255,255,.09);
+  border-radius:14px;padding:11px 14px;
+  transition:border-color .2s;
+}
+.chat-input-wrap:focus-within{border-color:rgba(255,255,255,.2);}
+.chat-input-attach{color:rgba(255,255,255,.3);font-size:.88rem;cursor:pointer;flex-shrink:0;}
+.chat-msg-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:#fff;font-family:var(--font);font-size:.84rem;
+  caret-color:#fff;resize:none;max-height:100px;line-height:1.4;
+}
+.chat-msg-input::placeholder{color:rgba(255,255,255,.22);}
+.chat-send-btn{
+  width:42px;height:42px;border-radius:12px;
+  background:#fff;color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;cursor:pointer;flex-shrink:0;
+  opacity:0;transform:scale(.7);pointer-events:none;
+  transition:.18s cubic-bezier(.32,.72,0,1);
+}
+.chat-send-btn.visible{opacity:1;transform:scale(1);pointer-events:all;}
+.chat-send-btn:active{transform:scale(.9);}
 </style>
 </head>
 <body>
@@ -1182,7 +1402,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
     <i class="fa-solid fa-sparkles" id="nav-es-icon" style="position:absolute;display:none;color:var(--accent);"></i>
   </div>
   <div class="nav-item" id="nav-zynx" onclick="handleZynxNav()"><i class="fa-solid fa-play-circle"></i></div>
-  <div class="nav-item" id="nav-rocket" onclick="openGuestProfile()"><i class="fa-solid fa-paper-plane"></i></div>
+  <div class="nav-item" id="nav-rocket" onclick="openMessages()"><i class="fa-solid fa-paper-plane"></i></div>
   <div class="nav-item" id="nav-notif" onclick="setNav('notif')">
     <i class="fa-regular fa-bell"></i>
     <div class="nav-notif-dot"></div>
@@ -1906,15 +2126,16 @@ function buildEsSuggestions(q){
   if(!q){ strip.style.display='none'; return; }
   const ql=q.toLowerCase().replace(/\s/g,'');
   const colleges=window.XOS_COLLEGES||[];
-  const users=window.XOS_PROFILES||[];
+  const profiles=window.XOS_PROFILES||{};
 
   const matchColleges=colleges.filter(c=>
     c.name.toLowerCase().replace(/\s/g,'').includes(ql)
   ).slice(0,2);
 
-  const matchUsers=users.filter(u=>
-    (u.name||'').toLowerCase().includes(ql)||
-    (u.userid||'').toLowerCase().includes(ql)
+  const matchUsers=Object.values(profiles).filter(u=>
+    (u.displayName||'').toLowerCase().includes(ql)||
+    (u.userid||'').toLowerCase().includes(ql)||
+    (u.handle||'').toLowerCase().includes(ql)
   ).slice(0,2);
 
   const chips=[
@@ -1925,7 +2146,7 @@ function buildEsSuggestions(q){
       </div>`;
     }),
     ...matchUsers.map(u=>`<div class="es-suggest-chip user-chip" onclick="esSearchUser('${u.userid}')">
-        <i class="fa-regular fa-user"></i>${u.name}
+        <i class="fa-regular fa-user"></i>${u.displayName}
       </div>`)
   ];
 
@@ -1943,19 +2164,20 @@ function doEsSearch(val){
   document.getElementById('es-send').classList.remove('visible');
   document.getElementById('es-suggestions').style.display='none';
 
-  // hide greeting
   const greet=document.getElementById('es-greeting');
   if(greet) greet.style.display='none';
 
-  // user bubble
   appendEsBubbleUser(q);
 
-  // search colleges + users
   const colleges=window.XOS_COLLEGES||[];
-  const users=window.XOS_PROFILES||[];
+  const profiles=window.XOS_PROFILES||{};
 
   const matchCollege=colleges.find(c=>c.name.toLowerCase().replace(/\s/g,'').includes(ql));
-  const matchUser=users.find(u=>(u.name||'').toLowerCase().includes(ql)||(u.userid||'').toLowerCase().includes(ql));
+  const matchUser=Object.values(profiles).find(u=>
+    (u.displayName||'').toLowerCase().includes(ql)||
+    (u.userid||'').toLowerCase().includes(ql)||
+    (u.handle||'').toLowerCase().includes(ql)
+  );
 
   setTimeout(()=>{
     if(!matchCollege && !matchUser){
@@ -1981,37 +2203,15 @@ function doEsSearch(val){
   }, 320);
 }
 
-function esSearchCollege(idx){
-  const colleges=window.XOS_COLLEGES||[];
-  const c=colleges[idx];
-  if(!c) return;
-  document.getElementById('es-input').value='';
-  document.getElementById('es-suggestions').style.display='none';
-  const greet=document.getElementById('es-greeting');
-  if(greet) greet.style.display='none';
-  appendEsBubbleUser(c.name.split(',')[0].trim());
-  setTimeout(()=>{
-    const sys=document.createElement('div');
-    sys.className='es-bubble-sys';
-    const txt=document.createElement('div');
-    txt.className='es-bubble-sys-text';
-    txt.textContent="Here's what I found";
-    sys.appendChild(txt);
-    sys.appendChild(buildEsCollegeCard(c, idx));
-    document.getElementById('es-messages').appendChild(sys);
-    scrollEsToBottom();
-  },320);
-}
-
 function esSearchUser(userid){
-  const users=window.XOS_PROFILES||[];
-  const u=users.find(p=>p.userid===userid);
+  const profiles=window.XOS_PROFILES||{};
+  const u=profiles[userid];
   if(!u) return;
   document.getElementById('es-input').value='';
   document.getElementById('es-suggestions').style.display='none';
   const greet=document.getElementById('es-greeting');
   if(greet) greet.style.display='none';
-  appendEsBubbleUser(u.name);
+  appendEsBubbleUser(u.displayName);
   setTimeout(()=>{
     const sys=document.createElement('div');
     sys.className='es-bubble-sys';
@@ -2049,18 +2249,30 @@ function buildEsCollegeCard(c, idx){
 }
 
 function buildEsUserCard(u){
+  const followerCount=(u.followers||[]).length;
+  const followingCount=(u.following||[]).length;
+  // badge HTML
+  const badgeHtml = u.verified==='gold'
+    ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;position:relative;overflow:hidden;border-radius:50%;vertical-align:middle;margin-left:4px;"><i class="fa-solid fa-certificate" style="font-size:13px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i><i class="fa-solid fa-check" style="font-size:6px;color:#000;position:relative;z-index:6;font-weight:900;"></i></span>`
+    : u.verified==='blue'
+    ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;background:#1d9bf0;border-radius:50%;vertical-align:middle;margin-left:4px;"><i class="fa-solid fa-check" style="font-size:7px;color:#fff;font-weight:900;"></i></span>`
+    : '';
   const card=document.createElement('div');
   card.className='es-result-card';
-  card.onclick=()=>window.location.href='golden.html';
+  card.onclick=()=>window.open(`anush-decodes.html?user=${u.userid}`,'_self');
   card.innerHTML=`
     <div class="es-result-row">
-      <img class="es-result-pfp square" src="${u.pfp||'1000046129.png'}" onerror="this.src='1000046129.png'" alt="">
-      <div>
-        <div class="es-result-name">${u.name}</div>
-        <div class="es-result-sub">${u.userid}</div>
+      <img class="es-result-pfp square" src="${u.avatar||'1000046129.png'}" onerror="this.src='1000046129.png'" alt=""
+        style="border-radius:10px;width:46px;height:46px;object-fit:cover;flex-shrink:0;">
+      <div style="flex:1;min-width:0;">
+        <div class="es-result-name">${u.displayName}${badgeHtml}</div>
+        <div class="es-result-sub" style="color:var(--accent)">${u.handle}</div>
+        <div style="font-size:.62rem;color:var(--muted);margin-top:3px;">
+          <b style="color:var(--text)">${followerCount}</b> followers · <b style="color:var(--text)">${followingCount}</b> following
+        </div>
       </div>
-    </div>
-    ${u.college_id ? `<div class="es-result-pills"><span class="es-result-pill"><i class="fa-solid fa-building-columns" style="margin-right:4px;"></i>${u.college_id}</span></div>` : ''}`;
+      <div style="font-size:.72rem;color:var(--muted);flex-shrink:0;"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>`;
   return card;
 }
 
@@ -2343,5 +2555,133 @@ function submitAddCollege(){
 <script src="colleges.js"></script>
 <script src="Dishabase.js"></script>
 <script src="disha-extensions.js"></script>
-</body>
-</html>
+<!-- ══════════════════════════
+     MESSAGES OVERLAY
+══════════════════════════ -->
+<div class="msgs-overlay" id="msgs-overlay">
+
+  <!-- top bar -->
+  <div class="msgs-topbar">
+    <div class="msgs-title">Messages</div>
+    <div class="msgs-top-actions">
+      <div class="msgs-top-btn"><i class="fa-solid fa-sliders"></i></div>
+      <div class="msgs-top-btn" onclick="msgsNewChat()"><i class="fa-solid fa-pen-to-square"></i></div>
+    </div>
+  </div>
+
+  <!-- search -->
+  <div class="msgs-search-wrap">
+    <div class="msgs-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input class="msgs-search-input" id="msgs-search-input" placeholder="Search messages"
+        autocomplete="off" oninput="msgsSearch(this.value)">
+    </div>
+  </div>
+
+  <!-- conv list -->
+  <div class="msgs-list" id="msgs-list"></div>
+
+  <!-- chat view (slides in from right inside overlay) -->
+  <div class="chat-view" id="chat-view">
+    <div class="chat-topbar">
+      <div class="chat-back" onclick="closeChat()"><i class="fa-solid fa-chevron-left"></i></div>
+      <img class="chat-top-avatar" id="chat-top-avatar" src="" alt="">
+      <div class="chat-top-info">
+        <div class="chat-top-name" id="chat-top-name">—</div>
+        <div class="chat-top-status" id="chat-top-status">x0s user</div>
+      </div>
+      <div class="chat-top-more"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <div class="chat-input-wrap">
+          <div class="chat-input-attach"><i class="fa-solid fa-plus"></i></div>
+          <textarea class="chat-msg-input" id="chat-msg-input" placeholder="Message…" rows="1"
+            oninput="onChatInput(this)"></textarea>
+        </div>
+        <div class="chat-send-btn" id="chat-send-btn" onclick="sendChatMsg()">
+          <i class="fa-solid fa-arrow-up"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ══════ MESSAGES ══════ */
+const MSGS_DATA=[
+  {id:1,name:'Alex',handle:'alex@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Alex&backgroundColor=111111',preview:'See you tomorrow.',time:'11:24 AM',unread:true,online:true,messages:[{text:"Hey! you free tomorrow?",out:false,time:'11:20 AM'},{text:"Yeah what's up",out:true,time:'11:21 AM'},{text:"Let's meet at campus",out:false,time:'11:22 AM'},{text:"Sure works for me",out:true,time:'11:23 AM'},{text:"See you tomorrow.",out:false,time:'11:24 AM'}]},
+  {id:2,name:'Nova',handle:'nova@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Nova&backgroundColor=0a0a0a',preview:'Sent you a photo',time:'10:08 AM',unread:true,online:false,messages:[{text:"Check this out",out:false,time:'10:05 AM'},{img:true,text:'Photo',out:false,time:'10:08 AM'}]},
+  {id:3,name:'Jay',handle:'jay@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Jay&backgroundColor=0d0d0d',preview:'That was insane!',time:'9:47 AM',unread:false,online:true,messages:[{text:"Did you see the match?",out:false,time:'9:45 AM'},{text:"Yes bro! unreal finish",out:true,time:'9:46 AM'},{text:"That was insane!",out:false,time:'9:47 AM'}]},
+  {id:4,name:'Lucas',handle:'lucas@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Lucas&backgroundColor=080808',preview:"Let's catch up soon.",time:'8:31 AM',unread:true,online:false,messages:[{text:"Haven't seen you in a while",out:false,time:'8:28 AM'},{text:"I know right, been busy",out:true,time:'8:30 AM'},{text:"Let's catch up soon.",out:false,time:'8:31 AM'}]},
+  {id:5,name:'Mila',handle:'mila@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Mila&backgroundColor=0f0f0f',preview:'Okay, sounds good.',time:'7:12 AM',unread:false,online:false,messages:[{text:"Can we reschedule the call?",out:true,time:'7:10 AM'},{text:"Okay, sounds good.",out:false,time:'7:12 AM'}]},
+  {id:6,name:'Ethan',handle:'ethan@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Ethan&backgroundColor=0a0a0a',preview:'Thanks!',time:'Yesterday',unread:false,online:false,messages:[{text:"Sent you the files",out:true,time:'Yesterday'},{text:"Thanks!",out:false,time:'Yesterday'}]},
+  {id:7,name:'Zara',handle:'zara@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Zara&backgroundColor=0d0d0d',preview:'Can you send the files?',time:'Yesterday',unread:true,online:false,messages:[{text:"Hey, can you send the files?",out:false,time:'Yesterday'}]},
+  {id:8,name:'Noah',handle:'noah@x0s',avatar:'https://api.dicebear.com/8.x/notionists/svg?seed=Noah&backgroundColor=111111',preview:'Got it, thank you.',time:'Mon',unread:false,online:false,messages:[{text:"Sharing the doc",out:true,time:'Mon'},{text:"Got it, thank you.",out:false,time:'Mon'}]},
+];
+
+let msgsOpen=false,chatOpen=false,activeMsgConv=null;
+
+function openMessages(){
+  if(msgsOpen) return;
+  msgsOpen=true;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-rocket').classList.add('active');
+  const el=document.getElementById('msgs-overlay');
+  el.style.display='flex';
+  el.classList.remove('closing');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
+  renderMsgsList(MSGS_DATA);
+  history.pushState({modal:'messages'},'');
+}
+
+function closeMessages(fromPop){
+  if(!msgsOpen) return;
+  if(chatOpen) closeChat(true);
+  msgsOpen=false;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-home')?.classList.add('active');
+  const el=document.getElementById('msgs-overlay');
+  el.classList.remove('open');
+  el.classList.add('closing');
+  if(!fromPop) history.back();
+  setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},380);
+}
+
+function renderMsgsList(list){
+  const el=document.getElementById('msgs-list');
+  el.innerHTML=list.map((c,i)=>`
+    <div class="msgs-row" onclick="openChat(${c.id})" style="animation:fadeUp .24s var(--ease) ${i*0.03}s both;">
+      <div class="msgs-avatar-wrap">
+        <img class="msgs-avatar" src="${c.avatar}" alt="" onerror="this.style.opacity='.3'">
+        ${c.online?'<div class="msgs-online"></div>':''}
+      </div>
+      <div class="msgs-info">
+        <div class="msgs-name">${c.name}</div>
+        <div class="msgs-preview${c.unread?' unread':''}">${c.preview}</div>
+      </div>
+      <div class="msgs-right">
+        <div class="msgs-time">${c.time}</div>
+        ${c.unread?'<div class="msgs-unread-dot"></div>':''}
+      </div>
+    </div>`).join('');
+}
+
+function msgsSearch(val){
+  const q=val.trim().toLowerCase();
+  if(!q){renderMsgsList(MSGS_DATA);return;}
+  renderMsgsList(MSGS_DATA.filter(c=>c.name.toLowerCase().includes(q)||c.preview.toLowerCase().includes(q)));
+}
+
+function msgsNewChat(){document.getElementById('msgs-search-input').focus();}
+
+function openChat(id){
+  const c=MSGS_DATA.find(x=>x.id===id);
+  if(!c) return;
+  activeMsgConv=c; c.unread=false;
+  renderMsgsList(MSGS_DATA);
+  document.getElementById('chat-top-avatar').src=c.avatar;
+  document.getElementById('chat-top-name').textContent=c.name;
+  document.getElementById('chat-top-status').textConten
