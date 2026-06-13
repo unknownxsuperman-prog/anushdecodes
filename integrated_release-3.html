@@ -308,26 +308,18 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .spill{padding:8px 22px;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--muted);transition:all .2s;}
 .spill.active{background:var(--text);color:var(--bg);border-color:var(--text);}
 .search-tab-hint{font-size:.62rem;color:var(--muted);margin-bottom:18px;padding-left:2px;min-height:16px;transition:opacity .2s;}
-.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
-.people-card{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:18px;
-  padding:16px 12px 14px;
-  display:flex;flex-direction:column;align-items:center;
-  cursor:pointer;transition:background .15s;gap:10px;
-  text-align:center;
-}
-.people-card:active{background:rgba(255,255,255,.08);}
-.people-card-pfp{
-  width:62px;height:62px;
-  border-radius:16px;
-  object-fit:cover;
-  border:1px solid rgba(255,255,255,.09);
-  background:var(--card);
-  display:block;
-}
-.people-card-name{font-size:.82rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
+.people-grid{display:flex;flex-direction:column;gap:0;margin-top:4px;}
+.people-card{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s;}
+.people-card:active{background:rgba(255,255,255,.04);}
+.people-card-pfp{width:46px;height:46px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.08);background:var(--card);display:block;flex-shrink:0;}
+.people-card-info{flex:1;min-width:0;}
+.people-card-name{font-size:.84rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.people-card-id{font-size:.62rem;color:var(--muted);margin-top:1px;}
+.people-card-followers{font-size:.6rem;color:var(--muted);margin-top:2px;}
+.people-card-followers b{color:rgba(255,255,255,.5);font-weight:600;}
+.people-follow-btn{flex-shrink:0;padding:6px 15px;border-radius:99px;background:#fff;color:#000;border:none;font-size:.7rem;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .15s;}
+.people-follow-btn:active{opacity:.75;}
+.people-follow-btn.following{background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);}
 .no-results-wrap{display:flex;flex-direction:column;align-items:center;padding:48px 0 20px;}
 .no-results-txt{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px;}
 .no-results-sub{font-size:.72rem;color:var(--muted2,#444);}
@@ -930,15 +922,26 @@ function renderPeopleGrid(){
     el.innerHTML=`<div class="no-results-wrap"><i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i><div class="no-results-txt">No profiles yet</div><div class="no-results-sub">People will show up here</div></div>`;
     return;
   }
-  el.innerHTML=`<div class="people-grid">${users.map(u=>`
-    <div class="people-card" onclick="window.open('https://unknownxsuperman-prog.github.io/anushdecodes/xos_updated.html?user=${u.userid}','_self')">
+  const followState={};
+  el.innerHTML=`<div class="people-grid">${users.map((u,i)=>{
+    const fc=(u.followers||[]).length;
+    const fStr=fc>=1000?(fc/1000).toFixed(1)+'k':fc;
+    return `<div class="people-card" onclick="window.open('https://unknownxsuperman-prog.github.io/anushdecodes/xos_updated.html?user=${u.userid}','_self')">
       <img class="people-card-pfp" src="${u.avatar||'1000046129.png'}" onerror="this.src='1000046129.png'" alt="">
-      <div style="width:100%;overflow:hidden;">
+      <div class="people-card-info">
         <div class="people-card-name">${u.displayName}</div>
         <div class="people-card-id">${u.handle}</div>
+        <div class="people-card-followers"><b>${fStr}</b> followers</div>
       </div>
-    </div>`).join('')}
-  </div>`;
+      <button class="people-follow-btn" id="pf-${i}" onclick="event.stopPropagation();togglePeopleFollow(${i},this)">${'Follow'}</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function togglePeopleFollow(i,btn){
+  const isF=btn.classList.contains('following');
+  btn.classList.toggle('following',!isF);
+  btn.textContent=isF?'Follow':'Following';
 }
 
 const likeCounts=[42,128,42];
