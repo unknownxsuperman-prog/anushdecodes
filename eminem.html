@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>XOS Audio Runtime Validator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #000000;
+            --accent: #007aff;
+            --card: #0a0a0a;
+            --card2: #111111;
+            --border: #1a1a1a;
+            --border2: rgba(255, 255, 255, 0.06);
+            --text: #ffffff;
+            --muted: #666666;
+            --font: 'Space Grotesk', sans-serif;
+            --ease: cubic-bezier(.4, 0, .2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; padding: 40px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes eqBar { from { height: 2px; } to { height: 14px; } }
+
+        .test-panel { width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); animation: slideUp 0.4s var(--ease); }
+        
+        /* USER SESSION NAV PILLS */
+        .session-switcher { display: flex; gap: 8px; margin-bottom: 24px; background: var(--card2); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+        .session-pill { flex: 1; text-align: center; padding: 8px 0; font-size: 0.75rem; font-weight: 600; color: var(--muted); text-decoration: none; border-radius: 8px; transition: 0.2s; text-transform: capitalize; }
+        .session-pill.active { background: var(--border); color: var(--text); }
+
+        /* INLINE BIO COMPONENT */
+        .bio-music-container { display: flex; align-items: center; gap: 12px; background: var(--card2); border: 1px solid var(--border); padding: 12px 16px; border-radius: 16px; margin-bottom: 20px; }
+        .bio-music-play { width: 36px; height: 36px; border-radius: 50%; background: var(--text); color: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; flex-shrink: 0; transition: transform 0.1s; }
+        .bio-music-play:active { transform: scale(0.92); }
+        .bio-music-info { flex: 1; min-width: 0; cursor: pointer; }
+        .bio-music-label { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .bio-music-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; display: block; }
+        
+        /* EQ GRAPHIC AUDIO ATTRIBUTE */
+        .bio-music-eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; width: 14px; flex-shrink: 0; }
+        .bio-music-eq span { width: 2px; background: var(--accent); border-radius: 1px; min-height: 2px; }
+        .bio-music-eq span:nth-child(1) { animation: eqBar 0.6s 0.0s infinite alternate ease-in-out; }
+        .bio-music-eq span:nth-child(2) { animation: eqBar 0.6s 0.15s infinite alternate ease-in-out; }
+        .bio-music-eq span:nth-child(3) { animation: eqBar 0.6s 0.3s infinite alternate ease-in-out; }
+        .bio-music-eq.paused span { animation-play-state: paused !important; height: 2px !important; }
+
+        /* MODAL POP CONTAINER SCREEN */
+        .music-modal { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s var(--ease); }
+        .music-modal.active { display: flex; opacity: 1; }
+        .music-box { width: 85vw; max-width: 320px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; padding: 24px; position: relative; text-align: center; transform: scale(0.95); transition: transform 0.3s var(--ease); }
+        .music-modal.active .music-box { transform: scale(1); }
+        
+        .music-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: var(--card2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); cursor: pointer; font-size: 0.8rem; }
+        .music-thumb { width: 100%; aspect-ratio: 1/1; border-radius: 18px; object-fit: cover; margin: 12px 0 16px; border: 1px solid var(--border); }
+        .music-title { font-size: 1rem; font-weight: 700; }
+        .music-artist { font-size: 0.75rem; color: var(--muted); margin-top: 2px; margin-bottom: 20px; }
+        
+        .music-progress { width: 100%; height: 4px; -webkit-appearance: none; background: var(--border); border-radius: 2px; outline: none; margin-bottom: 6px; accent-color: var(--accent); }
+        .music-progress::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+        .music-times { display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--muted); font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <audio id="bio-audio" loop preload="auto"></audio>
+    <audio id="music-audio-player" preload="auto"></audio>
+
+    <div class="test-panel">
+        <div class="session-switcher">
+            <a href="?user=nikhil" class="session-pill" id="pill-nikhil">nikhil</a>
+            <a href="?user=gemini" class="session-pill" id="pill-gemini">gemini</a>
+            <a href="?user=niranjan" class="session-pill" id="pill-niranjan">niranjan</a>
+        </div>
+
+        <div class="bio-music-container">
+            <div class="bio-music-play" onclick="toggleBioMusic(event)">
+                <i class="fa-solid fa-play" id="bio-play-icon"></i>
+            </div>
+            <div class="bio-music-info" onclick="openMusicPlayer()">
+                <span class="bio-music-label" id="bio-track-title">Loading Track...</span>
+                <span class="bio-music-sub" id="bio-track-artist">Loading Artist...</span>
+            </div>
+            <div class="bio-music-eq paused" id="bio-eq"><span></span><span></span><span></span></div>
+        </div>
+    </div>
+
+    <div class="music-modal" id="music-modal" onclick="closeMusicModal()">
+        <div class="music-box" onclick="event.stopPropagation()">
+            <div class="music-close" onclick="closeMusicModal()"><i class="fa-solid fa-xmark"></i></div>
+            <img class="music-thumb" id="modal-track-thumb" src="" alt="">
+            <div class="music-title" id="modal-track-title">—</div>
+            <div class="music-artist" id="modal-track-artist">—</div>
+            
+            <input type="range" class="music-progress" id="music-progress" value="0" min="0" max="100" step="0.1">
+            <div class="music-times">
+                <span id="music-current">0:00</span>
+                <span id="music-duration">0:00</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="profilexyz.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUser = urlParams.get('user') || 'nikhil';
+        
+        const bioAudio = document.getElementById('bio-audio');
+        const modalAudio = document.getElementById('music-audio-player');
+        let progressPoller = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Highlight current active user selection array node
+            const activePill = document.getElementById(`pill-${targetUser}`);
+            if (activePill) activePill.classList.add('active');
+
+            // Fallback checking to ensure data schema structure loaded successfully
+            const profileData = window.XOS_PROFILES && window.XOS_PROFILES[targetUser];
+            if (!profileData) {
+                document.getElementById('bio-track-title').textContent = "Profile Array Error";
+                document.getElementById('bio-track-artist').textContent = "Check profilexyz.js mapping";
+                return;
+            }
+
+            // Extract structural schema data to interface components
+            const track = profileData.audioTrack || {};
+            document.getElementById('bio-track-title').textContent = track.title || 'Unknown Track';
+            document.getElementById('bio-track-artist').textContent = track.artist || 'Unknown Artist';
+            
+            document.getElementById('modal-track-title').textContent = track.title || 'Unknown Track';
+            document.getElementById('modal-track-artist').textContent = track.artist || 'Unknown Artist';
+            document.getElementById('modal-track-thumb').src = track.artworkUrl || '';
+
+            // Setup targeted hardware runtime streams
+            bioAudio.src = track.streamUrl || '';
+            modalAudio.src = track.streamUrl || '';
+
+            // Setup progressive input change tracking handler updates
+            modalAudio.addEventListener('timeupdate', updateProgressTrackers);
+            modalAudio.addEventListener('ended', () => {
+                document.getElementById('bio-play-icon').className = 'fa-solid fa-play';
+            });
+            
+            document.getElementById('music-progress').addEventListener('input', (e) => {
+                if (!modalAudio.duration) return;
+                modalAudio.currentTime = (e.target.value / 100) * modalAudio.duration;
+            });
+        });
+
+        /* PLAYBACK LOGIC SYNC ENGINE CONTROL SYSTEM */
+        function toggleBioMusic(e) {
+            if (e) e.stopPropagation();
+            if (!bioAudio.src) return;
+
+            // Stop modal audio loop context instantly before running bio inline context
+            if (!modalAudio.paused) {
+                modalAudio.pause();
+                clearInterval(progressPoller);
+            }
+
+            const playIcon = document.getElementById('bio-play-icon');
+            const eqBars = document.getElementById('bio-eq');
+
+            if (bioAudio.paused) {
+                bioAudio.play().then(() => {
+                    playIcon.className = 'fa-solid fa-pause';
+                    eqBars.classList.remove('paused');
+                }).catch(() => {});
+            } else {
+                bioAudio.pause();
+                playIcon.className = 'fa-solid fa-play';
+                eqBars.classList.add('paused');
+            }
+        }
+
+        function openMusicPlayer() {
+            // Drop inline preview track seamlessly
+            if (!bioAudio.paused) {
+                bioAudio.pause();
+                document.getElementById('bio-play-icon').className = 'fa-solid fa-play';
+                document.getElementById('bio-eq').classList.add('paused');
+            }
+
+            const modal = document.getElementById('music-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+
+            modalAudio.currentTime = 0;
+            modalAudio.play().then(() => {
+                clearInterval(progressPoller);
+                progressPoller = setInterval(updateProgressTrackers, 250);
+            }).catch(() => {});
+        }
+
+        function closeMusicModal() {
+            const modal = document.getElementById('music-modal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+            
+            modalAudio.pause();
+            clearInterval(progressPoller);
+        }
+
+        function updateProgressTrackers() {
+            if (!modalAudio.duration || isNaN(modalAudio.duration)) return;
+            
+            const cur = modalAudio.currentTime;
+            const dur = modalAudio.duration;
+            
+            document.getElementById('music-progress').value = (cur / dur) * 100;
+            document.getElementById('music-current').textContent = formatSecondsToMMSS(cur);
+            document.getElementById('music-duration').textContent = formatSecondsToMMSS(dur);
+        }
+
+        function formatSecondsToMMSS(s) {
+            if (!s || isNaN(s)) return '0:00';
+            return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
