@@ -308,6 +308,26 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .spill{padding:8px 22px;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--muted);transition:all .2s;}
 .spill.active{background:var(--text);color:var(--bg);border-color:var(--text);}
 .search-tab-hint{font-size:.62rem;color:var(--muted);margin-bottom:18px;padding-left:2px;min-height:16px;transition:opacity .2s;}
+.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.people-card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
+  padding:16px 12px 14px;
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;transition:background .15s;gap:10px;
+  text-align:center;
+}
+.people-card:active{background:rgba(255,255,255,.08);}
+.people-card-pfp{
+  width:62px;height:62px;
+  border-radius:16px;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,.09);
+  background:var(--card);
+  display:block;
+}
+.people-card-name{font-size:.82rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
 .no-results-wrap{display:flex;flex-direction:column;align-items:center;padding:48px 0 20px;}
 .no-results-txt{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px;}
 .no-results-sub{font-size:.72rem;color:var(--muted2,#444);}
@@ -720,7 +740,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
         <div class="spill" id="spill-colleges" onclick="setSearchTab('colleges')">Colleges</div>
       </div>
       <div class="search-tab-hint" id="search-tab-hint"></div>
-      <div id="stab-people"><div class="no-results-wrap"><i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i><div class="no-results-txt">No profiles yet</div><div class="no-results-sub">People will show up here</div></div></div>
+      <div id="stab-people" id="stab-people"></div>
       <div id="stab-colleges" style="display:none;"><div class="no-results-wrap"><i class="fa-solid fa-building-columns" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i><div class="no-results-txt">Type a college name</div><div class="no-results-sub">or type #college to see all</div></div></div>
     </div>
     <div id="search-results" style="display:none;"><div id="results-list"></div></div>
@@ -896,7 +916,30 @@ let toastTimer=null;
 function showToast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
 
 function initFeedCollegeRows(){const stored=localStorage.getItem('xos_linked_college');if(!stored)return;const c=JSON.parse(stored);document.querySelectorAll('[id^="feed-college-row-"]').forEach(el=>{el.innerHTML=`<i class="fa-solid fa-building-columns"></i><span style="overflow:hidden;text-overflow:ellipsis;">${c.name}</span>`;});}
-document.addEventListener('DOMContentLoaded',initFeedCollegeRows);
+document.addEventListener('DOMContentLoaded',()=>{
+  initFeedCollegeRows();
+  renderPeopleGrid();
+});
+
+function renderPeopleGrid(){
+  const profiles=window.XOS_PROFILES||{};
+  const users=Object.values(profiles);
+  const el=document.getElementById('stab-people');
+  if(!el) return;
+  if(!users.length){
+    el.innerHTML=`<div class="no-results-wrap"><i class="fa-regular fa-user" style="font-size:2rem;color:var(--muted);margin-bottom:12px;"></i><div class="no-results-txt">No profiles yet</div><div class="no-results-sub">People will show up here</div></div>`;
+    return;
+  }
+  el.innerHTML=`<div class="people-grid">${users.map(u=>`
+    <div class="people-card" onclick="window.open('https://unknownxsuperman-prog.github.io/anushdecodes/xos_updated.html?user=${u.userid}','_self')">
+      <img class="people-card-pfp" src="${u.avatar||'1000046129.png'}" onerror="this.src='1000046129.png'" alt="">
+      <div style="width:100%;overflow:hidden;">
+        <div class="people-card-name">${u.displayName}</div>
+        <div class="people-card-id">${u.handle}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
 
 const likeCounts=[42,128,42];
 const liked=[false,false,false];
@@ -980,7 +1023,7 @@ function closeGuestProfile(){if(!guestOpen)return;guestOpen=false;const el=docum
 let esTapTimer=null,esTapCount=0;
 function handleSearchTap(){esTapCount++;if(esTapCount===1){esTapTimer=setTimeout(()=>{esTapCount=0;if(esMode)openEssential();else openSearch();},300);}else if(esTapCount===2){clearTimeout(esTapTimer);esTapCount=0;toggleEsMode(true);openEssential();}}
 function toggleEsMode(forceOn){esMode=forceOn!==undefined?forceOn:!esMode;document.getElementById('nav-search-icon').style.display=esMode?'none':'';document.getElementById('nav-es-icon').style.display=esMode?'':'none';document.getElementById('nav-es-icon').style.color='var(--accent)';}
-function openEssential(){if(esOpen)return;esOpen=true;setNav('search');document.querySelector('.top-bar').style.display='none';document.querySelector('.tabs').style.display='none';const el=document.getElementById('es-overlay');el.style.display='flex';el.classList.remove('closing');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));history.pushState({modal:'essential'},'');setTimeout(()=>document.getElementById('es-input').focus(),450);}
+function openEssential(){if(esOpen)return;if(zynxOpen){zPauseAll();closeZynx(false);}esOpen=true;setNav('search');document.querySelector('.top-bar').style.display='none';document.querySelector('.tabs').style.display='none';const el=document.getElementById('es-overlay');el.style.display='flex';el.classList.remove('closing');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));history.pushState({modal:'essential'},'');setTimeout(()=>document.getElementById('es-input').focus(),450);}
 function closeEssential(fromPop){if(!esOpen)return;esOpen=false;setNav('home');toggleEsMode(false);const iw=document.getElementById('es-input-wrap-el');if(iw)iw.style.transform='translateY(0)';document.querySelector('.top-bar').style.display='';document.querySelector('.tabs').style.display='';const el=document.getElementById('es-overlay');el.style.bottom='0px';el.classList.remove('open');el.classList.add('closing');if(!fromPop)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},380);}
 function onEsInput(val){const send=document.getElementById('es-send');send.classList.toggle('visible',val.trim().length>0);buildEsSuggestions(val.trim());}
 function buildEsSuggestions(q){const strip=document.getElementById('es-suggestions');if(!q){strip.style.display='none';return;}const ql=q.toLowerCase().replace(/\s/g,'');const colleges=window.XOS_COLLEGES||[];const profiles=window.XOS_PROFILES||{};const matchColleges=colleges.filter(c=>c.name.toLowerCase().replace(/\s/g,'').includes(ql)).slice(0,2);const matchUsers=Object.values(profiles).filter(u=>(u.displayName||'').toLowerCase().includes(ql)||(u.userid||'').toLowerCase().includes(ql)||(u.handle||'').toLowerCase().includes(ql)).slice(0,2);const chips=[...matchColleges.map(c=>{const displayName=c.name.split(',')[0].trim();return `<div class="es-suggest-chip college-chip" onclick="esSearchCollege(${colleges.indexOf(c)})"><i class="fa-solid fa-building-columns"></i>${displayName}</div>`;}), ...matchUsers.map(u=>`<div class="es-suggest-chip user-chip" onclick="esSearchUser('${u.userid}')"><i class="fa-regular fa-user"></i>${u.displayName}</div>`)];if(chips.length===0){strip.style.display='none';return;}strip.innerHTML=chips.join('');strip.style.display='flex';}
@@ -993,7 +1036,7 @@ function appendEsBubbleUser(text){const b=document.createElement('div');b.classN
 function appendEsNotFound(q){const b=document.createElement('div');b.className='es-bubble-notfound';b.textContent=`No results for "${q}". Try a different name or @id.`;document.getElementById('es-messages').appendChild(b);scrollEsToBottom();}
 function scrollEsToBottom(){const el=document.getElementById('es-messages');setTimeout(()=>el.scrollTo({top:el.scrollHeight,behavior:'smooth'}),50);}
 
-function openSearch(){if(searchOpen)return;searchOpen=true;setNav('search');document.querySelector('.top-bar').style.display='none';document.querySelector('.tabs').style.display='none';const el=document.getElementById('search-overlay');el.style.display='flex';requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));history.pushState({modal:'search'},'');setTimeout(()=>document.getElementById('search-input').focus(),400);}
+function openSearch(){if(searchOpen)return;if(zynxOpen){zPauseAll();closeZynx(false);}searchOpen=true;setNav('search');document.querySelector('.top-bar').style.display='none';document.querySelector('.tabs').style.display='none';const el=document.getElementById('search-overlay');el.style.display='flex';requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));history.pushState({modal:'search'},'');setTimeout(()=>document.getElementById('search-input').focus(),400);}
 function closeSearch(fromPop){if(!searchOpen)return;searchOpen=false;setNav('home');document.querySelector('.top-bar').style.display='';document.querySelector('.tabs').style.display='';const el=document.getElementById('search-overlay');el.classList.remove('open');if(!fromPop)history.back();setTimeout(()=>{el.style.display='none';},400);clearSearch();}
 function clearSearch(){const inp=document.getElementById('search-input');inp.value='';document.getElementById('search-clear').classList.remove('visible');showDefaultSearch();}
 function setSearchTab(tab){searchTab=tab;document.getElementById('spill-people').classList.toggle('active',tab==='people');document.getElementById('spill-colleges').classList.toggle('active',tab==='colleges');document.getElementById('stab-people').style.display=tab==='people'?'':'none';document.getElementById('stab-colleges').style.display=tab==='colleges'?'':'none';document.getElementById('search-tab-hint').textContent=tab==='colleges'?'Type #college to see all colleges':'';const q=document.getElementById('search-input').value.trim();if(q)onSearchInput(q);}
@@ -1016,7 +1059,7 @@ const MSGS_DATA=[{id:1,name:'Alex',handle:'alex@x0s',avatar:'https://api.dicebea
 
 function openMessages(){
   if(msgsOpen) return;
-  if(zynxOpen){ closeZynx(false); setTimeout(()=> _openMessages(), 420); return; }
+  if(zynxOpen){ zPauseAll(); closeZynx(false); }
   _openMessages();
 }
 function _openMessages(){
