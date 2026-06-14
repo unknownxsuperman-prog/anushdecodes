@@ -308,18 +308,54 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 .spill{padding:8px 22px;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--muted);transition:all .2s;}
 .spill.active{background:var(--text);color:var(--bg);border-color:var(--text);}
 .search-tab-hint{font-size:.62rem;color:var(--muted);margin-bottom:18px;padding-left:2px;min-height:16px;transition:opacity .2s;}
-.people-grid{display:flex;flex-direction:column;gap:0;margin-top:4px;}
-.people-card{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s;}
-.people-card:active{background:rgba(255,255,255,.04);}
-.people-card-pfp{width:46px;height:46px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.08);background:var(--card);display:block;flex-shrink:0;}
-.people-card-info{flex:1;min-width:0;}
-.people-card-name{font-size:.84rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;}
-.people-card-id{font-size:.62rem;color:var(--muted);margin-top:1px;}
-.people-card-followers{font-size:.6rem;color:var(--muted);margin-top:2px;}
+.people-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.people-card{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:20px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:background .15s;
+  display:flex;flex-direction:column;
+}
+.people-card:active{background:rgba(255,255,255,.07);}
+.people-card-cover{
+  width:100%;aspect-ratio:1/1;
+  background:rgba(255,255,255,.05);
+  position:relative;overflow:hidden;
+}
+.people-card-pfp{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+.people-card-body{
+  padding:10px 11px 12px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.people-card-name{
+  font-size:.8rem;font-weight:700;
+  color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;gap:4px;
+}
+.people-card-id{font-size:.6rem;color:var(--muted);margin-top:-4px;}
+.people-card-followers{font-size:.58rem;color:var(--muted);}
 .people-card-followers b{color:rgba(255,255,255,.5);font-weight:600;}
-.people-follow-btn{flex-shrink:0;padding:6px 15px;border-radius:99px;background:#fff;color:#000;border:none;font-size:.7rem;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .15s;}
+.people-follow-btn{
+  width:100%;padding:7px 0;
+  border-radius:10px;
+  background:rgba(255,255,255,.9);
+  color:#000;border:none;
+  font-size:.72rem;font-weight:700;
+  font-family:var(--font);cursor:pointer;
+  transition:opacity .15s;
+}
 .people-follow-btn:active{opacity:.75;}
-.people-follow-btn.following{background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.12);}
+.people-follow-btn.following{
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.1);
+}
 .no-results-wrap{display:flex;flex-direction:column;align-items:center;padding:48px 0 20px;}
 .no-results-txt{font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px;}
 .no-results-sub{font-size:.72rem;color:var(--muted2,#444);}
@@ -926,13 +962,17 @@ function renderPeopleGrid(){
     const fc=(u.followers||[]).length;
     const fStr=fc>=1000?(fc/1000).toFixed(1)+'k':fc;
     return `<div class="people-card" onclick="window.open('https://unknownxsuperman-prog.github.io/anushdecodes/xos_updated.html?user=${u.userid}','_self')">
-      <img class="people-card-pfp" src="${u.avatar||'1000046129.png'}" onerror="this.src='1000046129.png'" alt="">
-      <div class="people-card-info">
-        <div class="people-card-name">${u.displayName}${inlineBadge(u.verified)}</div>
-        <div class="people-card-id">${u.handle}</div>
-        <div class="people-card-followers"><b>${fStr}</b> followers</div>
+      <div class="people-card-cover">
+        <img class="people-card-pfp" src="${u.avatar||'1000046129.png'}" onerror="this.src='1000046129.png'" alt="">
       </div>
-      <button class="people-follow-btn" id="pf-${i}" onclick="event.stopPropagation();togglePeopleFollow(${i},this)">${'Follow'}</button>
+      <div class="people-card-body">
+        <div>
+          <div class="people-card-name">${u.displayName}${inlineBadge(u.verified)}</div>
+          <div class="people-card-id">${u.handle}</div>
+          <div class="people-card-followers"><b>${fStr}</b> followers</div>
+        </div>
+        <button class="people-follow-btn" id="pf-${i}" onclick="event.stopPropagation();togglePeopleFollow(${i},this)">Follow</button>
+      </div>
     </div>`;
   }).join('')}</div>`;
 }
