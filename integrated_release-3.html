@@ -174,6 +174,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 }
 .post-media img,.post-media video{width:100%;height:100%;object-fit:cover;display:block;}
 .post-caption{font-size:.83rem;line-height:1.55;color:var(--text);margin-bottom:10px;font-weight:300;padding:0 2px;}
+.post-vol-btn{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:.72rem;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.post-vol-btn:active{background:rgba(255,255,255,.16);}
 .post-actions{display:flex;align-items:center;padding:6px 0 13px;border-top:1px solid var(--border2);margin-top:2px;gap:2px;}
 .post-action{display:flex;align-items:center;gap:5px;padding:6px 10px 6px 0;font-size:.72rem;color:var(--muted);font-weight:500;cursor:pointer;transition:color .18s;user-select:none;}
 .post-action i{font-size:1rem;transition:transform .18s,color .18s;}
@@ -605,81 +607,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 <!-- FEED -->
 <div class="feed" id="feed">
 
-  <!-- POST 1 -->
-  <div class="post" onclick="goGolden()">
-    <div class="post-header">
-      <div class="post-avatar-wrap">
-        <img class="post-avatar" src="Screenshot_20260418-234611.png" alt="">
-        <div class="post-verified v-gold" id="pv-0"></div>
-      </div>
-      <div class="post-meta">
-        <div class="post-name">Anush Decodes</div>
-        <div class="post-handle">anush@x0s · 2h</div>
-        <div class="post-college-row" id="feed-college-row-0"></div>
-      </div>
-      <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
-    </div>
-    <div class="post-media">
-      <img src="file_00000000862871fab1161995ce9f104e.png" alt="" loading="lazy" onerror="this.style.display='none'">
-    </div>
-    <div class="post-caption">Deep logic toggle. Building the future one commit at a time. 🔧</div>
-    <div class="post-actions" onclick="event.stopPropagation()">
-      <div class="post-action" id="like-0" onclick="toggleLike(0)"><i class="fa-regular fa-heart"></i><span>42</span></div>
-      <div class="post-action-spacer"></div>
-      <div class="post-action" onclick="sharePost()"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-      <div class="post-action" id="save-0" onclick="toggleSave(0)" style="margin-left:4px;"><i class="fa-regular fa-bookmark"></i></div>
-    </div>
-  </div>
-
-  <!-- POST 2 -->
-  <div class="post" onclick="goGolden()">
-    <div class="post-header">
-      <div class="post-avatar-wrap">
-        <img class="post-avatar" src="Screenshot_20260418-234611.png" alt="">
-        <div class="post-verified v-gold" id="pv-1"></div>
-      </div>
-      <div class="post-meta">
-        <div class="post-name">Anush Decodes</div>
-        <div class="post-handle">anush@x0s · 1d</div>
-      </div>
-      <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
-    </div>
-    <div class="post-media">
-      <video src="lv_7587788892909276421_20260417222425.mp4" muted autoplay loop playsinline></video>
-    </div>
-    <div class="post-caption">✨✨</div>
-    <div class="post-actions" onclick="event.stopPropagation()">
-      <div class="post-action" id="like-1" onclick="toggleLike(1)"><i class="fa-regular fa-heart"></i><span>128</span></div>
-      <div class="post-action-spacer"></div>
-      <div class="post-action" onclick="sharePost()"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-      <div class="post-action" id="save-1" onclick="toggleSave(1)" style="margin-left:4px;"><i class="fa-regular fa-bookmark"></i></div>
-    </div>
-  </div>
-
-  <!-- POST 3 -->
-  <div class="post" onclick="goGolden()">
-    <div class="post-header">
-      <div class="post-avatar-wrap">
-        <img class="post-avatar" src="Screenshot_20260418-234611.png" alt="">
-        <div class="post-verified v-gold" id="pv-2"></div>
-      </div>
-      <div class="post-meta">
-        <div class="post-name">Anush Decodes</div>
-        <div class="post-handle">anush@x0s · 2d</div>
-      </div>
-      <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
-    </div>
-    <div class="post-media">
-      <video src="Video-784.mp4" muted autoplay loop playsinline></video>
-    </div>
-    <div class="post-caption">😇😇</div>
-    <div class="post-actions" onclick="event.stopPropagation()">
-      <div class="post-action" id="like-2" onclick="toggleLike(2)"><i class="fa-regular fa-heart"></i><span>42</span></div>
-      <div class="post-action-spacer"></div>
-      <div class="post-action" onclick="sharePost()"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-      <div class="post-action" id="save-2" onclick="toggleSave(2)" style="margin-left:4px;"><i class="fa-regular fa-bookmark"></i></div>
-    </div>
-  </div>
+  <!-- posts rendered by JS -->
 
 </div>
 
@@ -945,6 +873,7 @@ function showToast(msg){const t=document.getElementById('toast');if(!t)return;t.
 function initFeedCollegeRows(){const stored=localStorage.getItem('xos_linked_college');if(!stored)return;const c=JSON.parse(stored);document.querySelectorAll('[id^="feed-college-row-"]').forEach(el=>{el.innerHTML=`<i class="fa-solid fa-building-columns"></i><span style="overflow:hidden;text-overflow:ellipsis;">${c.name}</span>`;});}
 document.addEventListener('DOMContentLoaded',()=>{
   initFeedCollegeRows();
+  renderFeed();
   renderPeopleGrid();
 });
 
@@ -983,11 +912,97 @@ function togglePeopleFollow(i,btn){
   btn.textContent=isF?'Follow':'Following';
 }
 
-const likeCounts=[42,128,42];
-const liked=[false,false,false];
-const saved=[false,false,false];
-function toggleLike(i){liked[i]=!liked[i];const btn=document.getElementById('like-'+i);const icon=btn.querySelector('i');const count=btn.querySelector('span');icon.className=liked[i]?'fa-solid fa-heart':'fa-regular fa-heart';count.textContent=likeCounts[i]+(liked[i]?1:0);btn.classList.toggle('liked',liked[i]);}
-function toggleSave(i){saved[i]=!saved[i];const btn=document.getElementById('save-'+i);const icon=btn.querySelector('i');icon.className=saved[i]?'fa-solid fa-bookmark':'fa-regular fa-bookmark';btn.classList.toggle('saved',saved[i]);}
+/* ── DYNAMIC FEED ── */
+let FEED_POSTS = [];
+const feedLiked = {}, feedSaved = {}, feedMuted = {};
+
+function buildFeedPosts() {
+  const profiles = window.XOS_PROFILES || {};
+  FEED_POSTS = [];
+  Object.values(profiles).forEach(u => {
+    (u.posts || []).forEach(p => {
+      FEED_POSTS.push({ ...p, _user: u });
+    });
+  });
+}
+
+function renderFeed() {
+  buildFeedPosts();
+  const feed = document.getElementById('feed');
+  feed.innerHTML = FEED_POSTS.map((p, i) => {
+    const u = p._user;
+    const isVid = p.type === 'video';
+    const file = (p.files || [])[0] || '';
+    const profileUrl = `https://unknownxsuperman-prog.github.io/anushdecodes/xos_updated.html?user=${u.userid}`;
+    const vtype = u.verified || 'none';
+    const badgeClass = vtype !== 'none' ? `v-${vtype}` : '';
+    return `<div class="post">
+      <div class="post-header">
+        <div class="post-avatar-wrap" onclick="window.open('${profileUrl}','_self')" style="cursor:pointer;">
+          <img class="post-avatar" src="${u.avatar||''}" alt="" onerror="this.style.opacity='.3'">
+          <div class="post-verified ${badgeClass}" id="fpv-${i}"></div>
+        </div>
+        <div class="post-meta" onclick="window.open('${profileUrl}','_self')" style="cursor:pointer;">
+          <div class="post-name">${u.displayName}</div>
+          <div class="post-handle">${u.handle} · ${p.time||''}</div>
+        </div>
+        <div class="post-menu" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis"></i></div>
+      </div>
+      <div class="post-media" id="fmedia-${i}">
+        ${isVid
+          ? `<video src="${file}" id="fvid-${i}" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>`
+          : `<img src="${file}" alt="" loading="lazy" onerror="this.style.display='none'">`
+        }
+      </div>
+      <div class="post-caption">${p.caption||''}</div>
+      <div class="post-actions">
+        <div class="post-action" id="flike-${i}" onclick="feedToggleLike(${i})">
+          <i class="fa-regular fa-heart"></i><span>${p.likes||0}</span>
+        </div>
+        <div class="post-action-spacer"></div>
+        ${isVid ? `<div class="post-vol-btn" id="fvol-${i}" onclick="feedToggleMute(${i})"><i class="fa-solid fa-volume-xmark" id="fvol-icon-${i}"></i></div>` : ''}
+        <div class="post-action" onclick="sharePost()"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+        <div class="post-action" id="fsave-${i}" onclick="feedToggleSave(${i})" style="margin-left:4px;"><i class="fa-regular fa-bookmark"></i></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // inject badges
+  FEED_POSTS.forEach((p, i) => {
+    const el = document.getElementById(`fpv-${i}`);
+    if (el) el.innerHTML = badgeImg(p._user.verified, 18);
+  });
+}
+
+function feedToggleLike(i) {
+  feedLiked[i] = !feedLiked[i];
+  const btn = document.getElementById(`flike-${i}`);
+  if (!btn) return;
+  btn.querySelector('i').className = feedLiked[i] ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+  btn.querySelector('span').textContent = (FEED_POSTS[i].likes||0) + (feedLiked[i]?1:0);
+  btn.classList.toggle('liked', feedLiked[i]);
+}
+
+function feedToggleSave(i) {
+  feedSaved[i] = !feedSaved[i];
+  const btn = document.getElementById(`fsave-${i}`);
+  if (!btn) return;
+  btn.querySelector('i').className = feedSaved[i] ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark';
+  btn.classList.toggle('saved', feedSaved[i]);
+}
+
+function feedToggleMute(i) {
+  feedMuted[i] = !feedMuted[i];
+  const vid = document.getElementById(`fvid-${i}`);
+  const icon = document.getElementById(`fvol-icon-${i}`);
+  if (vid) vid.muted = feedMuted[i];
+  if (icon) icon.className = feedMuted[i] ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+}
+
+// keep old toggleLike/toggleSave as aliases so nothing breaks
+const likeCounts=[];const liked=[];const saved=[];
+function toggleLike(i){feedToggleLike(i);}
+function toggleSave(i){feedToggleSave(i);}
 
 // Build ZYNX feed from all profiles in profiles.js
 function getZynxPosts(){
@@ -1022,9 +1037,10 @@ function makeZynxItem(p,i){
   const u = p._user || activeUser;
   const vtype=u.verified;
   const zbadgeHTML=(vtype&&vtype!=='none'&&BADGE_SRC[vtype])?`<span class="z-badge">${badgeImg(vtype,14)}</span>`:'';
+  const profileUrl=`https://unknownxsuperman-prog.github.io/anushdecodes/xos_updated.html?user=${u.userid}`;
 
   const info=document.createElement('div');info.className='zynx-info';
-  info.innerHTML=`<div class="zynx-user-row"><img class="zynx-avatar" src="${u.avatar||'Screenshot_20260418-234611.png'}" alt="" onerror="this.style.opacity='.3'"><div><div class="zynx-name">${u.displayName}${zbadgeHTML}</div><div class="zynx-handle">${u.handle}</div></div></div><div class="zynx-caption">${p.caption||''}</div>${(p.files||[]).length>1?`<div class="zynx-dots" id="zdots-${i}">${p.files.map((_,j)=>`<div class="zynx-dot${j===0?' active':''}" id="zdot-${i}-${j}"></div>`).join('')}</div>`:''}`;
+  info.innerHTML=`<div class="zynx-user-row" onclick="window.open('${profileUrl}','_self')" style="cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;"><img class="zynx-avatar" src="${u.avatar||'Screenshot_20260418-234611.png'}" alt="" onerror="this.style.opacity='.3'"><div><div class="zynx-name">${u.displayName}${zbadgeHTML}</div><div class="zynx-handle">${u.handle}</div></div></div><div class="zynx-caption">${p.caption||''}</div>${(p.files||[]).length>1?`<div class="zynx-dots" id="zdots-${i}">${p.files.map((_,j)=>`<div class="zynx-dot${j===0?' active':''}" id="zdot-${i}-${j}"></div>`).join('')}</div>`:''}`;
   item.appendChild(info);
 
   const actions=document.createElement('div');actions.className='zynx-actions';
