@@ -174,9 +174,17 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 }
 .post-media img,.post-media video{width:100%;height:100%;object-fit:cover;display:block;}
 .post-caption{font-size:.83rem;line-height:1.55;color:var(--text);margin-bottom:10px;font-weight:300;padding:0 2px;}
-.post-mute-tap{position:absolute;inset:0;z-index:5;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.post-mute-ind{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.6);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.05rem;pointer-events:none;opacity:0;z-index:6;border:1px solid rgba(255,255,255,.18);}
-.post-mute-ind.flash{animation:zMuteFlash .65s ease forwards;}
+.post-vol-btn{
+  position:absolute;bottom:10px;right:10px;z-index:6;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:.78rem;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s;
+}
+.post-vol-btn:active{background:rgba(0,0,0,.75);}
 .post-actions{display:flex;align-items:center;padding:6px 0 13px;border-top:1px solid var(--border2);margin-top:2px;gap:2px;}
 .post-action{display:flex;align-items:center;gap:5px;padding:6px 10px 6px 0;font-size:.72rem;color:var(--muted);font-weight:500;cursor:pointer;transition:color .18s;user-select:none;}
 .post-action i{font-size:1rem;transition:transform .18s,color .18s;}
@@ -963,8 +971,7 @@ function renderFeed() {
       <div class="post-media" id="fmedia-${i}">
         ${isVid
           ? `<video src="${file}" id="fvid-${i}" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
-             <div class="post-mute-tap" id="fmt-${i}" onclick="feedToggleMute(${i})"></div>
-             <div class="post-mute-ind" id="fmi-${i}"><i class="fa-solid fa-volume-xmark" id="fmi-icon-${i}"></i></div>`
+             <div class="post-vol-btn" id="fvol-${i}" onclick="feedToggleMute(${i})"><i class="fa-solid fa-volume-xmark" id="fvol-icon-${i}"></i></div>`
           : `<img src="${file}" alt="" loading="lazy" onerror="this.style.display='none'">`
         }
       </div>
@@ -1007,11 +1014,21 @@ function feedToggleSave(i) {
 function feedToggleMute(i) {
   feedMuted[i] = !feedMuted[i];
   const vid = document.getElementById(`fvid-${i}`);
-  const icon = document.getElementById(`fmi-icon-${i}`);
-  const ind = document.getElementById(`fmi-${i}`);
+  const icon = document.getElementById(`fvol-icon-${i}`);
   if (vid) vid.muted = feedMuted[i];
   if (icon) icon.className = feedMuted[i] ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-  if (ind) { ind.classList.remove('flash'); void ind.offsetWidth; ind.classList.add('flash'); }
+  if (!feedMuted[i]) {
+    // unmuting a feed video — silence zynx and mute every other feed video
+    if (zynxOpen) zMuteAllItems();
+    FEED_POSTS.forEach((_, j) => {
+      if (j === i) return;
+      const v = document.getElementById(`fvid-${j}`);
+      const ic = document.getElementById(`fvol-icon-${j}`);
+      if (v) v.muted = true;
+      if (ic) ic.className = 'fa-solid fa-volume-xmark';
+      feedMuted[j] = true;
+    });
+  }
 }
 
 // keep old toggleLike/toggleSave as aliases so nothing breaks
@@ -1034,7 +1051,16 @@ let ZYNX_POSTS = [];
 let zCurrentItem=0;
 const zLiked={},zSaved={},zMuted={};
 
-function openZynx(){if(zynxOpen)return;zynxOpen=true;setNav('zynx');ZYNX_POSTS=getZynxPosts();buildZynxFeed();document.querySelector('.top-bar').style.display='none';document.querySelector('.tabs').style.display='none';const el=document.getElementById('zynx-overlay');el.style.display='flex';el.classList.remove('closing');el.classList.add('open');history.pushState({modal:'zynx'},'');setTimeout(()=>zPlayCurrent(0),450);}
+function muteAllFeedVideos(){
+  FEED_POSTS.forEach((_,i)=>{
+    const vid=document.getElementById(`fvid-${i}`);
+    const icon=document.getElementById(`fvol-icon-${i}`);
+    if(vid){ vid.muted=true; feedMuted[i]=true; }
+    if(icon) icon.className='fa-solid fa-volume-xmark';
+  });
+}
+
+function openZynx(){if(zynxOpen)return;zynxOpen=true;muteAllFeedVideos();setNav('zynx');ZYNX_POSTS=getZynxPosts();buildZynxFeed();document.querySelector('.top-bar').style.display='none';document.querySelector('.tabs').style.display='none';const el=document.getElementById('zynx-overlay');el.style.display='flex';el.classList.remove('closing');el.classList.add('open');history.pushState({modal:'zynx'},'');setTimeout(()=>zPlayCurrent(0),450);}
 function closeZynx(fromPop){if(!zynxOpen)return;zynxOpen=false;setNav('home');zPauseAll();document.querySelector('.top-bar').style.display='';document.querySelector('.tabs').style.display='';const el=document.getElementById('zynx-overlay');el.classList.remove('open');el.classList.add('closing');if(!fromPop)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},400);}
 
 function buildZynxFeed(){const feed=document.getElementById('zynx-feed');feed.innerHTML='';ZYNX_POSTS.forEach((p,i)=>{feed.appendChild(makeZynxItem(p,i));});feed.onscroll=()=>onZynxScroll();}
@@ -1073,7 +1099,19 @@ function zPauseItem(idx){const item=document.getElementById(`zi-${idx}`);if(!ite
 function zPauseAll(){ZYNX_POSTS.forEach((_,i)=>zPauseItem(i));}
 
 function setupZTapZone(el,idx,isVid){let lastTap=0,tapTimer=null;el.addEventListener('click',e=>{const now=Date.now(),gap=now-lastTap;lastTap=now;if(gap<300&&gap>0){clearTimeout(tapTimer);lastTap=0;zDoubleTapLike(idx);}else{if(isVid)tapTimer=setTimeout(()=>zToggleMute(idx),250);}});}
-function zToggleMute(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(!vid)return;zMuted[idx]=!zMuted[idx];vid.muted=zMuted[idx];const ind=document.getElementById(`zm-${idx}`);const icon=document.getElementById(`zmi-${idx}`);if(icon)icon.className=zMuted[idx]?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';if(ind){ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}}
+function zMuteAllItems(){
+  ZYNX_POSTS.forEach((_,idx)=>{
+    const item=document.getElementById(`zi-${idx}`);
+    if(!item) return;
+    const vid=item.querySelector('video');
+    if(vid) vid.muted=true;
+    zMuted[idx]=true;
+    const icon=document.getElementById(`zmi-${idx}`);
+    if(icon) icon.className='fa-solid fa-volume-xmark';
+  });
+}
+
+function zToggleMute(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(!vid)return;zMuted[idx]=!zMuted[idx];vid.muted=zMuted[idx];const ind=document.getElementById(`zm-${idx}`);const icon=document.getElementById(`zmi-${idx}`);if(icon)icon.className=zMuted[idx]?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';if(ind){ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}if(!zMuted[idx])muteAllFeedVideos();}
 function zDoubleTapLike(idx){if(!zLiked[idx]){zLiked[idx]=true;const btn=document.getElementById(`zlike-${idx}`);const icon=btn?.querySelector('i');const count=document.getElementById(`zlc-${idx}`);if(icon)icon.className='fa-solid fa-heart';if(count)count.textContent=ZYNX_POSTS[idx].likes+1;if(btn)btn.classList.add('liked');}const h=document.getElementById(`zh-${idx}`);if(h){h.classList.remove('flash');void h.offsetWidth;h.classList.add('flash');}}
 function zToggleLike(idx){zLiked[idx]=!zLiked[idx];const btn=document.getElementById(`zlike-${idx}`);const icon=btn?.querySelector('i');const count=document.getElementById(`zlc-${idx}`);if(icon)icon.className=zLiked[idx]?'fa-solid fa-heart':'fa-regular fa-heart';if(count)count.textContent=ZYNX_POSTS[idx].likes+(zLiked[idx]?1:0);if(btn)btn.classList.toggle('liked',zLiked[idx]);}
 function zToggleSave(idx){zSaved[idx]=!zSaved[idx];const btn=document.getElementById(`zsave-${idx}`);const icon=btn?.querySelector('i');if(icon)icon.className=zSaved[idx]?'fa-solid fa-bookmark':'fa-regular fa-bookmark';if(btn)btn.classList.toggle('saved',zSaved[idx]);}
