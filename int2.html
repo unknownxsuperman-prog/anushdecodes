@@ -174,8 +174,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:
 }
 .post-media img,.post-media video{width:100%;height:100%;object-fit:cover;display:block;}
 .post-caption{font-size:.83rem;line-height:1.55;color:var(--text);margin-bottom:10px;font-weight:300;padding:0 2px;}
-.post-vol-btn{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:.72rem;cursor:pointer;transition:background .15s;flex-shrink:0;}
-.post-vol-btn:active{background:rgba(255,255,255,.16);}
+.post-mute-tap{position:absolute;inset:0;z-index:5;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.post-mute-ind{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.6);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.05rem;pointer-events:none;opacity:0;z-index:6;border:1px solid rgba(255,255,255,.18);}
+.post-mute-ind.flash{animation:zMuteFlash .65s ease forwards;}
 .post-actions{display:flex;align-items:center;padding:6px 0 13px;border-top:1px solid var(--border2);margin-top:2px;gap:2px;}
 .post-action{display:flex;align-items:center;gap:5px;padding:6px 10px 6px 0;font-size:.72rem;color:var(--muted);font-weight:500;cursor:pointer;transition:color .18s;user-select:none;}
 .post-action i{font-size:1rem;transition:transform .18s,color .18s;}
@@ -961,7 +962,9 @@ function renderFeed() {
       </div>
       <div class="post-media" id="fmedia-${i}">
         ${isVid
-          ? `<video src="${file}" id="fvid-${i}" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>`
+          ? `<video src="${file}" id="fvid-${i}" muted autoplay loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+             <div class="post-mute-tap" id="fmt-${i}" onclick="feedToggleMute(${i})"></div>
+             <div class="post-mute-ind" id="fmi-${i}"><i class="fa-solid fa-volume-xmark" id="fmi-icon-${i}"></i></div>`
           : `<img src="${file}" alt="" loading="lazy" onerror="this.style.display='none'">`
         }
       </div>
@@ -971,7 +974,6 @@ function renderFeed() {
           <i class="fa-regular fa-heart"></i><span>${p.likes||0}</span>
         </div>
         <div class="post-action-spacer"></div>
-        ${isVid ? `<div class="post-vol-btn" id="fvol-${i}" onclick="feedToggleMute(${i})"><i class="fa-solid fa-volume-xmark" id="fvol-icon-${i}"></i></div>` : ''}
         <div class="post-action" onclick="sharePost()"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
         <div class="post-action" id="fsave-${i}" onclick="feedToggleSave(${i})" style="margin-left:4px;"><i class="fa-regular fa-bookmark"></i></div>
       </div>
@@ -1005,9 +1007,11 @@ function feedToggleSave(i) {
 function feedToggleMute(i) {
   feedMuted[i] = !feedMuted[i];
   const vid = document.getElementById(`fvid-${i}`);
-  const icon = document.getElementById(`fvol-icon-${i}`);
+  const icon = document.getElementById(`fmi-icon-${i}`);
+  const ind = document.getElementById(`fmi-${i}`);
   if (vid) vid.muted = feedMuted[i];
   if (icon) icon.className = feedMuted[i] ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+  if (ind) { ind.classList.remove('flash'); void ind.offsetWidth; ind.classList.add('flash'); }
 }
 
 // keep old toggleLike/toggleSave as aliases so nothing breaks
@@ -1043,13 +1047,6 @@ function makeZynxItem(p,i){
   item.appendChild(carousel);
   const tap=document.createElement('div');tap.className='zynx-tap-zone';setupZTapZone(tap,i,isVid);item.appendChild(tap);
   const muteInd=document.createElement('div');muteInd.className='z-mute-ind';muteInd.id=`zm-${i}`;muteInd.innerHTML='<i class="fa-solid fa-volume-xmark" id="zmi-'+i+'"></i>';item.appendChild(muteInd);
-  if(isVid){
-    const volBtn=document.createElement('div');
-    volBtn.className='z-vol-toggle';volBtn.id=`zvol-${i}`;
-    volBtn.innerHTML=`<i class="fa-solid fa-volume-xmark" id="zvol-icon-${i}"></i>`;
-    volBtn.addEventListener('click',e=>{e.stopPropagation();zToggleMute(i);});
-    item.appendChild(volBtn);
-  }
   const heartInd=document.createElement('div');heartInd.className='z-heart-ind';heartInd.id=`zh-${i}`;heartInd.innerHTML='<i class="fa-solid fa-heart"></i>';item.appendChild(heartInd);
 
   const u = p._user || activeUser;
@@ -1071,12 +1068,12 @@ function makeZynxItem(p,i){
 
 let zScrollTimer=null;
 function onZynxScroll(){clearTimeout(zScrollTimer);zScrollTimer=setTimeout(()=>{const feed=document.getElementById('zynx-feed');const idx=Math.round(feed.scrollTop/window.innerHeight);if(idx!==zCurrentItem){zPauseItem(zCurrentItem);zCurrentItem=idx;zPlayCurrent(idx);}},80);}
-function zPlayCurrent(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(vid){vid.muted=!!zMuted[idx];vid.play().catch(()=>{vid.muted=true;zMuted[idx]=true;const vi=document.getElementById(`zvol-icon-${idx}`);if(vi)vi.className='fa-solid fa-volume-xmark';});const vi=document.getElementById(`zvol-icon-${idx}`);if(vi)vi.className=zMuted[idx]?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';}}
+function zPlayCurrent(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(vid){vid.muted=!!zMuted[idx];vid.play().catch(()=>{vid.muted=true;zMuted[idx]=true;});}}
 function zPauseItem(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(vid)vid.pause();}
 function zPauseAll(){ZYNX_POSTS.forEach((_,i)=>zPauseItem(i));}
 
-function setupZTapZone(el,idx,isVid){let lastTap=0,tapTimer=null;el.addEventListener('click',e=>{const now=Date.now(),gap=now-lastTap;lastTap=now;if(gap<300&&gap>0){clearTimeout(tapTimer);lastTap=0;zDoubleTapLike(idx);}});}
-function zToggleMute(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(!vid)return;zMuted[idx]=!zMuted[idx];vid.muted=zMuted[idx];const volIcon=document.getElementById(`zvol-icon-${idx}`);if(volIcon)volIcon.className=zMuted[idx]?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';}
+function setupZTapZone(el,idx,isVid){let lastTap=0,tapTimer=null;el.addEventListener('click',e=>{const now=Date.now(),gap=now-lastTap;lastTap=now;if(gap<300&&gap>0){clearTimeout(tapTimer);lastTap=0;zDoubleTapLike(idx);}else{if(isVid)tapTimer=setTimeout(()=>zToggleMute(idx),250);}});}
+function zToggleMute(idx){const item=document.getElementById(`zi-${idx}`);if(!item)return;const vid=item.querySelector('video');if(!vid)return;zMuted[idx]=!zMuted[idx];vid.muted=zMuted[idx];const ind=document.getElementById(`zm-${idx}`);const icon=document.getElementById(`zmi-${idx}`);if(icon)icon.className=zMuted[idx]?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';if(ind){ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}}
 function zDoubleTapLike(idx){if(!zLiked[idx]){zLiked[idx]=true;const btn=document.getElementById(`zlike-${idx}`);const icon=btn?.querySelector('i');const count=document.getElementById(`zlc-${idx}`);if(icon)icon.className='fa-solid fa-heart';if(count)count.textContent=ZYNX_POSTS[idx].likes+1;if(btn)btn.classList.add('liked');}const h=document.getElementById(`zh-${idx}`);if(h){h.classList.remove('flash');void h.offsetWidth;h.classList.add('flash');}}
 function zToggleLike(idx){zLiked[idx]=!zLiked[idx];const btn=document.getElementById(`zlike-${idx}`);const icon=btn?.querySelector('i');const count=document.getElementById(`zlc-${idx}`);if(icon)icon.className=zLiked[idx]?'fa-solid fa-heart':'fa-regular fa-heart';if(count)count.textContent=ZYNX_POSTS[idx].likes+(zLiked[idx]?1:0);if(btn)btn.classList.toggle('liked',zLiked[idx]);}
 function zToggleSave(idx){zSaved[idx]=!zSaved[idx];const btn=document.getElementById(`zsave-${idx}`);const icon=btn?.querySelector('i');if(icon)icon.className=zSaved[idx]?'fa-solid fa-bookmark':'fa-regular fa-bookmark';if(btn)btn.classList.toggle('saved',zSaved[idx]);}
