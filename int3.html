@@ -13,27 +13,42 @@
             --accent: #007aff;--text: #fff;--muted: #666;--muted2: #444;--glass: rgba(10,10,10,.75);
             --ease: cubic-bezier(.4,0,.2,1);--font: 'Space Grotesk',sans-serif;
             --badge-blue:#1d9bf0;--badge-green:#25D366;
-            --danger: #ff3b5c;
         }
         .light-mode {--bg:#fff;--card:#f5f5f7;--card2:#f0f0f2;--border:#e0e0e2;--border2:rgba(0,0,0,.07);--text:#000;--muted:#888;--glass:rgba(255,255,255,.82);}
         *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
         html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;transition:background .35s var(--ease),color .35s var(--ease);}
         ::-webkit-scrollbar{display:none;}
+
+        /* ═══ ANIMATIONS ═══ */
         @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(.95)}}
         @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes shimmer{0%{left:-100%}100%{left:100%}}
+        @keyframes shimmer{0%{left:-100%}100%{left:200%}}
         @keyframes eqBar{from{height:2px}to{height:10px}}
         @keyframes likeHeartPop{0%{transform:scale(1)}30%{transform:scale(1.55)}60%{transform:scale(.88)}100%{transform:scale(1)}}
         @keyframes muteFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}30%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}}
         @keyframes dtFlash{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}55%{opacity:1;transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.85)}}
         @keyframes pfpIn{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
         @keyframes pfpOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.88)}}
-        @keyframes editSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-        @keyframes editSlideDown{from{transform:translateY(0)}to{transform:translateY(100%)}}
-        @keyframes editFieldFocus{0%{box-shadow:0 0 0 0 rgba(0,122,255,.4)}100%{box-shadow:0 0 0 4px rgba(0,122,255,.08)}}
-        @keyframes savedToast{0%{opacity:0;transform:translateX(-50%) translateY(20px) scale(.9)}15%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}85%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-10px) scale(.95)}}
-        @keyframes linkItemIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+
+        /* ═══ INDUSTRIAL BADGE ANIMATIONS ═══ */
+        @keyframes goldRotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @keyframes goldPulse{0%,100%{box-shadow:0 0 0 0 rgba(252,209,80,.0),0 0 6px 1px rgba(252,209,80,.18)}50%{box-shadow:0 0 0 2.5px rgba(252,209,80,.12),0 0 10px 3px rgba(252,209,80,.28)}}
+        @keyframes bluePulse{0%,100%{box-shadow:0 0 0 0 rgba(29,155,240,.0),0 0 5px 1px rgba(29,155,240,.2)}50%{box-shadow:0 0 0 2px rgba(29,155,240,.18),0 0 8px 2px rgba(29,155,240,.32)}}
+        @keyframes greenPulse{0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,.0),0 0 5px 1px rgba(37,211,102,.18)}50%{box-shadow:0 0 0 2px rgba(37,211,102,.15),0 0 8px 2px rgba(37,211,102,.28)}}
+        @keyframes badgeShimmer{0%{left:-120%}100%{left:160%}}
+        @keyframes badgeAppear{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.18) rotate(4deg)}80%{transform:scale(.94)}100%{transform:scale(1) rotate(0deg);opacity:1}}
+
+        /* ═══ GLASS OVERLAY ANIMATIONS ═══ */
+        @keyframes glassSlideUp{from{transform:translateY(100%) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+        @keyframes glassSlideDown{from{transform:translateY(0) scale(1);opacity:1}to{transform:translateY(105%) scale(.96);opacity:0}}
+        @keyframes liquidIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes rowFadeIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes orbFloat1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(12px,-18px) scale(1.06)}}
+        @keyframes orbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-14px,10px) scale(1.04)}}
+        @keyframes orbFloat3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8px,14px) scale(.96)}}
+
+        /* ═══ LAYOUT ═══ */
         .page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
         .top-bar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);}
         .light-mode .top-bar{background:rgba(255,255,255,.72);border-bottom:1px solid var(--border);}
@@ -54,31 +69,107 @@
         .profile-section{padding:0 20px;margin-top:-52px;position:relative;animation:slideUp .6s var(--ease) both;}
         .follow-btn{position:absolute;right:20px;top:65px;padding:10px 30px;background:rgba(255,255,255,.9);color:#000;border:none;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 4px 15px rgba(0,0,0,.4);font-family:var(--font);outline:none;-webkit-appearance:none;}
         .follow-btn.following{background:var(--card);color:var(--text);border:1px solid var(--border);}
-        .avatar-wrap{width:84px;height:84px;position:relative;margin-bottom:14px;cursor:pointer;}
+        .avatar-wrap{width:84px;height:84px;position:relative;margin-bottom:14px;cursor:pointer;overflow:visible;}
         .avatar-wrap:active .avatar-img{transform:scale(.94);opacity:.85;}
         .avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:1px solid var(--border);display:block;transition:transform .18s var(--ease),opacity .18s var(--ease);}
-        .pfp-badge{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;z-index:5;background:var(--bg);border-radius:50%;border:1.5px solid var(--bg);overflow:hidden;animation:pulse 3s infinite ease-in-out;}
-        .pfp-badge .fa-certificate{font-size:18px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-        .pfp-badge .fa-check{font-size:8px;color:#000;position:relative;z-index:6;font-weight:900;}
-        .pfp-badge::after{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);animation:shimmer 2s infinite linear;z-index:7;}
-        .pfp-badge.badge-blue{background:var(--badge-blue);border-color:var(--badge-blue);animation:none;}
-        .pfp-badge.badge-blue .fa-certificate{display:none;}
-        .pfp-badge.badge-blue .fa-check{font-size:10px;color:#fff;}
-        .pfp-badge.badge-blue::after{display:none;}
-        .pfp-badge.badge-green{background:var(--badge-green);border-color:var(--badge-green);animation:none;}
-        .pfp-badge.badge-green .fa-certificate{display:none;}
-        .pfp-badge.badge-green .fa-check{font-size:10px;color:#fff;}
-        .pfp-badge.badge-green::after{display:none;}
-        .pfp-badge.badge-none{display:none;}
+
+        /* ═══════════════════════════════════════════════════
+           INDUSTRIAL SEAL BADGES — SVG SCALLOPED STAMP STYLE
+           Exactly matching: Standard Green / Blue / Enterprise Gold
+        ═══════════════════════════════════════════════════ */
+
+        /* ── PFP BADGE ──
+           26px total. bottom-right corner overlapping avatar.
+           offset = -8px so ~70% inside, 30% outside
+        */
+       /* ===========================
+   Profile Picture Verified Badge
+   Optimized for x0s.link UI
+   =========================== */
+
+.pfp-badge{
+    position:absolute;
+    bottom:-3px;
+    right:-3px;
+    width:23px;
+    height:23px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10;
+    background:none;
+    border:none;
+    padding:0;
+    overflow:visible;
+    transition:transform .18s ease;
+}
+
+.pfp-badge:hover{
+    transform:scale(1.05);
+}
+
+.pfp-badge img,
+.pfp-badge svg{
+    width:23px;
+    height:23px;
+    display:block;
+    object-fit:contain;
+    filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));
+}
+
+.pfp-badge.badge-none{
+    display:none;
+}
+
+
+/* ===========================
+   Inline Verified Badge
+   Beside Username
+   =========================== */
+
+.sheet-verified{
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 16px;
+    height: 16px;
+
+    margin-left: 5px;
+    vertical-align: middle;
+
+    flex-shrink: 0;
+}
+
+.sheet-verified img,
+.sheet-verified svg{
+    width: 16px;
+    height: 16px;
+
+    display: block;
+    object-fit: contain;
+
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
+
+.sheet-verified.badge-none{
+    display: none;
+}
+
+        /* ═══ PROFILE LAYOUT ═══ */
         .name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
         .name{font-size:1.35rem;font-weight:700;letter-spacing:-.01em;}
         .handle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
         .handle{font-size:.72rem;font-weight:500;color:var(--accent);letter-spacing:.06em;}
+
+        /* ═══ FOLLOWER STAT — tap targets ═══ */
         .follower-stat{font-size:.72rem;color:var(--muted);display:flex;gap:12px;}
-        .follower-stat span{cursor:pointer;transition:color .2s;}
+        .follower-stat span{cursor:pointer;transition:color .2s;position:relative;padding:4px 2px;border-radius:6px;}
         .follower-stat span:hover{color:var(--text);}
         .follower-stat b{color:var(--text);}
-        .bio{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:14px;}
+
+        .bio{font-size:.82rem;color:rgba(255,255,255,.72);font-weight:400;line-height:1.6;margin-bottom:14px;}
         .bio-music{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;width:fit-content;max-width:100%;}
         .bio-music-play{background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.7rem;flex-shrink:0;cursor:pointer;transition:opacity .15s;padding:0;outline:none;-webkit-appearance:none;}
         .bio-music-play:active{opacity:.5;}
@@ -91,7 +182,35 @@
         .bio-music-eq span:nth-child(4){animation:eqBar .7s .1s infinite alternate ease-in-out;}
         .bio-music-eq.paused span{animation-play-state:paused;opacity:.25;}
         .links-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
-        .link-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:var(--card);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:.72rem;font-weight:600;white-space:nowrap;transition:.2s;}
+        /* ── LINK PILLS — reduced visual weight, tighter ── */
+        .link-pill{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:6px 11px;
+            background:rgba(255,255,255,.04);
+            border:1px solid rgba(255,255,255,.08);
+            border-radius:10px;text-decoration:none;
+            color:rgba(255,255,255,.65);
+            font-size:.70rem;font-weight:500;
+            white-space:nowrap;transition:.2s;
+            letter-spacing:.01em;
+        }
+        .link-pill:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);}
+        /* Arattai icon — fix sizing to match FA icons exactly */
+        .link-pill .fa-arattai{
+            font-size:.82rem;
+            line-height:1;
+            width:14px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            flex-shrink:0;
+        }
+        /* All other icons in pills */
+        .link-pill i{
+            font-size:.78rem;
+            line-height:1;
+            flex-shrink:0;
+        }
         .posts-section{padding:0 16px 100px;}
         .section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);margin-bottom:14px;display:block;}
         .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
@@ -102,6 +221,8 @@
         .post-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.45) 0%,transparent 45%);pointer-events:none;border-radius:10px;}
         .vid-badge{position:absolute;top:7px;right:7px;z-index:2;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 6px;font-size:.55rem;font-weight:700;color:#fff;letter-spacing:.06em;}
         .multi-badge{position:absolute;top:7px;left:7px;z-index:2;color:#fff;font-size:.75rem;filter:drop-shadow(0 1px 4px rgba(0,0,0,.7));}
+
+        /* ═══ POST MODAL ═══ */
         .post-modal-backdrop{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0);display:none;flex-direction:column;align-items:center;justify-content:flex-end;transition:background .32s var(--ease);overscroll-behavior:contain;}
         .post-modal-backdrop.active{background:rgba(0,0,0,.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
         .post-modal-sheet{width:100%;max-width:480px;background:#090909;border-radius:26px 26px 0 0;overflow:hidden;display:flex;flex-direction:column;transform:translateY(102%);transition:transform .42s cubic-bezier(.32,.72,0,1);border:1px solid rgba(255,255,255,.07);border-bottom:none;position:relative;will-change:transform;touch-action:pan-y;}
@@ -121,19 +242,6 @@
         .sheet-dot.active{background:#fff;transform:scale(1.2);width:14px;}
         .dt-indicator{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.55);width:62px;height:62px;background:rgba(0,0,0,.62);backdrop-filter:blur(12px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;pointer-events:none;opacity:0;z-index:21;border:1px solid rgba(255,100,100,.28);color:#ff3b5c;}
         .dt-indicator.flash{animation:dtFlash .75s var(--ease) forwards;}
-        .sheet-verified{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;position:relative;overflow:hidden;flex-shrink:0;vertical-align:middle;margin-left:5px;background:transparent;border-radius:50%;animation:pulse 3s infinite ease-in-out;}
-        .sheet-verified .fa-certificate{font-size:12px;position:absolute;background:linear-gradient(45deg,#BF953F,#FCF6BA,#B38728,#FBF5B7,#AA771C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-        .sheet-verified .fa-check{font-size:7px;color:#000;position:relative;z-index:6;font-weight:900;}
-        .sheet-verified::after{content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.8) 50%,transparent 70%);animation:shimmer 2s infinite linear;z-index:7;}
-        .sheet-verified.badge-blue{background:var(--badge-blue);animation:none;}
-        .sheet-verified.badge-blue .fa-certificate{display:none;}
-        .sheet-verified.badge-blue .fa-check{font-size:8px;color:#fff;}
-        .sheet-verified.badge-blue::after{display:none;}
-        .sheet-verified.badge-green{background:var(--badge-green);animation:none;}
-        .sheet-verified.badge-green .fa-certificate{display:none;}
-        .sheet-verified.badge-green .fa-check{font-size:8px;color:#fff;}
-        .sheet-verified.badge-green::after{display:none;}
-        .sheet-verified.badge-none{display:none;}
         .pfp-viewer-backdrop{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0);display:none;align-items:center;justify-content:center;transition:background .28s var(--ease);backdrop-filter:blur(0px);-webkit-backdrop-filter:blur(0px);}
         .pfp-viewer-backdrop.active{background:rgba(0,0,0,.88);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);}
         .pfp-viewer-box{position:relative;width:min(88vw,420px);height:min(88vw,420px);border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.1);box-shadow:0 32px 80px rgba(0,0,0,.9);opacity:0;}
@@ -164,6 +272,8 @@
         .comment-input::placeholder{color:var(--muted2);}
         .comment-send{color:var(--accent);font-size:.85rem;cursor:pointer;opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;flex-shrink:0;}
         .comment-send.visible{opacity:1;transform:scale(1);}
+
+        /* ═══ MUSIC MODAL ═══ */
         .music-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;opacity:0;transition:.3s;}
         .music-modal.active{display:flex;opacity:1;}
         .music-box{width:82vw;max-width:340px;background:#000;border:1px solid var(--border);border-radius:26px;overflow:hidden;padding:24px 20px 28px;transform:scale(.9);transition:.35s var(--ease);box-shadow:0 30px 80px rgba(0,0,0,.9);position:relative;}
@@ -180,6 +290,8 @@
         .music-controls{display:flex;align-items:center;justify-content:center;gap:28px;}
         .music-ctrl{color:var(--muted);font-size:.9rem;cursor:pointer;}
         .music-close{position:absolute;top:14px;right:14px;width:32px;height:32px;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:10;}
+
+        /* ═══ COLLEGE LINK ═══ */
         .college-link-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer;max-width:100%;overflow:hidden;}
         .college-link-icon{font-size:.78rem;color:var(--muted);flex-shrink:0;}
         .college-link-name-wrap{overflow:hidden;max-width:260px;}
@@ -209,283 +321,282 @@
         .clg-chevron{color:var(--muted);font-size:.72rem;flex-shrink:0;}
         .clg-no-results{text-align:center;padding:48px 0;color:var(--muted);font-size:.82rem;}
         .clg-hint{font-size:.68rem;color:var(--muted);margin-bottom:14px;padding:0 2px;}
-        /* FOLLOW LIST OVERLAY STYLES */
-        .follow-overlay {
-            position: fixed; inset: 0; z-index: 800; background: var(--bg);
-            display: none; flex-direction: column;
-            transform: translateY(100%);
-            transition: transform .36s cubic-bezier(.32,.72,0,1);
+
+        /* ═══════════════════════════════════════════════
+           LIQUID GLASS FOLLOW OVERLAY — INDUSTRIAL DESIGN
+        ═══════════════════════════════════════════════ */
+        .follow-overlay{
+            position:fixed;inset:0;z-index:800;
+            display:none;flex-direction:column;
+            overflow:hidden;
         }
-        .follow-overlay.open { transform: translateY(0); }
-        .follow-user-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px; border-bottom: 1px solid var(--border2);
-            cursor: pointer; transition: background .15s; border-radius: 12px;
+
+        /* Animated ambient orbs background */
+        .follow-overlay-bg{
+            position:absolute;inset:0;
+            background:#000;
+            overflow:hidden;
+            z-index:0;
         }
-        .follow-user-item:active { background: rgba(255,255,255,.04); }
-        .follow-user-pfp {
-            width: 44px; height: 44px; border-radius: 50%;
-            object-fit: cover; border: 1px solid var(--border);
-            background: var(--card); flex-shrink: 0;
+        .follow-overlay-bg::before{
+            content:'';
+            position:absolute;inset:0;
+            background:
+                radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,122,255,.18) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 80% 70%, rgba(100,50,255,.12) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 60% at 50% 100%, rgba(0,80,200,.1) 0%, transparent 60%);
         }
-        .follow-user-info { flex: 1; min-width: 0; }
-        .follow-user-name {
-            font-size: .84rem; font-weight: 600;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .fo-orb{position:absolute;border-radius:50%;filter:blur(48px);pointer-events:none;z-index:0;}
+        .fo-orb-1{width:260px;height:260px;background:rgba(0,122,255,.22);top:-60px;left:-80px;animation:orbFloat1 8s ease-in-out infinite;}
+        .fo-orb-2{width:200px;height:200px;background:rgba(80,0,255,.14);bottom:80px;right:-60px;animation:orbFloat2 10s ease-in-out infinite;}
+        .fo-orb-3{width:180px;height:180px;background:rgba(0,180,255,.1);top:40%;left:30%;animation:orbFloat3 12s ease-in-out infinite;}
+
+        /* Noise overlay */
+        .follow-overlay-noise{
+            position:absolute;inset:0;z-index:1;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity:.55;pointer-events:none;
         }
-        .follow-user-id { font-size: .62rem; color: var(--muted); margin-top: 2px; }
-        /* ═══════════════════════════════════
-           EDIT PROFILE OVERLAY STYLES
-        ═══════════════════════════════════ */
-        .edit-overlay {
-            position: fixed; inset: 0; z-index: 900; background: var(--bg);
-            display: none; flex-direction: column;
-            transform: translateY(100%);
-            will-change: transform;
+
+        /* Glass panel — the actual visible container */
+        .follow-glass-panel{
+            position:relative;z-index:2;
+            display:flex;flex-direction:column;
+            height:100%;
+            background:
+                linear-gradient(180deg,
+                    rgba(255,255,255,.04) 0%,
+                    rgba(255,255,255,.02) 40%,
+                    rgba(0,0,0,.08) 100%
+                );
+            backdrop-filter:blur(40px) saturate(160%);
+            -webkit-backdrop-filter:blur(40px) saturate(160%);
+            border-left:1px solid rgba(255,255,255,.07);
+            border-right:1px solid rgba(255,255,255,.07);
         }
-        .edit-overlay.open {
-            display: flex;
-            animation: editSlideUp .4s cubic-bezier(.32,.72,0,1) forwards;
+
+        /* Slide animation */
+        .follow-overlay.open .follow-glass-panel{
+            animation:glassSlideUp .46s cubic-bezier(.28,.72,.2,1) both;
         }
-        .edit-overlay.closing {
-            display: flex;
-            animation: editSlideDown .34s cubic-bezier(.32,.72,0,1) forwards;
+        .follow-overlay.closing .follow-glass-panel{
+            animation:glassSlideDown .34s cubic-bezier(.6,0,.8,1) both;
         }
-        .edit-topbar {
-            position: sticky; top: 0; display: flex; align-items: center;
-            justify-content: space-between; padding: 14px 16px;
-            background: rgba(0,0,0,.7); backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid var(--border2); z-index: 10; flex-shrink: 0;
+
+        /* Header */
+        .fo-header{
+            display:flex;align-items:center;
+            padding:52px 20px 18px;
+            border-bottom:1px solid rgba(255,255,255,.06);
+            flex-shrink:0;
+            position:relative;
         }
-        .edit-cancel-btn {
-            font-size: .82rem; font-weight: 600; color: var(--muted);
-            cursor: pointer; padding: 6px 10px; border-radius: 8px;
-            transition: color .2s, background .2s; font-family: var(--font);
-            background: transparent; border: none; outline: none;
+        .fo-header::after{
+            content:'';position:absolute;bottom:0;left:20px;right:20px;height:1px;
+            background:linear-gradient(90deg,transparent,rgba(0,122,255,.35),rgba(100,50,255,.25),transparent);
         }
-        .edit-cancel-btn:hover { color: var(--text); background: rgba(255,255,255,.05); }
-        .edit-save-btn {
-            padding: 8px 24px; background: var(--accent); color: #fff;
-            border: none; border-radius: 20px; font-size: .82rem; font-weight: 700;
-            cursor: pointer; font-family: var(--font); transition: all .2s;
-            outline: none; -webkit-appearance: none;
-            box-shadow: 0 4px 16px rgba(0,122,255,.3);
+        .fo-back{
+            width:38px;height:38px;border-radius:12px;
+            background:rgba(255,255,255,.06);
+            border:1px solid rgba(255,255,255,.1);
+            display:flex;align-items:center;justify-content:center;
+            color:rgba(255,255,255,.8);font-size:.82rem;cursor:pointer;
+            transition:background .15s,transform .15s;
+            flex-shrink:0;
+            backdrop-filter:blur(12px);
         }
-        .edit-save-btn:hover { background: #0088ff; box-shadow: 0 6px 24px rgba(0,122,255,.45); transform: translateY(-1px); }
-        .edit-save-btn:active { transform: scale(.96); }
-        .edit-save-btn:disabled { opacity: .4; cursor: default; transform: none; box-shadow: none; }
-        .edit-body {
-            flex: 1; overflow-y: auto; padding: 0 0 60px;
-            scroll-behavior: smooth;
+        .fo-back:active{background:rgba(255,255,255,.12);transform:scale(.92);}
+
+        .fo-title-block{flex:1;text-align:center;padding-right:38px;}
+        .fo-title{
+            font-size:1.05rem;font-weight:700;letter-spacing:-.02em;
+            color:#fff;line-height:1;margin-bottom:3px;
         }
-        /* Banner & Avatar edit area */
-        .edit-media-section {
-            position: relative; width: 100%; margin-bottom: 28px;
+        .fo-subtitle{font-size:.62rem;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase;font-weight:500;}
+
+        /* Search bar in overlay */
+        .fo-search{
+            margin:16px 20px 4px;
+            display:flex;align-items:center;gap:9px;
+            background:rgba(255,255,255,.055);
+            border:1px solid rgba(255,255,255,.09);
+            border-radius:14px;padding:10px 14px;
+            backdrop-filter:blur(8px);
+            flex-shrink:0;
         }
-        .edit-banner-wrap {
-            width: 100%; height: 160px; background: linear-gradient(135deg, #000814, #001d3d);
-            overflow: hidden; position: relative; cursor: pointer;
-            transition: opacity .2s;
+        .fo-search i{font-size:.78rem;color:rgba(255,255,255,.3);flex-shrink:0;}
+        .fo-search input{
+            flex:1;background:transparent;border:none;outline:none;
+            color:#fff;font-size:.82rem;font-family:var(--font);
+            caret-color:#007aff;
         }
-        .edit-banner-wrap:hover { opacity: .85; }
-        .edit-banner-wrap img {
-            width: 100%; height: 100%; object-fit: cover; opacity: .5;
+        .fo-search input::placeholder{color:rgba(255,255,255,.22);}
+
+        /* Tabs */
+        .fo-tabs{
+            display:flex;margin:12px 20px 0;gap:0;
+            background:rgba(255,255,255,.04);
+            border:1px solid rgba(255,255,255,.07);
+            border-radius:12px;padding:3px;flex-shrink:0;
         }
-        .edit-banner-overlay {
-            position: absolute; inset: 0;
-            background: rgba(0,0,0,.45);
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; color: #fff; font-size: .78rem; font-weight: 600;
-            letter-spacing: .03em; opacity: 0; transition: opacity .25s;
+        .fo-tab{
+            flex:1;text-align:center;padding:8px 0;
+            font-size:.72rem;font-weight:600;letter-spacing:.04em;
+            color:rgba(255,255,255,.35);cursor:pointer;
+            border-radius:10px;transition:all .22s var(--ease);
         }
-        .edit-banner-wrap:hover .edit-banner-overlay { opacity: 1; }
-        .edit-banner-overlay i { font-size: 1.1rem; }
-        .edit-avatar-float {
-            position: absolute; bottom: -36px; left: 20px;
-            width: 80px; height: 80px; border-radius: 20px;
-            overflow: hidden; border: 3px solid var(--bg);
-            cursor: pointer; background: var(--card);
-            transition: transform .2s, box-shadow .2s;
+        .fo-tab.active{
+            background:rgba(255,255,255,.1);
+            color:#fff;
+            box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 2px 8px rgba(0,0,0,.3);
         }
-        .edit-avatar-float:hover {
-            transform: scale(1.04);
-            box-shadow: 0 8px 30px rgba(0,0,0,.6);
+
+        /* Count badge on tab */
+        .fo-tab-count{
+            display:inline-flex;align-items:center;justify-content:center;
+            min-width:18px;height:16px;padding:0 5px;
+            background:rgba(0,122,255,.25);
+            border:1px solid rgba(0,122,255,.3);
+            border-radius:99px;font-size:.55rem;font-weight:700;
+            color:rgba(0,180,255,.9);margin-left:5px;vertical-align:middle;
         }
-        .edit-avatar-float img {
-            width: 100%; height: 100%; object-fit: cover; display: block;
+        .fo-tab.active .fo-tab-count{
+            background:rgba(0,122,255,.4);border-color:rgba(0,122,255,.5);color:#60d0ff;
         }
-        .edit-avatar-badge {
-            position: absolute; inset: 0;
-            background: rgba(0,0,0,.5); display: flex;
-            align-items: center; justify-content: center;
-            color: #fff; font-size: .9rem; opacity: 0; transition: opacity .25s;
-            border-radius: 17px;
+
+        /* Scroll list */
+        .fo-list{flex:1;overflow-y:auto;padding:12px 16px 40px;}
+
+        /* User row */
+        .fo-user-row{
+            display:flex;align-items:center;gap:12px;
+            padding:11px 10px;border-radius:14px;
+            cursor:pointer;
+            transition:background .15s;
+            margin-bottom:3px;
+            border:1px solid transparent;
+            position:relative;
+            opacity:0;
+            animation:rowFadeIn .3s var(--ease) both;
         }
-        .edit-avatar-float:hover .edit-avatar-badge { opacity: 1; }
-        /* Edit form fields */
-        .edit-fields {
-            padding: 50px 20px 0;
-            display: flex; flex-direction: column; gap: 22px;
+        .fo-user-row:active{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.06);}
+        .fo-user-row:hover{background:rgba(255,255,255,.04);}
+
+        /* Liquid glass card on hover */
+        .fo-user-row::before{
+            content:'';position:absolute;inset:0;border-radius:14px;
+            background:linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 60%);
+            opacity:0;transition:opacity .2s;pointer-events:none;
         }
-        .edit-field-group {
-            display: flex; flex-direction: column; gap: 7px;
+        .fo-user-row:hover::before{opacity:1;}
+
+        .fo-pfp-wrap{position:relative;flex-shrink:0;}
+        .fo-pfp{
+            width:46px;height:46px;border-radius:14px;
+            object-fit:cover;
+            border:1px solid rgba(255,255,255,.1);
+            background:rgba(255,255,255,.05);
+            display:block;
         }
-        .edit-field-label {
-            font-size: .65rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .18em; color: var(--muted);
+
+        /* Online dot */
+        .fo-online{
+            position:absolute;bottom:-2px;right:-2px;
+            width:11px;height:11px;border-radius:50%;
+            background:#2dd465;
+            border:2px solid rgba(0,0,0,.6);
+            box-shadow:0 0 5px rgba(45,212,101,.5);
         }
-        .edit-field-input {
-            width: 100%; padding: 13px 16px; background: rgba(255,255,255,.04);
-            border: 1px solid var(--border); border-radius: 14px;
-            color: var(--text); font-size: .88rem; font-family: var(--font);
-            outline: none; transition: border-color .25s, box-shadow .25s, background .25s;
-            caret-color: var(--accent);
+
+        .fo-user-info{flex:1;min-width:0;}
+        .fo-name{
+            font-size:.84rem;font-weight:600;color:#fff;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+            margin-bottom:2px;display:flex;align-items:center;gap:5px;
         }
-        .edit-field-input:focus {
-            border-color: rgba(0,122,255,.5);
-            background: rgba(0,122,255,.04);
-            animation: editFieldFocus .3s ease forwards;
+        .fo-handle{font-size:.62rem;color:rgba(255,255,255,.38);font-weight:400;}
+
+        /* Inline badge in list */
+        .fo-badge{
+            display:inline-flex;align-items:center;justify-content:center;
+            width:13px;height:13px;border-radius:50%;flex-shrink:0;
         }
-        .edit-field-input::placeholder { color: var(--muted2); }
-        .edit-field-textarea {
-            resize: vertical; min-height: 80px; max-height: 200px;
-            line-height: 1.6; font-weight: 300;
+        .fo-badge i{font-size:6.5px;font-weight:900;position:relative;z-index:2;}
+        .fo-badge.gold{
+            background:conic-gradient(#BF953F 0%,#FCF6BA 20%,#B38728 40%,#FFD700 80%,#BF953F 100%);
+            box-shadow:0 0 4px rgba(252,209,80,.35);
         }
-        .edit-field-hint {
-            font-size: .62rem; color: var(--muted2); margin-top: 2px;
+        .fo-badge.gold i{color:#2a1a00;}
+        .fo-badge.blue{
+            background:linear-gradient(135deg,#1da1f2,#0d8bd9);
+            box-shadow:0 0 4px rgba(29,155,240,.3);
         }
-        .edit-char-count {
-            font-size: .6rem; color: var(--muted2); text-align: right; margin-top: 2px;
-            transition: color .2s;
+        .fo-badge.blue i{color:#fff;}
+        .fo-badge.green{
+            background:linear-gradient(135deg,#2dd465,#17913e);
+            box-shadow:0 0 4px rgba(37,211,102,.28);
         }
-        .edit-char-count.warn { color: #ff9500; }
-        .edit-char-count.over { color: var(--danger); }
-        /* Edit section divider */
-        .edit-divider {
-            height: 1px; background: var(--border); margin: 8px 0;
+        .fo-badge.green i{color:#fff;}
+
+        /* Follow-back / mutual button */
+        .fo-action-btn{
+            flex-shrink:0;
+            padding:7px 14px;
+            border-radius:10px;
+            font-size:.68rem;font-weight:700;font-family:var(--font);
+            cursor:pointer;border:none;outline:none;
+            transition:all .18s;
         }
-        .edit-section-title {
-            font-size: .7rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: .16em; color: var(--accent); margin-bottom: 4px;
-            display: flex; align-items: center; gap: 8px;
+        .fo-action-btn.follow-back{
+            background:rgba(0,122,255,.18);
+            border:1px solid rgba(0,122,255,.3);
+            color:#60b8ff;
         }
-        .edit-section-title i { font-size: .72rem; }
-        /* Links editor */
-        .edit-links-list {
-            display: flex; flex-direction: column; gap: 10px;
+        .fo-action-btn.follow-back:active{background:rgba(0,122,255,.3);}
+        .fo-action-btn.mutual{
+            background:rgba(255,255,255,.07);
+            border:1px solid rgba(255,255,255,.1);
+            color:rgba(255,255,255,.45);
         }
-        .edit-link-item {
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(255,255,255,.03); border: 1px solid var(--border);
-            border-radius: 14px; padding: 10px 14px;
-            animation: linkItemIn .3s var(--ease) both;
-            transition: border-color .2s, background .2s;
+
+        /* Divider line w/ gradient */
+        .fo-divider{
+            height:1px;margin:0 10px;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
         }
-        .edit-link-item:hover { border-color: rgba(255,255,255,.12); }
-        .edit-link-icon-pick {
-            width: 36px; height: 36px; border-radius: 10px;
-            background: rgba(255,255,255,.06); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent); font-size: .88rem; cursor: pointer;
-            transition: background .2s; flex-shrink: 0;
+
+        /* Empty state */
+        .fo-empty{
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            padding:60px 20px;gap:12px;color:rgba(255,255,255,.25);
         }
-        .edit-link-icon-pick:hover { background: rgba(255,255,255,.1); }
-        .edit-link-fields {
-            flex: 1; display: flex; flex-direction: column; gap: 6px;
-            min-width: 0;
+        .fo-empty i{font-size:2rem;opacity:.3;}
+        .fo-empty p{font-size:.78rem;font-weight:400;}
+
+        /* Glass top separator line */
+        .fo-glass-line{
+            height:1px;flex-shrink:0;
+            background:linear-gradient(90deg,
+                transparent 0%,
+                rgba(0,122,255,.4) 25%,
+                rgba(100,80,255,.3) 55%,
+                rgba(0,200,255,.25) 75%,
+                transparent 100%
+            );
+            margin:0;
         }
-        .edit-link-input {
-            width: 100%; padding: 8px 10px; background: transparent;
-            border: 1px solid var(--border2); border-radius: 8px;
-            color: var(--text); font-size: .76rem; font-family: var(--font);
-            outline: none; transition: border-color .2s;
-        }
-        .edit-link-input:focus { border-color: rgba(0,122,255,.4); }
-        .edit-link-input::placeholder { color: var(--muted2); }
-        .edit-link-delete {
-            width: 30px; height: 30px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--muted); font-size: .78rem; cursor: pointer;
-            transition: color .2s, background .2s; flex-shrink: 0;
-        }
-        .edit-link-delete:hover { color: var(--danger); background: rgba(255,59,92,.08); }
-        .edit-add-link-btn {
-            display: flex; align-items: center; justify-content: center;
-            gap: 8px; padding: 12px; background: transparent;
-            border: 1px dashed var(--border); border-radius: 14px;
-            color: var(--accent); font-size: .78rem; font-weight: 600;
-            cursor: pointer; font-family: var(--font); transition: all .2s;
-            outline: none;
-        }
-        .edit-add-link-btn:hover {
-            border-color: rgba(0,122,255,.4);
-            background: rgba(0,122,255,.04);
-        }
-        /* Music edit */
-        .edit-music-row {
-            display: flex; gap: 10px; align-items: flex-start;
-        }
-        .edit-music-fields {
-            flex: 1; display: flex; flex-direction: column; gap: 8px;
-        }
-        /* Toast */
-        .edit-toast {
-            position: fixed; bottom: 40px; left: 50%;
-            transform: translateX(-50%) translateY(20px) scale(.9);
-            background: rgba(0,122,255,.9); backdrop-filter: blur(16px);
-            color: #fff; padding: 12px 28px; border-radius: 99px;
-            font-size: .82rem; font-weight: 700; font-family: var(--font);
-            letter-spacing: .02em; z-index: 999;
-            pointer-events: none; opacity: 0;
-            box-shadow: 0 8px 32px rgba(0,122,255,.35);
-            border: 1px solid rgba(255,255,255,.15);
-        }
-        .edit-toast.show {
-            animation: savedToast 2.2s var(--ease) forwards;
-        }
-        /* Icon picker dropdown */
-        .icon-picker-backdrop {
-            position: fixed; inset: 0; z-index: 950;
-            background: rgba(0,0,0,.6); display: none;
-            align-items: center; justify-content: center;
-        }
-        .icon-picker-backdrop.active { display: flex; }
-        .icon-picker-box {
-            background: #0d0d0d; border: 1px solid var(--border);
-            border-radius: 20px; padding: 20px; width: 300px;
-            box-shadow: 0 20px 60px rgba(0,0,0,.8);
-            animation: fadeIn .2s var(--ease);
-        }
-        .icon-picker-title {
-            font-size: .78rem; font-weight: 700; margin-bottom: 14px;
-            text-align: center; letter-spacing: .03em;
-        }
-        .icon-picker-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-        }
-        .icon-picker-item {
-            aspect-ratio: 1; border-radius: 12px;
-            background: rgba(255,255,255,.04); border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; cursor: pointer;
-            transition: all .2s;
-        }
-        .icon-picker-item:hover {
-            background: rgba(0,122,255,.12);
-            border-color: rgba(0,122,255,.4);
-            transform: scale(1.08);
-        }
-        .icon-picker-item.selected {
-            background: rgba(0,122,255,.18);
-            border-color: var(--accent);
-        }
+
+        /* ═══ OTHER ═══ */
         .color-twitter{color:#fff;}.color-linkedin{color:#0077b5;}.color-discord{color:#5865f2;}.color-globe{color:var(--accent);}.color-instagram{color:#e1306c;}.color-github{color:#fff;}.color-arattai{color:#007aff;}
+
+        /* College profile overlay */
+        #clg-profile-overlay{overflow-y:auto;}
     </style>
 </head>
 <body>
     <audio id="bio-audio" loop preload="auto"></audio>
     <audio id="music-audio-player" preload="auto"></audio>
+
     <!-- POST MODAL -->
     <div class="post-modal-backdrop" id="post-modal">
         <div class="post-modal-sheet" id="post-sheet">
@@ -537,6 +648,7 @@
             </div>
         </div>
     </div>
+
     <!-- MUSIC MODAL -->
     <div class="music-modal" id="music-modal" onclick="closeMusicModal()">
         <div class="music-box" onclick="event.stopPropagation()">
@@ -557,6 +669,7 @@
             </div>
         </div>
     </div>
+
     <!-- PFP VIEWER -->
     <div class="pfp-viewer-backdrop" id="pfp-viewer" onclick="closePfpViewer()">
         <div class="pfp-viewer-box" onclick="event.stopPropagation()">
@@ -564,80 +677,7 @@
             <img id="pfp-viewer-img" src="" alt="">
         </div>
     </div>
-    <!-- EDIT PROFILE OVERLAY -->
-    <div class="edit-overlay" id="edit-overlay">
-        <div class="edit-topbar">
-            <button class="edit-cancel-btn" onclick="closeEditProfile()">Cancel</button>
-            <div style="font-size:1rem;font-weight:700;letter-spacing:-.02em;">Edit Profile</div>
-            <button class="edit-save-btn" id="edit-save-btn" onclick="saveEditProfile()">Save</button>
-        </div>
-        <div class="edit-body">
-            <!-- Banner + Avatar -->
-            <div class="edit-media-section">
-                <div class="edit-banner-wrap" onclick="document.getElementById('edit-banner-file').click()">
-                    <img id="edit-banner-img" src="" alt="">
-                    <div class="edit-banner-overlay"><i class="fa-solid fa-camera"></i> Change Banner</div>
-                </div>
-                <div class="edit-avatar-float" onclick="document.getElementById('edit-avatar-file').click()">
-                    <img id="edit-avatar-img" src="" alt="">
-                    <div class="edit-avatar-badge"><i class="fa-solid fa-camera"></i></div>
-                </div>
-                <input type="file" id="edit-banner-file" accept="image/*" style="display:none" onchange="onEditBannerFile(event)">
-                <input type="file" id="edit-avatar-file" accept="image/*" style="display:none" onchange="onEditAvatarFile(event)">
-            </div>
-            <div class="edit-fields">
-                <!-- Display Name -->
-                <div class="edit-field-group">
-                    <label class="edit-field-label" for="edit-name">Display Name</label>
-                    <input class="edit-field-input" id="edit-name" type="text" placeholder="Your name" maxlength="40" oninput="onEditFieldChange()">
-                    <div class="edit-char-count" id="edit-name-count">0 / 40</div>
-                </div>
-                <!-- Handle -->
-                <div class="edit-field-group">
-                    <label class="edit-field-label" for="edit-handle">Handle</label>
-                    <input class="edit-field-input" id="edit-handle" type="text" placeholder="@yourhandle" maxlength="30" oninput="onEditFieldChange()">
-                    <div class="edit-field-hint">Your unique identifier</div>
-                </div>
-                <!-- Bio -->
-                <div class="edit-field-group">
-                    <label class="edit-field-label" for="edit-bio">Bio</label>
-                    <textarea class="edit-field-input edit-field-textarea" id="edit-bio" placeholder="Tell the world about yourself…" maxlength="280" oninput="onEditFieldChange()"></textarea>
-                    <div class="edit-char-count" id="edit-bio-count">0 / 280</div>
-                </div>
-                <div class="edit-divider"></div>
-                <!-- Music -->
-                <div class="edit-field-group">
-                    <div class="edit-section-title"><i class="fa-solid fa-music"></i> Bio Music</div>
-                    <div class="edit-music-row">
-                        <div class="edit-music-fields">
-                            <input class="edit-field-input" id="edit-music-title" type="text" placeholder="Track title" oninput="onEditFieldChange()">
-                            <input class="edit-field-input" id="edit-music-artist" type="text" placeholder="Artist name" oninput="onEditFieldChange()">
-                            <input class="edit-field-input" id="edit-music-url" type="url" placeholder="Stream URL (mp3/audio link)" oninput="onEditFieldChange()">
-                            <input class="edit-field-input" id="edit-music-art" type="url" placeholder="Artwork URL (optional)" oninput="onEditFieldChange()">
-                        </div>
-                    </div>
-                </div>
-                <div class="edit-divider"></div>
-                <!-- Links -->
-                <div class="edit-field-group">
-                    <div class="edit-section-title"><i class="fa-solid fa-link"></i> Social Links</div>
-                    <div class="edit-links-list" id="edit-links-list"></div>
-                    <button class="edit-add-link-btn" onclick="addEditLink()">
-                        <i class="fa-solid fa-plus"></i> Add Link
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ICON PICKER -->
-    <div class="icon-picker-backdrop" id="icon-picker-backdrop" onclick="closeIconPicker()">
-        <div class="icon-picker-box" onclick="event.stopPropagation()">
-            <div class="icon-picker-title">Choose Icon</div>
-            <div class="icon-picker-grid" id="icon-picker-grid"></div>
-        </div>
-    </div>
-    <!-- SAVE TOAST -->
-    <div class="edit-toast" id="edit-toast">✓ Profile Saved</div>
+
     <div class="page">
         <div class="top-bar">
             <div class="top-bar-brand">x<span>0</span>s.link</div>
@@ -645,7 +685,6 @@
         <div class="floating-menu-wrap" style="position:absolute;top:56px;right:20px;">
             <div class="menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
             <div class="dropdown-menu" id="dropdown-menu">
-                <div class="menu-item" onclick="openEditProfile()"><span>Edit Profile</span><i class="fa-solid fa-pen-to-square"></i></div>
                 <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
                 <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
                 <div class="menu-item" onclick="openCollegeLinkSearch()"><span>Link College</span><i class="fa-solid fa-building-columns"></i></div>
@@ -659,9 +698,8 @@
             <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
             <div class="avatar-wrap" onclick="openPfpViewer()">
                 <img class="avatar-img" id="avatar-img" src="" alt="">
-                <div class="pfp-badge" id="pfp-badge">
-                    <i class="fa-solid fa-certificate"></i>
-                    <i class="fa-solid fa-check"></i>
+                <div class="pfp-badge badge-none" id="pfp-badge">
+                    <!-- badge content injected by JS -->
                 </div>
             </div>
             <div class="name-row"><h1 class="name" id="display-name"></h1></div>
@@ -691,7 +729,8 @@
             <div class="posts-grid" id="posts-grid"></div>
         </section>
     </div>
-    <!-- College Profile Overlay -->
+
+    <!-- COLLEGE PROFILE OVERLAY -->
     <div id="clg-profile-overlay" style="position:fixed;inset:0;z-index:700;background:var(--bg);display:none;flex-direction:column;transform:translateX(100%);transition:transform .36s cubic-bezier(.32,.72,0,1);overflow-y:auto;">
         <div style="position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(0,0,0,.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);">
             <div class="clg-back" onclick="closeCollegeProfile()" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid #1a1a1a;display:flex;align-items:center;justify-content:center;cursor:pointer;"><i class="fa-solid fa-chevron-left"></i></div>
@@ -714,7 +753,8 @@
             </div>
         </div>
     </div>
-    <!-- College Link Search Overlay -->
+
+    <!-- COLLEGE LINK SEARCH -->
     <div class="clg-search-overlay" id="clg-search-overlay">
         <div class="clg-top">
             <div class="clg-back" onclick="closeCollegeLinkSearch()"><i class="fa-solid fa-chevron-left"></i></div>
@@ -728,759 +768,479 @@
             <div id="clg-results-list"></div>
         </div>
     </div>
-    <!-- FOLLOW LIST OVERLAY -->
+
+    <!-- ═══════════════════════════════════════
+         LIQUID GLASS FOLLOW OVERLAY
+    ═══════════════════════════════════════ -->
     <div class="follow-overlay" id="follow-overlay">
-        <div style="position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(0,0,0,.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);z-index:10;">
-            <div class="clg-back" onclick="closeFollowList()" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid #1a1a1a;display:flex;align-items:center;justify-content:center;cursor:pointer;"><i class="fa-solid fa-chevron-left"></i></div>
-            <div style="font-size:1.1rem;font-weight:700;letter-spacing:-.02em;" id="follow-overlay-title">Followers</div>
-            <div style="width:36px;"></div>
+        <!-- Ambient background -->
+        <div class="follow-overlay-bg">
+            <div class="fo-orb fo-orb-1"></div>
+            <div class="fo-orb fo-orb-2"></div>
+            <div class="fo-orb fo-orb-3"></div>
         </div>
-        <div id="follow-list-container" style="flex:1;overflow-y:auto;padding:16px;"></div>
+        <div class="follow-overlay-noise"></div>
+
+        <!-- Glass panel -->
+        <div class="follow-glass-panel">
+            <div class="fo-glass-line"></div>
+
+            <!-- Header -->
+            <div class="fo-header">
+                <div class="fo-back" onclick="closeFollowList()">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </div>
+                <div class="fo-title-block">
+                    <div class="fo-title" id="fo-title-text">Followers</div>
+                    <div class="fo-subtitle" id="fo-subtitle-text">0 people</div>
+                </div>
+            </div>
+
+            <!-- Tabs: Followers / Following -->
+            <div class="fo-tabs" id="fo-tabs">
+                <div class="fo-tab active" id="fo-tab-followers" onclick="switchFollowTab('followers')">
+                    Followers <span class="fo-tab-count" id="fo-followers-count">0</span>
+                </div>
+                <div class="fo-tab" id="fo-tab-following" onclick="switchFollowTab('following')">
+                    Following <span class="fo-tab-count" id="fo-following-count">0</span>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="fo-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search…" id="fo-search-input" oninput="onFollowSearch(this.value)" autocomplete="off">
+            </div>
+
+            <!-- List -->
+            <div class="fo-list" id="fo-list"></div>
+        </div>
     </div>
+
     <script src="profiles.js"></script>
     <script src="colleges.js"></script>
     <script>
         /* ═══════════════════════════════════════
            XOS LINK — DYNAMIC MULTI-USER ENGINE
-           With Edit Profile (localStorage-based)
         ═══════════════════════════════════════ */
-        // ── Resolve active user ──
         const urlParams = new URLSearchParams(window.location.search);
         const activeUsername = urlParams.get('user') || 'gemini';
         const ALL_PROFILES = window.XOS_PROFILES || {};
         const activeProfile = ALL_PROFILES[activeUsername] || ALL_PROFILES['gemini'] || null;
+
         if (!activeProfile) {
-            document.body.innerHTML =
-                '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-family:\'Space Grotesk\',sans-serif;">No profile data available. Please check profiles.js</div>';
+            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-family:\'Space Grotesk\',sans-serif;">No profile data available.</div>';
             throw new Error('XOS_PROFILES not found or empty.');
         }
-        // ── Scoped localStorage helpers ──
+
         const LS_SCOPE = activeUsername;
-        function lsGet(key, fallback) {
-            const raw = localStorage.getItem(`xos_${key}_${LS_SCOPE}`);
-            if (raw === null) return fallback;
-            try { return JSON.parse(raw); } catch (e) { return raw; }
+        function lsGet(key, fallback) { const raw = localStorage.getItem(`xos_${key}_${LS_SCOPE}`); if(raw===null) return fallback; try{return JSON.parse(raw);}catch(e){return raw;} }
+        function lsSet(key, value) { localStorage.setItem(`xos_${key}_${LS_SCOPE}`, JSON.stringify(value)); }
+
+        let POSTS = activeProfile.posts || [];
+
+        /* ─── BADGE — SVG placeholders, swap src when files arrive ─── */
+        const BADGE_SRC = {
+            gold:  'badge-gold.png',
+            blue:  'badge-blue.svg',
+            green: 'badge-green.svg',
+        };
+
+        function buildBadgeHTML(type) {
+            if (!type || type === 'none') return '';
+            const t = BADGE_SRC[type] ? type : 'gold';
+            return `<span class="sheet-verified badge-${t}"><img src="${BADGE_SRC[t]}" alt=""></span>`;
         }
-        function lsSet(key, value) {
-            localStorage.setItem(`xos_${key}_${LS_SCOPE}`, JSON.stringify(value));
+
+        function setPfpBadge(type) {
+            const el = document.getElementById('pfp-badge');
+            if (!type || type === 'none') { el.className = 'pfp-badge badge-none'; el.innerHTML = ''; return; }
+            const t = BADGE_SRC[type] ? type : 'gold';
+            el.className = `pfp-badge badge-${t}`;
+            el.innerHTML = `<img src="${BADGE_SRC[t]}" alt="${t} verified">`;
         }
-        // ── Get profile field with localStorage override ──
-        function getField(field) {
-            return lsGet('edit_' + field, null);
+
+        function makeFoBadge(type) {
+            if (!type || type === 'none') return '';
+            const t = BADGE_SRC[type] ? type : 'gold';
+            return `<span class="fo-badge ${t}"><img src="${BADGE_SRC[t]}" style="width:15px;height:15px;object-fit:contain;" alt=""></span>`;
         }
-        function getProfileVal(field, fallback) {
-            const override = getField(field);
-            if (override !== null && override !== undefined) return override;
-            return fallback;
-        }
-        // ── Derive posts from active profile ──
-        const POSTS = activeProfile.posts || [];
-        /* ─── RENDER PROFILE UI ─── */
+
+        /* ─── RENDER PROFILE ─── */
         function renderProfile() {
             const p = activeProfile;
-            const displayName = getProfileVal('displayName', p.displayName);
-            const handle = getProfileVal('handle', p.handle);
-            const bio = getProfileVal('bio', p.bio || '');
-            const avatar = getProfileVal('avatar', p.avatar || '');
-            const banner = getProfileVal('banner', p.banner || '');
-            const links = getProfileVal('links', p.links || []);
-            const musicTitle = getProfileVal('musicTitle', (p.audioTrack || {}).title || 'Track');
-            const musicArtist = getProfileVal('musicArtist', (p.audioTrack || {}).artist || 'Artist');
-            const musicStreamUrl = getProfileVal('musicStreamUrl', (p.audioTrack || {}).streamUrl || '');
-            const musicArtworkUrl = getProfileVal('musicArtworkUrl', (p.audioTrack || {}).artworkUrl || '');
-            document.getElementById('page-title').textContent = displayName + ' | x0s.link';
-            document.title = displayName + ' | x0s.link';
-            document.getElementById('banner-img').src = banner;
-            document.getElementById('avatar-img').src = avatar;
-            document.getElementById('pfp-viewer-img').src = avatar;
-            document.getElementById('sheet-avatar-img').src = avatar;
-            document.getElementById('comment-avatar-img').src = avatar;
-            document.getElementById('display-name').textContent = displayName;
-            document.getElementById('handle-display').textContent = handle;
-            document.getElementById('sheet-display-name').innerHTML = buildVerifiedHTML(p.verified, displayName);
-            document.getElementById('sheet-handle-tag').textContent = handle;
-            document.getElementById('bio-text').textContent = bio;
-            document.getElementById('bio-music-label').textContent = musicTitle + ' • ' + musicArtist;
-            document.getElementById('music-title-display').textContent = musicTitle;
-            document.getElementById('music-artist-display').textContent = musicArtist;
-            document.getElementById('bio-audio').src = musicStreamUrl;
-            document.getElementById('music-audio-player').src = musicStreamUrl;
-            document.getElementById('music-thumb').src = musicArtworkUrl || avatar;
-            // Verified badge
-            const pfpBadge = document.getElementById('pfp-badge');
-            pfpBadge.className = 'pfp-badge badge-' + (p.verified || 'none');
-            // Links
+            POSTS = p.posts || [];
+            document.getElementById('page-title').textContent = p.displayName + ' | x0s.link';
+            document.title = p.displayName + ' | x0s.link';
+            document.getElementById('banner-img').src = p.banner || '';
+            document.getElementById('avatar-img').src = p.avatar || '';
+            document.getElementById('pfp-viewer-img').src = p.avatar || '';
+            document.getElementById('sheet-avatar-img').src = p.avatar || '';
+            document.getElementById('comment-avatar-img').src = p.avatar || '';
+            document.getElementById('display-name').textContent = p.displayName;
+            document.getElementById('handle-display').textContent = p.handle;
+            document.getElementById('sheet-display-name').innerHTML = p.displayName + buildBadgeHTML(p.verified);
+            document.getElementById('sheet-handle-tag').textContent = p.handle;
+            document.getElementById('bio-text').textContent = p.bio || '';
+
+            const track = p.audioTrack || {};
+            document.getElementById('bio-music-label').textContent = (track.title || 'Track') + ' • ' + (track.artist || 'Artist');
+            document.getElementById('music-title-display').textContent = track.title || 'Track Title';
+            document.getElementById('music-artist-display').textContent = track.artist || 'Artist';
+            const streamUrl = track.streamUrl || '';
+            document.getElementById('bio-audio').src = streamUrl;
+            document.getElementById('music-audio-player').src = streamUrl;
+            document.getElementById('music-thumb').src = track.artworkUrl || p.avatar || '';
+
+            setPfpBadge(p.verified);
+
             const linksRow = document.getElementById('links-row');
-            linksRow.innerHTML = links.map(l => {
-                const iconClass = l.arattai ? 'fa-arattai' : (l.icon || 'fa-solid fa-link');
+            linksRow.innerHTML = (p.links || []).map(l => {
+                const iconClass = l.arattai ? null : (l.icon || 'fa-solid fa-link');
                 const colorClass = l.color || 'color-globe';
-                return `<a href="${l.url || '#'}" class="link-pill" target="_blank"><i class="${iconClass} ${colorClass}"></i>${l.label}</a>`;
+                const iconHTML = l.arattai
+                    ? `<img src="arattai.png" style="width:13px;height:13px;object-fit:contain;display:block;flex-shrink:0;background:none;" alt="arattai">`
+                    : `<i class="${iconClass} ${colorClass}"></i>`;
+                return `<a href="${l.url||'#'}" class="link-pill" target="_blank">${iconHTML}${l.label}</a>`;
             }).join('');
-            // Follow state
-            followerBase = (typeof window.xosFollowerCount === 'function') ? window.xosFollowerCount(activeUsername) : 0;
-            followingBase = (typeof window.xosFollowingCount === 'function') ? window.xosFollowingCount(activeUsername) : 0;
+
+            followerBase = window.xosFollowerCount ? window.xosFollowerCount(activeUsername) : (activeProfile.followerCount || 0);
+            followingBase = window.xosFollowingCount ? window.xosFollowingCount(activeUsername) : (activeProfile.followingCount || 0);
             isFollowing = lsGet('is_following', false);
             updateFollowUI();
-            // Audio reset
+
             document.getElementById('bio-play-icon').className = 'fa-solid fa-play';
             document.getElementById('bio-eq').classList.add('paused');
             const bioAudio = document.getElementById('bio-audio');
-            bioAudio.pause();
-            bioAudio.currentTime = 0;
+            bioAudio.pause(); bioAudio.currentTime = 0;
             const modalAudio = document.getElementById('music-audio-player');
-            modalAudio.pause();
-            modalAudio.currentTime = 0;
+            modalAudio.pause(); modalAudio.currentTime = 0;
             document.getElementById('music-play-icon').className = 'fa-solid fa-play';
             document.getElementById('music-progress').value = 0;
             document.getElementById('music-current').textContent = '0:00';
             document.getElementById('music-duration').textContent = '0:00';
-            if (typeof initCollegeLink === 'function') initCollegeLink();
+
+            initCollegeLink();
             renderPosts();
+
+            // Init follow tab counts
+            const fc = followerBase + (isFollowing ? 1 : 0);
+            const fgc = followingBase;
+            document.getElementById('fo-followers-count').textContent = fc >= 1000 ? (fc/1000).toFixed(1)+'k' : fc;
+            document.getElementById('fo-following-count').textContent = fgc >= 1000 ? (fgc/1000).toFixed(1)+'k' : fgc;
         }
-        function buildVerifiedHTML(verifiedType, displayName) {
-            if (!verifiedType) return displayName;
-            const badgeClass = 'badge-' + verifiedType;
-            return displayName +
-                ' <span class="sheet-verified ' + badgeClass +
-                '"><i class="fa-solid fa-certificate"></i><i class="fa-solid fa-check"></i></span>';
-        }
+
         /* ─── MENU / THEME ─── */
-        function toggleMenu(e) {
-            e.stopPropagation();
-            document.getElementById('dropdown-menu').classList.toggle('active');
-        }
-        function toggleDarkMode() {
-            document.body.classList.toggle('light-mode');
-            document.getElementById('dropdown-menu').classList.remove('active');
-        }
+        function toggleMenu(e) { e.stopPropagation(); document.getElementById('dropdown-menu').classList.toggle('active'); }
+        function toggleDarkMode() { document.body.classList.toggle('light-mode'); document.getElementById('dropdown-menu').classList.remove('active'); }
         window.onclick = () => document.getElementById('dropdown-menu').classList.remove('active');
+
         /* ─── FOLLOW ─── */
-        let followerBase = 0;
-        let followingBase = 0;
-        let isFollowing = false;
+        let followerBase=0, followingBase=0, isFollowing=false;
         function updateFollowUI() {
-            const displayedFollowers = followerBase + (isFollowing ? 1 : 0);
-            document.getElementById('follower-count').innerText =
-                displayedFollowers >= 1000 ? (displayedFollowers / 1000).toFixed(1) + 'k' : displayedFollowers;
+            const d = followerBase + (isFollowing ? 1 : 0);
+            document.getElementById('follower-count').innerText = d >= 1000 ? (d/1000).toFixed(1)+'k' : d;
             document.getElementById('following-count').innerText = followingBase;
             const btn = document.getElementById('follow-btn');
             btn.innerText = isFollowing ? 'Following' : 'Follow';
             btn.classList.toggle('following', isFollowing);
         }
-        function toggleFollow() {
-            isFollowing = !isFollowing;
-            lsSet('is_following', isFollowing);
-            updateFollowUI();
-        }
-        /* ─── FOLLOW LIST OVERLAY ─── */
+        function toggleFollow() { isFollowing = !isFollowing; lsSet('is_following', isFollowing); updateFollowUI(); }
+
+        /* ─────────────────────────────────────────────
+           LIQUID GLASS FOLLOW OVERLAY ENGINE
+        ───────────────────────────────────────────── */
         let followOverlayOpen = false;
+        let currentFollowTab = 'followers';
+        let followSearchQuery = '';
+
         function showFollowList(type) {
-            const title = type === 'followers' ? 'Followers' : 'Following';
-            document.getElementById('follow-overlay-title').textContent = title;
-            const users = type === 'followers' ?
-                (typeof window.xosGetFollowers === 'function' ? window.xosGetFollowers(activeUsername) : []) :
-                (typeof window.xosGetFollowing === 'function' ? window.xosGetFollowing(activeUsername) : []);
-            const container = document.getElementById('follow-list-container');
-            if (!users.length) {
-                container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);font-size:.82rem;">No users yet</div>`;
-            } else {
-                container.innerHTML = users.map(u => `
-                  <div class="follow-user-item" onclick="navigateToUser('${u.userid}')">
-                    <img class="follow-user-pfp" src="${u.avatar || ''}" onerror="this.style.display='none'" alt="">
-                    <div class="follow-user-info">
-                      <div class="follow-user-name">${u.displayName || u.userid}</div>
-                      <div class="follow-user-id">${u.handle || u.userid + '@x0s'}</div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right" style="color:var(--muted);font-size:.72rem;"></i>
-                  </div>
-                `).join('');
-            }
+            currentFollowTab = type;
+            followSearchQuery = '';
+            document.getElementById('fo-search-input').value = '';
+
+            updateFollowTabUI();
+            renderFollowList();
+
             followOverlayOpen = true;
             const el = document.getElementById('follow-overlay');
             el.style.display = 'flex';
+            el.classList.remove('closing');
             requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('open')));
             history.pushState({ modal: 'follow-list' }, '');
         }
+
+        function updateFollowTabUI() {
+            const isFollowers = currentFollowTab === 'followers';
+            document.getElementById('fo-tab-followers').classList.toggle('active', isFollowers);
+            document.getElementById('fo-tab-following').classList.toggle('active', !isFollowers);
+            document.getElementById('fo-title-text').textContent = isFollowers ? 'Followers' : 'Following';
+        }
+
+        function switchFollowTab(type) {
+            if (currentFollowTab === type) return;
+            currentFollowTab = type;
+            followSearchQuery = '';
+            document.getElementById('fo-search-input').value = '';
+            updateFollowTabUI();
+            renderFollowList();
+        }
+
+        function onFollowSearch(val) {
+            followSearchQuery = val.trim().toLowerCase();
+            renderFollowList();
+        }
+
+        function renderFollowList() {
+            const isFollowers = currentFollowTab === 'followers';
+            let users = [];
+            try {
+                users = isFollowers ?
+                    (window.xosGetFollowers ? window.xosGetFollowers(activeUsername) : []) :
+                    (window.xosGetFollowing ? window.xosGetFollowing(activeUsername) : []);
+            } catch(e) { users = []; }
+
+            // Update subtitle
+            const count = users.length + (!isFollowers && isFollowing ? 0 : 0);
+            document.getElementById('fo-subtitle-text').textContent = users.length + ' people';
+
+            // Filter by search
+            if (followSearchQuery) {
+                users = users.filter(u =>
+                    (u.displayName || '').toLowerCase().includes(followSearchQuery) ||
+                    (u.userid || '').toLowerCase().includes(followSearchQuery) ||
+                    (u.handle || '').toLowerCase().includes(followSearchQuery)
+                );
+            }
+
+            const list = document.getElementById('fo-list');
+            if (!users.length) {
+                list.innerHTML = `<div class="fo-empty"><i class="fa-solid fa-user-group"></i><p>${followSearchQuery ? 'No results found' : 'Nothing here yet'}</p></div>`;
+                return;
+            }
+
+            list.innerHTML = users.map((u, i) => {
+                const vType = u.verified || null;
+                const badgeHTML = (vType && vType !== 'none') ? makeFoBadge(vType) : '';
+
+                const isMutual = Math.random() > 0.6; // replace with real mutual logic
+                const showOnline = Math.random() > 0.7;
+                const delay = (i * 38) + 'ms';
+
+                return `<div class="fo-user-row" style="animation-delay:${delay}" onclick="navigateToUser('${u.userid}')">
+                    <div class="fo-pfp-wrap">
+                        <img class="fo-pfp" src="${u.avatar || ''}" onerror="this.src=''" alt="">
+                        ${showOnline ? '<div class="fo-online"></div>' : ''}
+                    </div>
+                    <div class="fo-user-info">
+                        <div class="fo-name">${u.displayName || u.userid}${badgeHTML}</div>
+                        <div class="fo-handle">${u.handle || '@' + u.userid}</div>
+                    </div>
+                    ${isMutual ?
+                        `<button class="fo-action-btn mutual" onclick="event.stopPropagation()">Mutual</button>` :
+                        `<button class="fo-action-btn follow-back" onclick="event.stopPropagation()">Follow</button>`
+                    }
+                </div>
+                ${i < users.length - 1 ? '<div class="fo-divider"></div>' : ''}`;
+            }).join('');
+        }
+
         function closeFollowList(fromPop) {
             if (!followOverlayOpen) return;
             followOverlayOpen = false;
             const el = document.getElementById('follow-overlay');
             el.classList.remove('open');
+            el.classList.add('closing');
             if (!fromPop) history.back();
-            setTimeout(() => { el.style.display = 'none'; }, 360);
+            setTimeout(() => { el.style.display = 'none'; el.classList.remove('closing'); }, 380);
         }
+
         function navigateToUser(userid) {
             window.location.href = window.location.pathname + '?user=' + userid;
         }
+
         /* ─── GRID ─── */
         let gridIntervals = [];
         function renderPosts() {
             const grid = document.getElementById('posts-grid');
-            gridIntervals.forEach(clearInterval);
-            gridIntervals = [];
-            grid.innerHTML = POSTS.map((p, i) => `
+            if (!grid) return;
+            gridIntervals.forEach(clearInterval); gridIntervals = [];
+            grid.innerHTML = POSTS.map((p,i) => `
             <div class="post-thumb" onclick="openPost(${i})">
-              ${p.type === 'video'
+              ${p.type==='video'
                 ? `<video src="${p.files[0]}" muted autoplay loop playsinline></video><div class="vid-badge">▶ VIDEO</div>`
                 : `<img src="${p.files[0]}" id="thumb-${i}" loading="lazy">`}
-              ${p.files.length > 1 ? `<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>` : ''}
+              ${p.files.length>1 ? `<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>` : ''}
             </div>`).join('');
-            POSTS.forEach((p, i) => {
-                if (p.files.length > 1 && p.type === 'image') {
-                    let idx = 0;
+            POSTS.forEach((p,i) => {
+                if (p.files.length>1 && p.type==='image') {
+                    let idx=0;
                     gridIntervals.push(setInterval(() => {
-                        idx = (idx + 1) % p.files.length;
-                        const el = document.getElementById(`thumb-${i}`);
-                        if (el) el.src = p.files[idx];
+                        idx=(idx+1)%p.files.length;
+                        const el=document.getElementById(`thumb-${i}`);
+                        if(el) el.src=p.files[idx];
                     }, 2200));
                 }
             });
         }
-        /* ─── POST MODAL STATE ─── */
-        let currentPost = -1, currentFile = 0, modalOpen = false;
-        let likedPosts = {}, videoMuted = false, suppressMuteFlash = false;
+
+        /* ─── MODAL STATE ─── */
+        let currentPost=-1, currentFile=0, modalOpen=false;
+        let likedPosts={}, videoMuted=false, suppressMuteFlash=false;
+
         function openPost(idx) {
-            if (idx < 0 || idx >= POSTS.length) return;
-            currentPost = idx;
-            currentFile = 0;
-            const post = POSTS[idx];
-            renderPostMedia(post, 0);
-            document.getElementById('sheet-caption').textContent = post.caption || '';
-            document.getElementById('sheet-time').textContent = post.time || 'just now';
-            const liked = likedPosts[idx] || false;
-            const likeBtn = document.getElementById('like-btn');
-            const likeIcon = document.getElementById('like-icon');
-            likeBtn.classList.toggle('liked', liked);
-            likeIcon.className = liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-            document.getElementById('like-count').textContent = (post.likes || 0) + (liked ? 1 : 0);
-            document.getElementById('comment-count').textContent = post.comments || 0;
-            const modal = document.getElementById('post-modal');
-            modal.style.display = 'flex';
-            requestAnimationFrame(() => {
-                modal.classList.add('active');
-                modalOpen = true;
-            });
-            history.pushState({ modal: 'post' }, '');
-        }
-        function renderPostMedia(post, fileIdx) {
-            const imgCurr = document.getElementById('img-curr');
-            const video = document.getElementById('sheet-video');
-            const strip = document.getElementById('carousel-strip');
-            if (post.type === 'video') {
-                imgCurr.style.display = 'none';
-                video.style.display = 'block';
-                video.src = post.files[0];
-                video.muted = videoMuted;
-                video.play().catch(() => {});
-                document.getElementById('mute-tap-zone').style.display = 'block';
-            } else {
-                video.style.display = 'none';
-                video.pause();
-                imgCurr.style.display = 'block';
-                imgCurr.src = post.files[fileIdx];
-                document.getElementById('mute-tap-zone').style.display = 'none';
-            }
-            // Carousel dots
-            const dotsEl = document.getElementById('sheet-dots');
-            const counter = document.getElementById('sheet-counter');
-            if (post.files.length > 1) {
-                dotsEl.innerHTML = post.files.map((_, i) =>
-                    `<div class="sheet-dot${i === fileIdx ? ' active' : ''}"></div>`
-                ).join('');
-                counter.style.display = 'block';
-                counter.textContent = (fileIdx + 1) + ' / ' + post.files.length;
-            } else {
-                dotsEl.innerHTML = '';
-                counter.style.display = 'none';
-            }
-            // Adjacent slides
-            const prevImg = document.getElementById('img-prev');
-            const nextImg = document.getElementById('img-next');
-            if (post.files.length > 1 && post.type === 'image') {
-                prevImg.src = fileIdx > 0 ? post.files[fileIdx - 1] : '';
-                nextImg.src = fileIdx < post.files.length - 1 ? post.files[fileIdx + 1] : '';
-            } else {
-                prevImg.src = '';
-                nextImg.src = '';
-            }
-            strip.style.transition = 'none';
-            strip.style.transform = 'translateX(-33.333%)';
-        }
-        function closePostModal() {
-            const modal = document.getElementById('post-modal');
-            const video = document.getElementById('sheet-video');
-            video.pause();
-            modal.classList.remove('active');
-            modalOpen = false;
-            setTimeout(() => { modal.style.display = 'none'; }, 420);
-        }
-        // Carousel swipe
-        (function() {
-            const media = document.getElementById('sheet-media');
-            const strip = document.getElementById('carousel-strip');
-            let startX = 0, dx = 0, swiping = false;
-            media.addEventListener('touchstart', e => {
-                if (currentPost < 0) return;
-                const post = POSTS[currentPost];
-                if (post.files.length <= 1 || post.type === 'video') return;
-                startX = e.touches[0].clientX;
-                dx = 0;
-                swiping = true;
-                strip.style.transition = 'none';
-            });
-            media.addEventListener('touchmove', e => {
-                if (!swiping) return;
-                dx = e.touches[0].clientX - startX;
-                const base = -33.333;
-                const pxPercent = (dx / media.offsetWidth) * 33.333;
-                strip.style.transform = `translateX(${base + pxPercent}%)`;
-            });
-            media.addEventListener('touchend', () => {
-                if (!swiping) return;
-                swiping = false;
-                const post = POSTS[currentPost];
-                const threshold = media.offsetWidth * 0.2;
-                let newIdx = currentFile;
-                if (dx < -threshold && currentFile < post.files.length - 1) newIdx++;
-                else if (dx > threshold && currentFile > 0) newIdx--;
-                if (newIdx !== currentFile) {
-                    const dir = newIdx > currentFile ? -1 : 1;
-                    strip.style.transition = 'transform .3s cubic-bezier(.32,.72,0,1)';
-                    strip.style.transform = `translateX(${-33.333 + dir * 33.333}%)`;
-                    setTimeout(() => {
-                        currentFile = newIdx;
-                        renderPostMedia(post, currentFile);
-                    }, 300);
-                } else {
-                    strip.style.transition = 'transform .25s cubic-bezier(.32,.72,0,1)';
-                    strip.style.transform = 'translateX(-33.333%)';
-                }
-            });
-        })();
-        // Mute toggle
-        document.getElementById('mute-tap-zone').addEventListener('click', () => {
-            videoMuted = !videoMuted;
-            const v = document.getElementById('sheet-video');
-            v.muted = videoMuted;
-            const icon = document.getElementById('mute-icon');
-            icon.className = videoMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
-            const indicator = document.getElementById('mute-indicator');
-            indicator.classList.remove('flash');
-            void indicator.offsetWidth;
-            indicator.classList.add('flash');
-        });
-        // Double-tap like
-        (function() {
-            let lastTap = 0;
-            document.getElementById('sheet-media').addEventListener('click', e => {
-                if (e.target.closest('.mute-tap-zone') || e.target.closest('.sheet-close-btn')) return;
-                const now = Date.now();
-                if (now - lastTap < 350) {
-                    if (currentPost >= 0 && !likedPosts[currentPost]) {
-                        likedPosts[currentPost] = true;
-                        const post = POSTS[currentPost];
-                        document.getElementById('like-count').textContent = (post.likes || 0) + 1;
-                        document.getElementById('like-icon').className = 'fa-solid fa-heart';
-                        document.getElementById('like-btn').classList.add('liked');
-                    }
-                    const dt = document.getElementById('dt-indicator');
-                    dt.classList.remove('flash');
-                    void dt.offsetWidth;
-                    dt.classList.add('flash');
-                }
-                lastTap = now;
-            });
-        })();
-        function toggleLike(e) {
-            if (currentPost < 0) return;
-            const post = POSTS[currentPost];
-            likedPosts[currentPost] = !likedPosts[currentPost];
-            const liked = likedPosts[currentPost];
-            const btn = document.getElementById('like-btn');
-            const icon = document.getElementById('like-icon');
-            btn.classList.toggle('liked', liked);
-            icon.className = liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
-            document.getElementById('like-count').textContent = (post.likes || 0) + (liked ? 1 : 0);
-        }
-        function focusComment() {
-            document.getElementById('comment-input').focus();
-        }
-        function onCommentInput(el) {
-            document.getElementById('comment-send').classList.toggle('visible', el.value.trim().length > 0);
-        }
-        function onCommentKey(e) { if (e.key === 'Enter') sendComment(); }
-        function sendComment() {
-            const input = document.getElementById('comment-input');
-            if (!input.value.trim()) return;
-            input.value = '';
+            if (modalOpen || pfpOpen) return;
+            currentPost=idx; currentFile=0; modalOpen=true;
+            const p=POSTS[idx];
+            likedPosts[idx]=lsGet('liked_'+idx,false);
+            const storedComments=lsGet('comments_'+idx, p.comments||0);
+            document.getElementById('like-count').textContent=(p.likes||0)+(likedPosts[idx]?1:0);
+            document.getElementById('comment-count').textContent=storedComments;
+            updateLikeUI();
+            document.getElementById('sheet-caption').textContent=p.caption||'';
+            document.getElementById('sheet-time').textContent=p.time||'just now';
+            const ci=document.getElementById('comment-input'); ci.value='';
             document.getElementById('comment-send').classList.remove('visible');
-        }
-        function sharePost() {
-            if (navigator.share) {
-                navigator.share({ title: 'Check this post on x0s.link', url: window.location.href });
-            }
-        }
-        function shareProfile() {
-            document.getElementById('dropdown-menu').classList.remove('active');
-            if (navigator.share) {
-                navigator.share({ title: document.title, url: window.location.href });
-            }
-        }
-        /* ─── BIO MUSIC ─── */
-        let bioPlaying = false;
-        function toggleBioMusic(e) {
-            e && e.stopPropagation();
-            const audio = document.getElementById('bio-audio');
-            const icon = document.getElementById('bio-play-icon');
-            const eq = document.getElementById('bio-eq');
-            if (bioPlaying) {
-                audio.pause();
-                icon.className = 'fa-solid fa-play';
-                eq.classList.add('paused');
-            } else {
-                audio.play().catch(() => {});
-                icon.className = 'fa-solid fa-pause';
-                eq.classList.remove('paused');
-            }
-            bioPlaying = !bioPlaying;
-        }
-        /* ─── MUSIC MODAL ─── */
-        let musicModalPlaying = false;
-        function openMusicPlayer() {
-            document.getElementById('music-modal').style.display = 'flex';
-            requestAnimationFrame(() => document.getElementById('music-modal').classList.add('active'));
-        }
-        function closeMusicModal() {
-            const modal = document.getElementById('music-modal');
-            modal.classList.remove('active');
-            setTimeout(() => { modal.style.display = 'none'; }, 300);
-        }
-        document.getElementById('music-play-pause').addEventListener('click', () => {
-            const audio = document.getElementById('music-audio-player');
-            const icon = document.getElementById('music-play-icon');
-            if (musicModalPlaying) {
-                audio.pause();
-                icon.className = 'fa-solid fa-play';
-            } else {
-                audio.play().catch(() => {});
-                icon.className = 'fa-solid fa-pause';
-            }
-            musicModalPlaying = !musicModalPlaying;
-        });
-        document.getElementById('music-audio-player').addEventListener('timeupdate', function() {
-            const p = document.getElementById('music-progress');
-            if (this.duration) {
-                p.value = (this.currentTime / this.duration) * 100;
-                document.getElementById('music-current').textContent = fmtTime(this.currentTime);
-                document.getElementById('music-duration').textContent = fmtTime(this.duration);
-            }
-        });
-        document.getElementById('music-progress').addEventListener('input', function() {
-            const audio = document.getElementById('music-audio-player');
-            if (audio.duration) audio.currentTime = (this.value / 100) * audio.duration;
-        });
-        function fmtTime(s) {
-            const m = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
-            return m + ':' + (sec < 10 ? '0' : '') + sec;
-        }
-        /* ─── PFP VIEWER ─── */
-        function openPfpViewer() {
-            const el = document.getElementById('pfp-viewer');
-            el.style.display = 'flex';
-            requestAnimationFrame(() => el.classList.add('active'));
-        }
-        function closePfpViewer() {
-            const el = document.getElementById('pfp-viewer');
-            el.classList.remove('active');
-            el.classList.add('closing');
-            setTimeout(() => { el.style.display = 'none'; el.classList.remove('closing'); }, 280);
-        }
-        /* ─── COLLEGE LINK ─── */
-        function initCollegeLink() {
-            const savedId = lsGet('linked_college', activeProfile.collegeId || null);
-            const nameEl = document.getElementById('college-link-name');
-            const iconEl = document.getElementById('college-link-icon');
-            if (savedId && typeof window.XOS_COLLEGES !== 'undefined') {
-                const c = window.XOS_COLLEGES.find(cl => cl.id === savedId);
-                if (c) {
-                    nameEl.textContent = c.name;
-                    nameEl.classList.add('linked');
-                    iconEl.classList.add('linked');
-                    return;
-                }
-            }
-            nameEl.textContent = '+ Link College';
-            nameEl.classList.remove('linked');
-            iconEl.classList.remove('linked');
-        }
-        function handleCollegeLinkClick() {
-            const savedId = lsGet('linked_college', activeProfile.collegeId || null);
-            if (savedId && typeof window.XOS_COLLEGES !== 'undefined') {
-                const c = window.XOS_COLLEGES.find(cl => cl.id === savedId);
-                if (c) { openCollegeProfile(c); return; }
-            }
-            openCollegeLinkSearch();
-        }
-        function openCollegeLinkSearch() {
-            document.getElementById('dropdown-menu').classList.remove('active');
-            const el = document.getElementById('clg-search-overlay');
-            el.style.display = 'flex';
-            el.classList.remove('closing');
-            el.classList.add('open');
-            setTimeout(() => document.getElementById('clg-search-input').focus(), 400);
-        }
-        function closeCollegeLinkSearch() {
-            const el = document.getElementById('clg-search-overlay');
-            el.classList.remove('open');
-            el.classList.add('closing');
-            setTimeout(() => { el.style.display = 'none'; el.classList.remove('closing'); }, 350);
-        }
-        function onClgSearchInput(val) {
-            const list = document.getElementById('clg-results-list');
-            if (!val.trim()) { list.innerHTML = ''; return; }
-            const colleges = window.XOS_COLLEGES || [];
-            const q = val.toLowerCase();
-            const results = q === '#college' ? colleges : colleges.filter(c => c.name.toLowerCase().includes(q));
-            if (!results.length) {
-                list.innerHTML = '<div class="clg-no-results">No colleges found</div>';
-                return;
-            }
-            list.innerHTML = results.map(c => `
-                <div class="clg-result-item" onclick="selectCollege('${c.id}')">
-                    <img class="clg-pfp" src="${c.logo || ''}" onerror="this.style.display='none'" alt="">
-                    <div><div class="clg-name">${c.name}</div><div class="clg-id">${c.id}</div></div>
-                    <i class="fa-solid fa-chevron-right clg-chevron"></i>
-                </div>
-            `).join('');
-        }
-        function selectCollege(id) {
-            lsSet('linked_college', id);
-            closeCollegeLinkSearch();
-            initCollegeLink();
-        }
-        function openCollegeProfile(college) {
-            document.getElementById('acp-pfp').src = college.logo || '';
-            document.getElementById('acp-name').textContent = college.name;
-            document.getElementById('acp-caption').textContent = college.caption || '';
-            const pillsEl = document.getElementById('acp-pills');
-            pillsEl.innerHTML = (college.tags || []).map(t =>
-                `<div style="padding:4px 10px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;font-size:.62rem;font-weight:600;">${t}</div>`
-            ).join('');
-            const el = document.getElementById('clg-profile-overlay');
-            el.style.display = 'flex';
-            requestAnimationFrame(() => { el.style.transform = 'translateX(0)'; });
-        }
-        function closeCollegeProfile() {
-            const el = document.getElementById('clg-profile-overlay');
-            el.style.transform = 'translateX(100%)';
-            setTimeout(() => { el.style.display = 'none'; }, 360);
-        }
-        /* ═══════════════════════════════════════
-           EDIT PROFILE — FULL IMPLEMENTATION
-        ═══════════════════════════════════════ */
-        const LINK_ICON_OPTIONS = [
-            { icon: 'fa-brands fa-twitter', color: 'color-twitter', label: 'Twitter' },
-            { icon: 'fa-brands fa-instagram', color: 'color-instagram', label: 'Instagram' },
-            { icon: 'fa-brands fa-linkedin', color: 'color-linkedin', label: 'LinkedIn' },
-            { icon: 'fa-brands fa-github', color: 'color-github', label: 'GitHub' },
-            { icon: 'fa-brands fa-discord', color: 'color-discord', label: 'Discord' },
-            { icon: 'fa-brands fa-youtube', color: '', label: 'YouTube' },
-            { icon: 'fa-brands fa-tiktok', color: '', label: 'TikTok' },
-            { icon: 'fa-brands fa-spotify', color: '', label: 'Spotify' },
-            { icon: 'fa-solid fa-globe', color: 'color-globe', label: 'Website' },
-            { icon: 'fa-solid fa-link', color: 'color-globe', label: 'Link' },
-        ];
-        let editLinks = [];
-        let editOverlayOpen = false;
-        let iconPickerCallback = null;
-        let editAvatarDataUrl = null;
-        let editBannerDataUrl = null;
-        function openEditProfile() {
-            document.getElementById('dropdown-menu').classList.remove('active');
-            const p = activeProfile;
-            // Populate fields with current (possibly overridden) values
-            document.getElementById('edit-name').value = getProfileVal('displayName', p.displayName) || '';
-            document.getElementById('edit-handle').value = getProfileVal('handle', p.handle) || '';
-            document.getElementById('edit-bio').value = getProfileVal('bio', p.bio || '') || '';
-            const avatar = getProfileVal('avatar', p.avatar || '');
-            const banner = getProfileVal('banner', p.banner || '');
-            document.getElementById('edit-avatar-img').src = avatar;
-            document.getElementById('edit-banner-img').src = banner;
-            editAvatarDataUrl = null;
-            editBannerDataUrl = null;
-            // Music
-            document.getElementById('edit-music-title').value = getProfileVal('musicTitle', (p.audioTrack || {}).title || '');
-            document.getElementById('edit-music-artist').value = getProfileVal('musicArtist', (p.audioTrack || {}).artist || '');
-            document.getElementById('edit-music-url').value = getProfileVal('musicStreamUrl', (p.audioTrack || {}).streamUrl || '');
-            document.getElementById('edit-music-art').value = getProfileVal('musicArtworkUrl', (p.audioTrack || {}).artworkUrl || '');
-            // Links
-            editLinks = JSON.parse(JSON.stringify(getProfileVal('links', p.links || [])));
-            renderEditLinks();
-            // Char counts
-            updateEditCharCounts();
-            // Show overlay
-            const el = document.getElementById('edit-overlay');
-            el.style.display = 'flex';
-            el.classList.remove('closing');
-            el.classList.add('open');
-            editOverlayOpen = true;
-            history.pushState({ modal: 'edit-profile' }, '');
-        }
-        function closeEditProfile(fromPop) {
-            if (!editOverlayOpen) return;
-            editOverlayOpen = false;
-            const el = document.getElementById('edit-overlay');
-            el.classList.remove('open');
-            el.classList.add('closing');
-            if (!fromPop) history.back();
-            setTimeout(() => {
-                el.style.display = 'none';
-                el.classList.remove('closing');
-            }, 350);
-        }
-        function saveEditProfile() {
-            // Save all fields to localStorage
-            lsSet('edit_displayName', document.getElementById('edit-name').value.trim());
-            lsSet('edit_handle', document.getElementById('edit-handle').value.trim());
-            lsSet('edit_bio', document.getElementById('edit-bio').value.trim());
-            // Avatar & Banner
-            if (editAvatarDataUrl) lsSet('edit_avatar', editAvatarDataUrl);
-            if (editBannerDataUrl) lsSet('edit_banner', editBannerDataUrl);
-            // Music
-            lsSet('edit_musicTitle', document.getElementById('edit-music-title').value.trim());
-            lsSet('edit_musicArtist', document.getElementById('edit-music-artist').value.trim());
-            lsSet('edit_musicStreamUrl', document.getElementById('edit-music-url').value.trim());
-            lsSet('edit_musicArtworkUrl', document.getElementById('edit-music-art').value.trim());
-            // Links
-            const cleanLinks = editLinks.filter(l => l.label || l.url).map(l => ({
-                icon: l.icon || 'fa-solid fa-link',
-                color: l.color || 'color-globe',
-                label: l.label || 'Link',
-                url: l.url || '#',
-                arattai: l.arattai || false,
+            videoMuted=false; suppressMuteFlash=true;
+            loadModalMedia(); initSwipeToClose();
+            history.pushState({modal:'post',idx},'');
+            const backdrop=document.getElementById('post-modal');
+            backdrop.style.display='flex';
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{
+                backdrop.classList.add('active');
+                setTimeout(()=>{suppressMuteFlash=false;},500);
             }));
-            lsSet('edit_links', cleanLinks);
-            // Re-render profile
-            renderProfile();
-            // Close + toast
-            closeEditProfile();
-            showEditToast();
         }
-        function showEditToast() {
-            const toast = document.getElementById('edit-toast');
-            toast.classList.remove('show');
-            void toast.offsetWidth;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2400);
+
+        function closePostModal(fromPopState) {
+            if(!modalOpen) return; modalOpen=false;
+            const backdrop=document.getElementById('post-modal');
+            backdrop.classList.remove('active');
+            const vid=document.getElementById('sheet-video'); vid.pause(); vid.src='';
+            if(!fromPopState) history.back();
+            setTimeout(()=>{backdrop.style.display='none';},420);
         }
-        function onEditFieldChange() {
-            updateEditCharCounts();
+
+        let pfpOpen=false;
+        function openPfpViewer() {
+            if(pfpOpen||modalOpen) return; pfpOpen=true;
+            const el=document.getElementById('pfp-viewer');
+            el.style.display='flex';
+            requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));
+            history.pushState({modal:'pfp'},'');
         }
-        function updateEditCharCounts() {
-            const nameVal = document.getElementById('edit-name').value;
-            const bioVal = document.getElementById('edit-bio').value;
-            const nameCount = document.getElementById('edit-name-count');
-            nameCount.textContent = nameVal.length + ' / 40';
-            nameCount.className = 'edit-char-count' + (nameVal.length >= 38 ? ' warn' : '') + (nameVal.length >= 40 ? ' over' : '');
-            const bioCount = document.getElementById('edit-bio-count');
-            bioCount.textContent = bioVal.length + ' / 280';
-            bioCount.className = 'edit-char-count' + (bioVal.length >= 250 ? ' warn' : '') + (bioVal.length >= 280 ? ' over' : '');
+        function closePfpViewer(fromPopState) {
+            if(!pfpOpen) return; pfpOpen=false;
+            const el=document.getElementById('pfp-viewer');
+            el.classList.add('closing'); el.classList.remove('active');
+            if(!fromPopState) history.back();
+            setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},280);
         }
-        // File upload handlers
-        function onEditAvatarFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                editAvatarDataUrl = e.target.result;
-                document.getElementById('edit-avatar-img').src = editAvatarDataUrl;
-            };
-            reader.readAsDataURL(file);
-        }
-        function onEditBannerFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                editBannerDataUrl = e.target.result;
-                document.getElementById('edit-banner-img').src = editBannerDataUrl;
-            };
-            reader.readAsDataURL(file);
-        }
-        // Links editor
-        function renderEditLinks() {
-            const list = document.getElementById('edit-links-list');
-            list.innerHTML = editLinks.map((l, i) => {
-                const iconClass = l.arattai ? 'fa-arattai' : (l.icon || 'fa-solid fa-link');
-                const colorClass = l.color || 'color-globe';
-                return `
-                <div class="edit-link-item" style="animation-delay:${i * 0.05}s">
-                    <div class="edit-link-icon-pick" onclick="openIconPicker(${i})" title="Change icon">
-                        <i class="${iconClass} ${colorClass}"></i>
-                    </div>
-                    <div class="edit-link-fields">
-                        <input class="edit-link-input" placeholder="Label (e.g. Twitter)" value="${escHtml(l.label || '')}" oninput="editLinks[${i}].label=this.value">
-                        <input class="edit-link-input" placeholder="URL" value="${escHtml(l.url || '')}" oninput="editLinks[${i}].url=this.value">
-                    </div>
-                    <div class="edit-link-delete" onclick="removeEditLink(${i})" title="Remove">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-        function addEditLink() {
-            editLinks.push({ icon: 'fa-solid fa-link', color: 'color-globe', label: '', url: '' });
-            renderEditLinks();
-            // Scroll to bottom
-            const body = document.querySelector('.edit-body');
-            setTimeout(() => body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' }), 100);
-        }
-        function removeEditLink(idx) {
-            editLinks.splice(idx, 1);
-            renderEditLinks();
-        }
-        function escHtml(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-        // Icon picker
-        function openIconPicker(linkIdx) {
-            iconPickerCallback = linkIdx;
-            const grid = document.getElementById('icon-picker-grid');
-            grid.innerHTML = LINK_ICON_OPTIONS.map((opt, i) => {
-                const selected = editLinks[linkIdx] && editLinks[linkIdx].icon === opt.icon ? ' selected' : '';
-                return `<div class="icon-picker-item${selected}" onclick="pickIcon(${i})" title="${opt.label}">
-                    <i class="${opt.icon} ${opt.color}"></i>
-                </div>`;
-            }).join('');
-            document.getElementById('icon-picker-backdrop').classList.add('active');
-        }
-        function closeIconPicker() {
-            document.getElementById('icon-picker-backdrop').classList.remove('active');
-            iconPickerCallback = null;
-        }
-        function pickIcon(optIdx) {
-            if (iconPickerCallback === null) return;
-            const opt = LINK_ICON_OPTIONS[optIdx];
-            editLinks[iconPickerCallback].icon = opt.icon;
-            editLinks[iconPickerCallback].color = opt.color;
-            editLinks[iconPickerCallback].arattai = false;
-            renderEditLinks();
-            closeIconPicker();
-        }
-        /* ─── BACK BUTTON HANDLING ─── */
+
         window.addEventListener('popstate', e => {
-            if (modalOpen) { closePostModal(); return; }
-            if (editOverlayOpen) { closeEditProfile(true); return; }
-            if (followOverlayOpen) { closeFollowList(true); return; }
+            if(followOverlayOpen){closeFollowList(true);return;}
+            if(clgProfileOpen){closeCollegeProfile(true);return;}
+            if(clgSearchOpen){closeCollegeLinkSearch(true);return;}
+            if(modalOpen){closePostModal(true);return;}
+            if(pfpOpen){closePfpViewer(true);return;}
         });
-        /* ─── FOLLOWER/FOLLOWING TAPS ─── */
-        document.getElementById('followers-tap-target').addEventListener('click', () => showFollowList('followers'));
-        document.getElementById('following-tap-target').addEventListener('click', () => showFollowList('following'));
+
+        /* ─── CAROUSEL ─── */
+        function getNeighbours(post,idx){const files=post.files;return{prev:files[(idx-1+files.length)%files.length],curr:files[idx],next:files[(idx+1)%files.length]};}
+        function loadModalMedia(){
+            const p=POSTS[currentPost]; const file=p.files[currentFile];
+            const vid=document.getElementById('sheet-video'); const strip=document.getElementById('carousel-strip');
+            const isVid=p.type==='video'||(file&&file.endsWith('.mp4'));
+            strip.style.transition='none'; strip.style.transform='translateX(-33.333%)';
+            if(isVid){
+                document.getElementById('img-curr').style.display='none';
+                document.getElementById('img-prev').src=''; document.getElementById('img-next').src='';
+                vid.style.display='block'; vid.src=file; vid.muted=videoMuted; vid.loop=true;
+                vid.play().catch(()=>{vid.muted=true;videoMuted=true;showMuteIndicator();vid.play();});
+            } else {
+                vid.pause(); vid.src=''; vid.style.display='none';
+                document.getElementById('img-curr').style.display='block';
+                const{prev,curr,next}=getNeighbours(p,currentFile);
+                document.getElementById('img-prev').src=p.files.length>1?prev:'';
+                document.getElementById('img-curr').src=curr;
+                document.getElementById('img-next').src=p.files.length>1?next:'';
+            }
+            document.getElementById('mute-tap-zone').style.display=isVid?'block':'none';
+            updateCounterDots();
+        }
+        function updateCounterDots(){
+            const p=POSTS[currentPost];
+            const counterEl=document.getElementById('sheet-counter'); const dotsEl=document.getElementById('sheet-dots');
+            if(p.files.length>1){counterEl.style.display='block';counterEl.textContent=`${currentFile+1} / ${p.files.length}`;}
+            else{counterEl.style.display='none';}
+            dotsEl.innerHTML='';
+            if(p.files.length>1){p.files.forEach((_,i)=>{const d=document.createElement('div');d.className='sheet-dot'+(i===currentFile?' active':'');dotsEl.appendChild(d);});}
+        }
+
+        (()=>{
+            const media=document.getElementById('sheet-media'); const strip=document.getElementById('carousel-strip');
+            const W=()=>media.offsetWidth; let sx=0,sy=0,t0=0,isHoriz=null,dragging=false; let lastX=0,lastT=0,velocity=0; const BASE=-33.333;
+            function pctToX(pct){return(pct/100)*(W()*3);}
+            function toPct(px){return(px/(W()*3))*100;}
+            function setStripPct(pct,transition){strip.style.transition=transition||'none';strip.style.transform=`translateX(${pct}%)`;}
+            media.addEventListener('touchstart',e=>{const p=POSTS[currentPost];if(!p||p.type==='video'||p.files.length<=1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;t0=lastT=Date.now();lastX=sx;velocity=0;isHoriz=null;dragging=true;strip.style.transition='none';},{passive:true});
+            media.addEventListener('touchmove',e=>{if(!dragging)return;const cx=e.touches[0].clientX;const cy=e.touches[0].clientY;const dx=cx-sx,dy=cy-sy;if(isHoriz===null){if(Math.abs(dx)<5&&Math.abs(dy)<5)return;isHoriz=Math.abs(dx)>Math.abs(dy);if(!isHoriz){dragging=false;return;}}if(!isHoriz)return;const now=Date.now();velocity=(cx-lastX)/Math.max(now-lastT,1);lastX=cx;lastT=now;const dragPct=toPct(dx);setStripPct(BASE+dragPct);},{passive:true});
+            media.addEventListener('touchend',e=>{if(!dragging||!isHoriz){dragging=false;return;}dragging=false;const p=POSTS[currentPost];const dx=e.changedTouches[0].clientX-sx;const threshold=W()*.22;const fast=Math.abs(velocity)>.4;const goNext=dx<-threshold||(fast&&velocity<0);const goPrev=dx>threshold||(fast&&velocity>0);const canNext=currentFile<p.files.length-1;const canPrev=currentFile>0;if(goNext&&canNext){setStripPct(BASE+toPct(-W()),'transform .32s cubic-bezier(.25,.72,.35,1)');setTimeout(()=>{currentFile++;loadModalMedia();updateCounterDots();},320);}else if(goPrev&&canPrev){setStripPct(BASE+toPct(W()),'transform .32s cubic-bezier(.25,.72,.35,1)');setTimeout(()=>{currentFile--;loadModalMedia();updateCounterDots();},320);}else{setStripPct(BASE,'transform .38s cubic-bezier(.25,.72,.35,1)');}},{passive:true});
+        })();
+
+        function initSwipeToClose(){
+            const sheet=document.getElementById('post-sheet'); let sy=0,sx=0,dragging=false,raf=null;
+            sheet.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;sx=e.touches[0].clientX;dragging=true;sheet.style.transition='none';},{passive:true});
+            sheet.addEventListener('touchmove',e=>{if(!dragging)return;const dy=e.touches[0].clientY-sy;const dx=e.touches[0].clientX-sx;if(Math.abs(dx)>Math.abs(dy))return;if(dy<=0)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{sheet.style.transform=`translateY(${dy}px)`;});},{passive:true});
+            sheet.addEventListener('touchend',e=>{if(!dragging)return;dragging=false;const dy=e.changedTouches[0].clientY-sy;sheet.style.transition='';if(dy>90){sheet.style.transform='';closePostModal();}else{sheet.style.transform='';}},{passive:true});
+        }
+
+        let lastTap=0,tapTimer=null;
+        document.getElementById('mute-tap-zone').addEventListener('click',e=>{const now=Date.now(),gap=now-lastTap;lastTap=now;if(gap<300&&gap>0){clearTimeout(tapTimer);lastTap=0;triggerDoubleTapLike(e);}else{tapTimer=setTimeout(toggleMute,260);}});
+        function toggleMute(){const vid=document.getElementById('sheet-video');if(!vid||vid.style.display==='none')return;videoMuted=!videoMuted;vid.muted=videoMuted;showMuteIndicator();}
+        function showMuteIndicator(){if(suppressMuteFlash)return;const ind=document.getElementById('mute-indicator');document.getElementById('mute-icon').className=videoMuted?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}
+        function triggerDoubleTapLike(e){if(currentPost<0)return;if(!likedPosts[currentPost]){likedPosts[currentPost]=true;lsSet('liked_'+currentPost,true);document.getElementById('like-count').textContent=(POSTS[currentPost].likes||0)+1;updateLikeUI();}const ind=document.getElementById('dt-indicator');ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}
+        function toggleLike(e){if(currentPost<0)return;likedPosts[currentPost]=!likedPosts[currentPost];lsSet('liked_'+currentPost,likedPosts[currentPost]);document.getElementById('like-count').textContent=(POSTS[currentPost].likes||0)+(likedPosts[currentPost]?1:0);updateLikeUI();}
+        function updateLikeUI(){const liked=likedPosts[currentPost]||false;document.getElementById('like-btn').classList.toggle('liked',liked);document.getElementById('like-icon').className=liked?'fa-solid fa-heart':'fa-regular fa-heart';}
+        function focusComment(){document.getElementById('comment-input').focus();}
+        function onCommentInput(el){document.getElementById('comment-send').classList.toggle('visible',el.value.trim().length>0);}
+        function onCommentKey(e){if(e.key==='Enter')sendComment();}
+        function sendComment(){const inp=document.getElementById('comment-input');if(!inp.value.trim())return;const cc=document.getElementById('comment-count');const newCount=parseInt(cc.textContent)+1;cc.textContent=newCount;lsSet('comments_'+currentPost,newCount);inp.value='';inp.blur();document.getElementById('comment-send').classList.remove('visible');}
+        function sharePost(){if(navigator.share)navigator.share({title:activeProfile.displayName+' | x0s.link',url:window.location.href});else alert('Link copied!');}
+
+        /* ─── MUSIC ─── */
+        let musicProgressTimer;
+        function openMusicPlayer(){const ba=document.getElementById('bio-audio');if(!ba.paused){ba.pause();document.getElementById('bio-play-icon').className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');}const m=document.getElementById('music-modal');m.style.display='flex';setTimeout(()=>m.classList.add('active'),10);const ma=document.getElementById('music-audio-player');ma.currentTime=0;ma.play().then(()=>{document.getElementById('music-play-icon').className='fa-solid fa-pause';}).catch(()=>{document.getElementById('music-play-icon').className='fa-solid fa-play';});clearInterval(musicProgressTimer);musicProgressTimer=setInterval(updateMusicProgress,400);}
+        function updateMusicProgress(){const ma=document.getElementById('music-audio-player');if(!ma||isNaN(ma.duration)||ma.duration<=0){document.getElementById('music-duration').textContent='0:00';document.getElementById('music-current').textContent='0:00';document.getElementById('music-progress').value=0;return;}const c=ma.currentTime,d=ma.duration;document.getElementById('music-progress').value=(c/d)*100;document.getElementById('music-current').textContent=fmtTime(c);document.getElementById('music-duration').textContent=fmtTime(d);document.getElementById('music-play-icon').className=ma.paused?'fa-solid fa-play':'fa-solid fa-pause';}
+        function fmtTime(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
+        function closeMusicModal(){const m=document.getElementById('music-modal');m.classList.remove('active');setTimeout(()=>m.style.display='none',300);const ma=document.getElementById('music-audio-player');ma.pause();clearInterval(musicProgressTimer);}
+        document.getElementById('music-play-pause').addEventListener('click',()=>{const ma=document.getElementById('music-audio-player');if(!ma.src)return;if(ma.paused){ma.play().then(()=>{document.getElementById('music-play-icon').className='fa-solid fa-pause';}).catch(()=>{});}else{ma.pause();document.getElementById('music-play-icon').className='fa-solid fa-play';}});
+        document.getElementById('music-progress').addEventListener('input',e=>{const ma=document.getElementById('music-audio-player');if(!ma||isNaN(ma.duration)||ma.duration<=0)return;ma.currentTime=(e.target.value/100)*ma.duration;});
+        document.getElementById('music-prev').addEventListener('click',()=>{const ma=document.getElementById('music-audio-player');if(!ma.src)return;ma.currentTime=0;if(ma.paused)ma.play().catch(()=>{});document.getElementById('music-play-icon').className='fa-solid fa-pause';});
+        document.getElementById('music-next').addEventListener('click',()=>{const ma=document.getElementById('music-audio-player');if(!ma.src||isNaN(ma.duration)||ma.duration<=0)return;ma.currentTime=Math.min(ma.duration,ma.currentTime+10);if(ma.paused)ma.play().catch(()=>{});document.getElementById('music-play-icon').className='fa-solid fa-pause';});
+        document.getElementById('music-audio-player').addEventListener('ended',()=>{document.getElementById('music-play-icon').className='fa-solid fa-play';document.getElementById('music-progress').value=100;});
+        function toggleBioMusic(e){if(e)e.stopPropagation();const a=document.getElementById('bio-audio'),ic=document.getElementById('bio-play-icon'),eq=document.getElementById('bio-eq');if(!a.src)return;if(a.paused){a.play();ic.className='fa-solid fa-pause';eq.classList.remove('paused');}else{a.pause();ic.className='fa-solid fa-play';eq.classList.add('paused');}}
+        function shareProfile(){if(navigator.share)navigator.share({title:activeProfile.displayName+' | x0s.link',url:window.location.href});else alert('Link copied!');document.getElementById('dropdown-menu').classList.remove('active');}
+
+        /* ─── COLLEGE ─── */
+        let clgProfileOpen=false;
+        function openCollegeProfile(idx){const colleges=window.XOS_COLLEGES||[];const c=colleges[idx];if(!c)return;const nameParts=c.name.split(',');const displayName=nameParts[0].trim();const caption=nameParts.slice(1).join(',').trim();document.getElementById('acp-pfp').src=c.pfp||'';document.getElementById('acp-name').textContent=displayName+' '+c.id;document.getElementById('acp-caption').textContent=caption||'Engineering College';document.getElementById('acp-pills').innerHTML=(c.pill1?`<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill1}</span>`:'')+(c.pill2?`<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill2}</span>`:'');clgProfileOpen=true;const el=document.getElementById('clg-profile-overlay');el.style.display='flex';requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.transform='translateX(0)'));history.pushState({modal:'clg-profile'},'');}
+        function closeCollegeProfile(fromPop){if(!clgProfileOpen)return;clgProfileOpen=false;const el=document.getElementById('clg-profile-overlay');el.style.transform='translateX(100%)';if(!fromPop)history.back();setTimeout(()=>{el.style.display='none';},380);}
+        let clgSearchOpen=false;
+        function handleCollegeLinkClick(){const stored=lsGet('linked_college',null);if(stored){const colleges=window.XOS_COLLEGES||[];const idx=colleges.findIndex(col=>col.id===stored.id);if(idx>=0){openCollegeProfile(idx);return;}}openCollegeLinkSearch();}
+        function initCollegeLink(){const stored=lsGet('linked_college',null);if(stored){setCollegeLinkUI(stored.name,true);}else{setCollegeLinkUI('+ Link College',false);}}
+        function setCollegeLinkUI(name,linked){const el=document.getElementById('college-link-name');const icon=document.getElementById('college-link-icon');const wrap=document.querySelector('.college-link-name-wrap');el.classList.toggle('linked',linked);icon.classList.toggle('linked',linked);el.classList.remove('marquee-anim');el.textContent=linked?name:'+ Link College';requestAnimationFrame(()=>{if(wrap&&el.scrollWidth>wrap.offsetWidth&&linked){el.textContent=name+'   ·   '+name;el.classList.add('marquee-anim');}});}
+        function openCollegeLinkSearch(){document.getElementById('dropdown-menu').classList.remove('active');clgSearchOpen=true;const el=document.getElementById('clg-search-overlay');el.style.display='flex';el.classList.remove('closing');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));setTimeout(()=>document.getElementById('clg-search-input').focus(),400);history.pushState({modal:'clg-search'},'');}
+        function closeCollegeLinkSearch(fromPop){if(!clgSearchOpen)return;clgSearchOpen=false;const el=document.getElementById('clg-search-overlay');el.classList.remove('open');el.classList.add('closing');document.getElementById('clg-search-input').value='';document.getElementById('clg-results-list').innerHTML='';if(!fromPop)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},340);}
+        function onClgSearchInput(val){const q=val.trim().toLowerCase().replace(/\s/g,'');const list=document.getElementById('clg-results-list');const colleges=window.XOS_COLLEGES||[];if(!q){list.innerHTML='';return;}const showAll=q==='#college'||q==='#colleges';let matches=showAll?colleges:colleges.filter(c=>c.name.toLowerCase().replace(/\s/g,'').includes(q)).slice(0,6);if(matches.length===0){list.innerHTML=`<div class="clg-no-results">No colleges found</div>`;return;}list.innerHTML=matches.map(c=>{const displayName=c.name.split(',')[0].trim();const originalIdx=colleges.indexOf(c);return`<div class="clg-result-item" onclick="linkCollege(${originalIdx})"><img class="clg-pfp" src="${c.pfp||''}" onerror="this.src=''" alt=""><div style="flex:1;min-width:0;"><div class="clg-name">${displayName}</div><div class="clg-id">${c.id}</div></div><i class="fa-solid fa-link clg-chevron"></i></div>`;}).join('');}
+        function linkCollege(idx){const colleges=window.XOS_COLLEGES||[];const c=colleges[idx];if(!c)return;const displayName=c.name.split(',')[0].trim();lsSet('linked_college',{id:c.id,name:displayName,pfp:c.pfp||''});setCollegeLinkUI(displayName,true);closeCollegeLinkSearch();}
+
         /* ─── INIT ─── */
-        renderProfile();
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProfile();
+            document.getElementById('followers-tap-target').addEventListener('click', e => { e.stopPropagation(); showFollowList('followers'); });
+            document.getElementById('following-tap-target').addEventListener('click', e => { e.stopPropagation(); showFollowList('following'); });
+        });
     </script>
 </body>
 </html>
