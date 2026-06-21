@@ -38,35 +38,39 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 /* ── BANNER ── */
 .cp-banner{
-  width:100%;height:220px;position:relative;overflow:hidden;
+  width:100%;height:240px;position:relative;overflow:hidden;
   background:linear-gradient(135deg,#0a0a14 0%,#0d1a2e 60%,#0a0a0a 100%);
 }
-.cp-banner-img{width:100%;height:100%;object-fit:cover;display:block;opacity:.7;}
+.cp-banner-img{width:100%;height:100%;object-fit:cover;display:block;opacity:.6;}
 .cp-banner-overlay{
   position:absolute;inset:0;
-  background:linear-gradient(to bottom, rgba(0,0,0,.15) 0%, rgba(0,0,0,.6) 100%);
+  background:linear-gradient(to bottom,
+    rgba(0,0,0,.08) 0%,
+    rgba(0,0,0,.18) 40%,
+    rgba(0,0,0,.72) 75%,
+    rgba(0,0,0,.92) 100%
+  );
 }
-
-/* ── PROFILE HEADER ── */
-.cp-header{padding:0 16px 0;margin-top:-40px;position:relative;}
+/* pfp + name pinned to bottom of banner */
+.cp-banner-identity{
+  position:absolute;bottom:18px;left:16px;right:16px;
+  display:flex;align-items:center;gap:14px;
+}
 .cp-pfp-wrap{
-  width:78px;height:78px;border-radius:50%;
-  overflow:hidden;
-  border:3px solid #000;
+  width:70px;height:70px;border-radius:50%;
+  overflow:hidden;flex-shrink:0;
+  border:2.5px solid rgba(255,255,255,.18);
   background:#111;
-  margin-bottom:10px;
-  box-shadow:0 4px 20px rgba(0,0,0,.8);
+  box-shadow:0 4px 20px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.5);
 }
 .cp-pfp-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
-.cp-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;}
-.cp-main-name{font-size:1.28rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;}
-.cp-verified-icon{
-  width:20px;height:20px;flex-shrink:0;
-  display:inline-flex;align-items:center;justify-content:center;
-}
-.cp-verified-icon img{width:20px;height:20px;object-fit:contain;}
-.cp-location{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--muted);margin-bottom:14px;}
-.cp-location i{font-size:.65rem;}
+.cp-identity-text{flex:1;min-width:0;}
+.cp-name-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap;}
+.cp-main-name{font-size:1.08rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.7);}
+.cp-verified-icon{width:17px;height:17px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
+.cp-verified-icon img{width:17px;height:17px;object-fit:contain;}
+.cp-location{display:flex;align-items:center;gap:5px;font-size:.68rem;color:rgba(255,255,255,.6);text-shadow:0 1px 4px rgba(0,0,0,.6);}
+.cp-location i{font-size:.6rem;}
 
 /* ── CTA BUTTONS ── */
 .cp-cta-row{display:flex;gap:10px;margin-bottom:20px;}
@@ -261,18 +265,22 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 <div class="cp-banner">
   <img class="cp-banner-img" src="college_banner.jpg" alt="" onerror="this.style.display='none'">
   <div class="cp-banner-overlay"></div>
+  <div class="cp-banner-identity">
+    <div class="cp-pfp-wrap">
+      <img src="college_pfp.png" alt="" onerror="this.src='1000046129.png'">
+    </div>
+    <div class="cp-identity-text">
+      <div class="cp-name-row">
+        <div class="cp-main-name">M S Ramaiah Institute of Technology</div>
+        <div class="cp-verified-icon"><img src="badge-blue.svg" alt=""></div>
+      </div>
+      <div class="cp-location"><i class="fa-solid fa-location-dot"></i> Bangalore, Karnataka</div>
+    </div>
+  </div>
 </div>
 
-<!-- HEADER -->
-<div class="cp-header">
-  <div class="cp-pfp-wrap">
-    <img src="college_pfp.png" alt="" onerror="this.src='1000046129.png'">
-  </div>
-  <div class="cp-name-row">
-    <div class="cp-main-name">M S Ramaiah Institute<br>of Technology</div>
-    <div class="cp-verified-icon"><img src="badge-blue.svg" alt=""></div>
-  </div>
-  <div class="cp-location"><i class="fa-solid fa-location-dot"></i> Bangalore, Karnataka</div>
+<!-- CTA BUTTONS -->
+<div class="cp-header" style="padding:14px 16px 0;margin-top:0;">
   <div class="cp-cta-row">
     <button class="cp-follow-btn" id="cp-follow-btn" onclick="toggleFollow()">Follow</button>
     <button class="cp-compare-btn"><i class="fa-solid fa-scale-balanced"></i> Compare</button>
