@@ -16,61 +16,83 @@
 html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;}
 ::-webkit-scrollbar{display:none;}
 
-/* ── TOP NAV ── */
-.cp-topnav{
-  position:sticky;top:0;z-index:80;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;
-  background:rgba(0,0,0,.65);
-  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-  border-bottom:1px solid var(--border2);
-}
-.cp-back,.cp-action{
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:.82rem;cursor:pointer;transition:background .15s;
-}
-.cp-back:active,.cp-action:active{background:rgba(255,255,255,.15);}
-.cp-topnav-actions{display:flex;gap:8px;}
-.cp-topnav-title{font-size:.9rem;font-weight:700;letter-spacing:-.02em;opacity:0;transition:opacity .2s;}
-.cp-topnav-title.visible{opacity:1;}
-
-/* ── BANNER ── */
-.cp-banner{
-  width:100%;height:240px;position:relative;overflow:hidden;
+/* ── HERO CARD ── */
+.cp-hero{
+  margin:12px 12px 0;
+  border-radius:28px;
+  overflow:hidden;
+  position:relative;
+  height:300px;
   background:linear-gradient(135deg,#0a0a14 0%,#0d1a2e 60%,#0a0a0a 100%);
+  box-shadow:
+    0 2px 0 rgba(255,255,255,.07) inset,
+    0 24px 60px rgba(0,0,0,.7),
+    0 0 0 1px rgba(255,255,255,.06);
+  flex-shrink:0;
 }
-.cp-banner-img{width:100%;height:100%;object-fit:cover;display:block;opacity:.6;}
+.cp-banner-img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;opacity:.65;
+  position:absolute;inset:0;
+}
 .cp-banner-overlay{
   position:absolute;inset:0;
   background:linear-gradient(to bottom,
-    rgba(0,0,0,.08) 0%,
-    rgba(0,0,0,.18) 40%,
-    rgba(0,0,0,.72) 75%,
-    rgba(0,0,0,.92) 100%
+    rgba(0,0,0,.05) 0%,
+    rgba(0,0,0,.1) 35%,
+    rgba(0,0,0,.65) 70%,
+    rgba(0,0,0,.88) 100%
   );
 }
-/* pfp + name pinned to bottom of banner */
+
+/* floating buttons row — top of hero */
+.cp-hero-toprow{
+  position:absolute;top:14px;left:14px;right:14px;
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:10;
+}
+.cp-back,.cp-action{
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:.8rem;cursor:pointer;
+  transition:background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cp-back:active,.cp-action:active{background:rgba(255,255,255,.26);}
+.cp-hero-actions{display:flex;gap:8px;}
+
+/* pfp + name pinned to bottom of hero */
 .cp-banner-identity{
   position:absolute;bottom:18px;left:16px;right:16px;
-  display:flex;align-items:center;gap:14px;
+  display:flex;align-items:center;gap:13px;
+  z-index:10;
 }
 .cp-pfp-wrap{
-  width:70px;height:70px;border-radius:50%;
+  width:68px;height:68px;border-radius:50%;
   overflow:hidden;flex-shrink:0;
-  border:2.5px solid rgba(255,255,255,.18);
+  border:2px solid rgba(255,255,255,.22);
   background:#111;
-  box-shadow:0 4px 20px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.5);
+  box-shadow:0 4px 18px rgba(0,0,0,.7);
 }
 .cp-pfp-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
 .cp-identity-text{flex:1;min-width:0;}
-.cp-name-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap;}
-.cp-main-name{font-size:1.08rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.7);}
-.cp-verified-icon{width:17px;height:17px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
-.cp-verified-icon img{width:17px;height:17px;object-fit:contain;}
-.cp-location{display:flex;align-items:center;gap:5px;font-size:.68rem;color:rgba(255,255,255,.6);text-shadow:0 1px 4px rgba(0,0,0,.6);}
-.cp-location i{font-size:.6rem;}
+.cp-name-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;}
+.cp-main-name{
+  font-size:1.05rem;font-weight:700;letter-spacing:-.02em;
+  line-height:1.2;color:#fff;
+  text-shadow:0 1px 8px rgba(0,0,0,.8);
+}
+.cp-verified-icon{width:16px;height:16px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;}
+.cp-verified-icon img{width:16px;height:16px;object-fit:contain;}
+.cp-location{
+  display:flex;align-items:center;gap:4px;
+  font-size:.66rem;color:rgba(255,255,255,.58);
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.cp-location i{font-size:.58rem;}
 
 /* ── CTA BUTTONS ── */
 .cp-cta-row{display:flex;gap:10px;margin-bottom:20px;}
@@ -261,10 +283,21 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   </div>
 </div>
 
-<!-- BANNER -->
-<div class="cp-banner">
+<!-- HERO CARD -->
+<div class="cp-hero">
   <img class="cp-banner-img" src="college_banner.jpg" alt="" onerror="this.style.display='none'">
   <div class="cp-banner-overlay"></div>
+
+  <!-- floating top row -->
+  <div class="cp-hero-toprow">
+    <div class="cp-back" onclick="history.back()"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="cp-hero-actions">
+      <div class="cp-action"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+      <div class="cp-action"><i class="fa-solid fa-ellipsis"></i></div>
+    </div>
+  </div>
+
+  <!-- pfp + name at bottom -->
   <div class="cp-banner-identity">
     <div class="cp-pfp-wrap">
       <img src="college_pfp.png" alt="" onerror="this.src='1000046129.png'">
@@ -280,7 +313,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 </div>
 
 <!-- CTA BUTTONS -->
-<div class="cp-header" style="padding:14px 16px 0;margin-top:0;">
+<div style="padding:14px 16px 0;">
   <div class="cp-cta-row">
     <button class="cp-follow-btn" id="cp-follow-btn" onclick="toggleFollow()">Follow</button>
     <button class="cp-compare-btn"><i class="fa-solid fa-scale-balanced"></i> Compare</button>
