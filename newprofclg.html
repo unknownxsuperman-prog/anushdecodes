@@ -18,8 +18,8 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 
 /* ── HERO CARD ── */
 .cp-hero{
-  margin:12px 12px 0;
-  border-radius:28px;
+  margin:0;
+  border-radius:0 0 28px 28px;
   overflow:hidden;
   position:relative;
   height:300px;
@@ -273,19 +273,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 </head>
 <body>
 
-<!-- TOP NAV -->
-<div class="cp-topnav" id="cp-topnav">
-  <div class="cp-back" onclick="history.back()"><i class="fa-solid fa-chevron-left"></i></div>
-  <div class="cp-topnav-title" id="cp-topnav-title">M S Ramaiah Institute of Technology</div>
-  <div class="cp-topnav-actions">
-    <div class="cp-action"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-    <div class="cp-action"><i class="fa-solid fa-ellipsis"></i></div>
-  </div>
-</div>
+
 
 <!-- HERO CARD -->
 <div class="cp-hero">
-  <img class="cp-banner-img" src="imgi_2_direct-admission-in-ms-ramaiah-institute-of-technology-2.png" alt="" onerror="this.style.display='none'">
+  <img class="cp-banner-img" src="college_banner.jpg" alt="" onerror="this.style.display='none'">
   <div class="cp-banner-overlay"></div>
 
   <!-- floating top row -->
@@ -592,11 +584,7 @@ function setTab(el, id){
   });
 }
 
-// Sticky title on scroll
-window.addEventListener('scroll', () => {
-  const title = document.getElementById('cp-topnav-title');
-  title.classList.toggle('visible', window.scrollY > 180);
-}, { passive: true });
+
 </script>
 </body>
 </html>
