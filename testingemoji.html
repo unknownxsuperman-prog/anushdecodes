@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xos1 | Emoji Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --accent: #007aff;
+            --card: #0a0a0a;
+            --border: #1a1a1a;
+        }
+        body {
+            background: var(--bg);
+            font-family: 'Space Grotesk', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+            margin: 0;
+        }
+        .xos-chatbox {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+        }
+        .badge {
+            font-size: 8px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        #chat-output {
+            height: 350px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        /* Hide scrollbar for cleaner UI */
+        #chat-output::-webkit-scrollbar { display: none; }
+        
+        .msg {
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 1.4rem;
+        }
+        .sys-msg {
+            font-size: 0.85rem;
+            color: var(--accent);
+            border: none;
+            background: transparent;
+            padding: 0;
+            text-align: center;
+        }
+        .err-msg {
+            color: #ff3333;
+        }
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 14px;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s ease, transform 0.1s ease;
+        }
+        input:focus {
+            border-color: var(--accent);
+        }
+        input:active {
+            transform: scale(0.98);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="xos-chatbox">
+    <div class="badge">xos1-predictor-engine</div>
+    <div id="chat-output"></div>
+    <input type="text" id="chat-input" placeholder="Input an emoji (e.g. 😂)..." autocomplete="off">
+</div>
+
+<script>
+    let dataset = [];
+    const input = document.getElementById('chat-input');
+    const output = document.getElementById('chat-output');
+
+    // 1. Asynchronously fetch your external JSON dataset
+    async function initEngine() {
+        try {
+            const response = await fetch('emoji_dataset.json');
+            if (!response.ok) throw new Error("Network response was not ok");
+            
+            const rawData = await response.json();
+            
+            // Targets the "dataset" array from your specific JSON structure
+            dataset = rawData.dataset; 
+            
+            output.innerHTML += `<div class="msg sys-msg">[System]: Loaded ${dataset.length} emojis from JSON. Engine ready.</div>`;
+        } catch (error) {
+            output.innerHTML += `<div class="msg sys-msg err-msg">[Error]: Failed to load emoji_dataset.json. You must run this via a local server (e.g. VS Code Live Server).</div>`;
+            console.error("Fetch error:", error);
+        }
+    }
+
+    initEngine();
+
+    // 2. CORE PREDICTOR LOGIC
+    function getPrediction(inputMappings, originalChar) {
+        let bestMatch = null;
+        let maxScore = -1;
+
+        dataset.forEach(item => {
+            if (item.char === originalChar) return;
+            
+            // Vector Dot Product Similarity
+            let score = 0;
+            for (let hash in inputMappings) {
+                if (item.mappings[hash]) {
+                    score += (inputMappings[hash] * item.mappings[hash]);
+                }
+            }
+
+            if (score > maxScore) {
+                maxScore = score;
+                bestMatch = item.char;
+            }
+        });
+        return bestMatch || "😐";
+    }
+
+    // 3. EVENT LISTENER
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && input.value.trim()) {
+            if (dataset.length === 0) return; // Prevent input if data isn't loaded
+
+            const char = input.value.trim();
+            const entry = dataset.find(i => i.char === char);
+            
+            if (entry) {
+                const aiResponse = getPrediction(entry.mappings, char);
+                output.innerHTML += `<div class="msg">You: ${char}</div>`;
+                output.innerHTML += `<div class="msg">AI: ${aiResponse}</div>`;
+            } else {
+                output.innerHTML += `<div class="msg sys-msg">Emoji not found in database.</div>`;
+            }
+            
+            output.scrollTop = output.scrollHeight; // Auto-scroll to bottom
+            input.value = '';
+        }
+    });
+</script>
+</body>
+</html>
