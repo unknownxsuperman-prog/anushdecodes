@@ -15,7 +15,6 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;}
 ::-webkit-scrollbar{display:none;}
-
 /* ── HERO CARD ── */
 .cp-hero{
   margin:0;
@@ -44,7 +43,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     rgba(0,0,0,.88) 100%
   );
 }
-
 /* floating buttons row — top of hero */
 .cp-hero-toprow{
   position:absolute;top:14px;left:14px;right:14px;
@@ -63,7 +61,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .cp-back:active,.cp-action:active{background:rgba(255,255,255,.26);}
 .cp-hero-actions{display:flex;gap:8px;}
-
 /* pfp + name pinned to bottom of hero */
 .cp-banner-identity{
   position:absolute;bottom:18px;left:16px;right:16px;
@@ -93,7 +90,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   text-shadow:0 1px 4px rgba(0,0,0,.7);
 }
 .cp-location i{font-size:.58rem;}
-
 /* ── CTA BUTTONS ── */
 .cp-cta-row{display:flex;gap:10px;margin-bottom:20px;}
 .cp-follow-btn{
@@ -115,7 +111,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   display:flex;align-items:center;justify-content:center;gap:6px;
 }
 .cp-compare-btn:active{background:rgba(255,255,255,.06);}
-
 /* ── STATS ROW ── */
 .cp-stats{
   display:grid;grid-template-columns:repeat(5,1fr);
@@ -130,13 +125,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cp-stat:last-child{border-right:none;}
 .cp-stat-label{font-size:.54rem;color:var(--muted);font-weight:500;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px;}
 .cp-stat-val{font-size:.88rem;font-weight:700;color:var(--text);letter-spacing:-.01em;}
-
 /* ── TABS ── */
 .cp-tabs{
   display:flex;overflow-x:auto;scrollbar-width:none;
   border-bottom:1px solid var(--border);
   padding:0 16px;
-  position:sticky;top:60px;z-index:60;
+  position:sticky;top:0;z-index:60;
   background:rgba(0,0,0,.85);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
 }
@@ -153,14 +147,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   content:'';position:absolute;bottom:0;left:14px;right:14px;
   height:2px;background:var(--accent);border-radius:2px;
 }
-
 /* ── CONTENT SECTIONS ── */
 .cp-body{padding:0 0 100px;}
 .cp-section{padding:18px 16px 0;}
-
 /* ── OVERVIEW GRID ── */
 .cp-overview-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px;}
-
 /* About */
 .cp-card{
   background:var(--card);border:1px solid var(--border);
@@ -169,13 +160,11 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cp-card-title{font-size:.78rem;font-weight:700;margin-bottom:10px;letter-spacing:-.01em;}
 .cp-about-text{font-size:.76rem;color:rgba(255,255,255,.62);line-height:1.65;font-weight:300;}
 .cp-read-more{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--accent);margin-top:10px;cursor:pointer;}
-
 /* Key Facts */
 .cp-fact-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2);}
 .cp-fact-row:last-child{border-bottom:none;}
 .cp-fact-icon{width:28px;height:28px;border-radius:8px;background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.15);display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--accent);flex-shrink:0;}
 .cp-fact-text{font-size:.74rem;color:rgba(255,255,255,.75);font-weight:400;}
-
 /* Accreditations */
 .cp-accred-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;}
 .cp-accred-chip{
@@ -193,14 +182,12 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 }
 .cp-accred-name{font-size:.7rem;font-weight:700;}
 .cp-accred-sub{font-size:.58rem;color:var(--muted);margin-top:1px;}
-
 /* Contact */
 .cp-contact-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border2);}
 .cp-contact-row:last-child{border-bottom:none;}
 .cp-contact-row i{font-size:.78rem;color:var(--muted);margin-top:2px;width:16px;flex-shrink:0;text-align:center;}
 .cp-contact-text{font-size:.72rem;color:rgba(255,255,255,.65);line-height:1.5;}
 .cp-contact-text a{color:var(--accent);text-decoration:none;}
-
 /* ── PLACEMENTS ── */
 .cp-placement-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cp-view-link{font-size:.68rem;font-weight:600;color:var(--accent);}
@@ -209,7 +196,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cp-pkg-label{font-size:.55rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
 .cp-pkg-val{font-size:.92rem;font-weight:700;letter-spacing:-.02em;}
 .cp-pkg-val.gold{background:linear-gradient(90deg,#D4A520,#F5C842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
 /* Chart bars */
 .cp-chart{margin-bottom:8px;}
 .cp-chart-title{font-size:.62rem;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
@@ -225,7 +211,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cp-bar.active{background:var(--accent);}
 .cp-bar-val{font-size:.55rem;color:var(--muted);font-weight:600;}
 .cp-bar-year{font-size:.52rem;color:var(--muted2);}
-
 /* Recruiters */
 .cp-recruiters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
 .cp-recruiter{
@@ -235,7 +220,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   font-size:.7rem;font-weight:800;letter-spacing:-.02em;
   min-height:44px;
 }
-
 /* ── BOTTOM QUICK LINKS ── */
 .cp-quick-links{
   display:grid;grid-template-columns:1fr 1fr 1fr;
@@ -257,7 +241,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 .cp-ql-name{font-size:.7rem;font-weight:700;}
 .cp-ql-sub{font-size:.58rem;color:var(--muted);margin-top:1px;}
 .cp-ql-arrow{margin-left:auto;color:var(--muted2);font-size:.65rem;flex-shrink:0;}
-
 /* ── COMING SOON BADGE ── */
 .cp-coming-soon{
   display:inline-flex;align-items:center;gap:5px;
@@ -266,20 +249,318 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
   font-size:.58rem;font-weight:700;color:rgba(255,180,0,.85);
   letter-spacing:.06em;text-transform:uppercase;margin-left:8px;
 }
-
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .cp-card{animation:fadeUp .3s var(--ease) both;}
+/* ═══════════════════════════════════════════════
+   STUDENT GALLERY
+   ═══════════════════════════════════════════════ */
+.sg-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.sg-header-left{display:flex;align-items:center;gap:8px;}
+.sg-header-title{font-size:.88rem;font-weight:700;letter-spacing:-.02em;}
+.sg-post-count{
+  font-size:.6rem;font-weight:600;color:var(--muted);
+  background:rgba(255,255,255,.06);
+  padding:3px 8px;border-radius:99px;
+}
+.sg-upload-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 14px;border-radius:99px;
+  background:var(--accent);color:#fff;
+  border:none;font-family:var(--font);
+  font-size:.7rem;font-weight:700;
+  cursor:pointer;transition:opacity .15s;
+}
+.sg-upload-btn:active{opacity:.7;}
+.sg-upload-btn i{font-size:.65rem;}
+/* Gallery Grid — 3 columns, 3:4 aspect ratio */
+.sg-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:3px;
+}
+.sg-post{
+  position:relative;
+  aspect-ratio:3/4;
+  border-radius:6px;
+  overflow:hidden;
+  cursor:pointer;
+  background:#111;
+}
+.sg-post img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .3s var(--ease), opacity .3s;
+}
+.sg-post:active img{transform:scale(1.03);opacity:.85;}
+/* Gradient overlay on each post for PFP visibility */
+.sg-post-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.6) 0%,
+    rgba(0,0,0,0) 40%
+  );
+  pointer-events:none;
+}
+/* PFP circle at bottom-left of each post */
+.sg-post-pfp{
+  position:absolute;
+  bottom:7px;left:7px;
+  width:24px;height:24px;
+  border-radius:50%;
+  overflow:hidden;
+  border:1.5px solid rgba(255,255,255,.5);
+  background:#222;
+  box-shadow:0 2px 8px rgba(0,0,0,.6);
+  z-index:2;
+}
+.sg-post-pfp img{width:100%;height:100%;object-fit:cover;display:block;}
+/* Multi-image indicator */
+.sg-multi-indicator{
+  position:absolute;top:7px;right:7px;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+  border-radius:6px;padding:3px 6px;
+  display:flex;align-items:center;gap:3px;
+  z-index:2;
+}
+.sg-multi-indicator i{font-size:.55rem;color:rgba(255,255,255,.8);}
+/* ═══════════════════════════════════════════════
+   POST VIEWER MODAL
+   ═══════════════════════════════════════════════ */
+.pv-modal-backdrop{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0);
+  backdrop-filter:blur(0px);
+  transition:background .3s var(--ease), backdrop-filter .3s var(--ease);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+}
+.pv-modal-backdrop.visible{
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.pv-modal{
+  width:100%;max-width:480px;
+  max-height:96vh;
+  background:#0a0a0a;
+  border-radius:24px 24px 0 0;
+  overflow:hidden;
+  transform:translateY(100%);
+  transition:transform .35s var(--ease);
+  display:flex;flex-direction:column;
+}
+.pv-modal-backdrop.visible .pv-modal{
+  transform:translateY(0);
+}
+/* Modal drag handle */
+.pv-drag-handle{
+  width:36px;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.2);
+  margin:10px auto 6px;flex-shrink:0;
+}
+/* Modal header */
+.pv-header{
+  display:flex;align-items:center;
+  padding:8px 16px 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.pv-header-pfp{
+  width:36px;height:36px;border-radius:50%;
+  overflow:hidden;flex-shrink:0;
+  border:1.5px solid rgba(255,255,255,.15);
+  background:#222;
+}
+.pv-header-pfp img{width:100%;height:100%;object-fit:cover;display:block;}
+.pv-header-info{flex:1;margin-left:10px;min-width:0;}
+.pv-header-name{
+  font-size:.78rem;font-weight:700;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:5px;
+}
+.pv-header-name .pv-badge{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.pv-header-name .pv-badge i{font-size:.5rem;color:#fff;}
+.pv-header-meta{
+  font-size:.64rem;color:var(--muted);margin-top:2px;
+  display:flex;align-items:center;gap:6px;
+}
+.pv-header-meta i{font-size:.5rem;}
+.pv-close-btn{
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.6);font-size:.75rem;
+  cursor:pointer;transition:background .15s;
+  flex-shrink:0;margin-left:8px;
+}
+.pv-close-btn:active{background:rgba(255,255,255,.16);}
+/* Modal image area */
+.pv-image-area{
+  position:relative;
+  width:100%;
+  aspect-ratio:3/4;
+  background:#080808;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.pv-image-area img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+/* Image pagination dots */
+.pv-dots{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;z-index:5;
+}
+.pv-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transition:background .2s, width .2s;
+}
+.pv-dot.active{background:#fff;width:16px;border-radius:99px;}
+/* Action bar */
+.pv-actions{
+  display:flex;align-items:center;
+  padding:12px 16px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.pv-action-group{display:flex;align-items:center;gap:18px;}
+.pv-action-btn{
+  display:flex;align-items:center;gap:6px;
+  background:none;border:none;
+  color:rgba(255,255,255,.7);
+  font-family:var(--font);font-size:.78rem;
+  cursor:pointer;padding:4px;
+  transition:color .15s, transform .15s;
+}
+.pv-action-btn:active{transform:scale(.9);}
+.pv-action-btn i{font-size:1.05rem;transition:color .2s;}
+.pv-action-btn .pv-action-count{font-size:.7rem;font-weight:600;}
+.pv-action-btn.liked i{color:#ff3b5c;}
+.pv-action-btn.liked .pv-action-count{color:#ff3b5c;}
+.pv-action-btn.bookmarked i{color:#ffb400;}
+.pv-action-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+/* Caption / description area */
+.pv-caption-area{
+  padding:12px 16px 16px;
+  overflow-y:auto;
+  flex:1;
+  min-height:0;
+}
+.pv-caption-text{
+  font-size:.76rem;color:rgba(255,255,255,.65);
+  line-height:1.6;font-weight:300;
+}
+.pv-caption-text strong{color:#fff;font-weight:600;}
+.pv-caption-tags{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-top:10px;
+}
+.pv-tag{
+  padding:4px 10px;border-radius:99px;
+  background:rgba(0,122,255,.1);
+  border:1px solid rgba(0,122,255,.15);
+  font-size:.62rem;font-weight:600;color:var(--accent);
+}
+/* Contributor section in modal */
+.pv-contributor{
+  padding:10px 16px 14px;
+  border-top:1px solid rgba(255,255,255,.06);
+  flex-shrink:0;
+}
+.pv-contributor-label{
+  font-size:.58rem;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;
+  margin-bottom:8px;
+}
+.pv-contributor-card{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+}
+.pv-contributor-pfp{
+  width:34px;height:34px;border-radius:50%;
+  overflow:hidden;flex-shrink:0;
+  border:1.5px solid rgba(255,255,255,.12);
+}
+.pv-contributor-pfp img{width:100%;height:100%;object-fit:cover;display:block;}
+.pv-contributor-info{flex:1;min-width:0;}
+.pv-contributor-name{
+  font-size:.74rem;font-weight:700;
+  display:flex;align-items:center;gap:5px;
+}
+.pv-contributor-handle{font-size:.62rem;color:var(--muted);margin-top:1px;}
+.pv-contributor-follow{
+  padding:6px 14px;border-radius:99px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  color:#fff;font-family:var(--font);
+  font-size:.66rem;font-weight:700;
+  cursor:pointer;transition:background .15s;
+  flex-shrink:0;
+}
+.pv-contributor-follow:active{background:rgba(255,255,255,.18);}
+/* Also posted on profile badge */
+.pv-cross-post{
+  display:flex;align-items:center;gap:6px;
+  margin-top:8px;padding:6px 10px;
+  background:rgba(0,122,255,.06);
+  border:1px solid rgba(0,122,255,.1);
+  border-radius:10px;
+}
+.pv-cross-post i{font-size:.6rem;color:var(--accent);}
+.pv-cross-post span{font-size:.6rem;color:rgba(255,255,255,.5);font-weight:500;}
+/* Share sheet */
+.pv-share-sheet{
+  position:fixed;bottom:0;left:0;right:0;
+  z-index:1100;
+  background:#111;
+  border-radius:20px 20px 0 0;
+  padding:16px 16px 32px;
+  transform:translateY(100%);
+  transition:transform .3s var(--ease);
+}
+.pv-share-sheet.visible{transform:translateY(0);}
+.pv-share-sheet-bg{
+  position:fixed;inset:0;z-index:1050;
+  background:rgba(0,0,0,.5);
+  display:none;
+}
+.pv-share-sheet-bg.visible{display:block;}
+.pv-share-title{
+  font-size:.82rem;font-weight:700;
+  text-align:center;margin-bottom:18px;
+}
+.pv-share-options{
+  display:flex;justify-content:center;gap:20px;
+}
+.pv-share-opt{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;
+}
+.pv-share-opt-icon{
+  width:50px;height:50px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;
+}
+.pv-share-opt-label{font-size:.6rem;font-weight:600;color:var(--muted);}
 </style>
 </head>
 <body>
-
-
-
 <!-- HERO CARD -->
 <div class="cp-hero">
-  <img class="cp-banner-img" src="imgi_2_direct-admission-in-ms-ramaiah-institute-of-technology-2.png" alt="" onerror="this.style.display='none'">
+  <img class="cp-banner-img" src="college_banner.jpg" alt="" onerror="this.style.display='none'">
   <div class="cp-banner-overlay"></div>
-
   <!-- floating top row -->
   <div class="cp-hero-toprow">
     <div class="cp-back" onclick="history.back()"><i class="fa-solid fa-chevron-left"></i></div>
@@ -288,7 +569,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <div class="cp-action"><i class="fa-solid fa-ellipsis"></i></div>
     </div>
   </div>
-
   <!-- pfp + name at bottom -->
   <div class="cp-banner-identity">
     <div class="cp-pfp-wrap">
@@ -303,7 +583,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     </div>
   </div>
 </div>
-
 <!-- CTA BUTTONS -->
 <div style="padding:14px 16px 0;">
   <div class="cp-cta-row">
@@ -311,7 +590,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <button class="cp-compare-btn"><i class="fa-solid fa-scale-balanced"></i> Compare</button>
   </div>
 </div>
-
 <!-- STATS -->
 <div class="cp-stats">
   <div class="cp-stat">
@@ -335,26 +613,22 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
     <div class="cp-stat-val">8.5K+</div>
   </div>
 </div>
-
 <!-- TABS -->
 <div class="cp-tabs" id="cp-tabs">
   <div class="cp-tab active" onclick="setTab(this,'overview')">Overview</div>
   <div class="cp-tab" onclick="setTab(this,'courses')">Courses <span class="cp-coming-soon">Soon</span></div>
+  <div class="cp-tab" onclick="setTab(this,'gallery')">Student Gallery</div>
   <div class="cp-tab" onclick="setTab(this,'cutoffs')">Cutoffs <span class="cp-coming-soon">Soon</span></div>
   <div class="cp-tab" onclick="setTab(this,'placements')">Placements</div>
   <div class="cp-tab" onclick="setTab(this,'campus')">Campus <span class="cp-coming-soon">Soon</span></div>
   <div class="cp-tab" onclick="setTab(this,'reviews')">Reviews <span class="cp-coming-soon">Soon</span></div>
   <div class="cp-tab" onclick="setTab(this,'events')">Events <span class="cp-coming-soon">Soon</span></div>
 </div>
-
 <!-- BODY -->
 <div class="cp-body">
-
   <!-- ══ OVERVIEW ══ -->
   <div id="tab-overview">
-
     <div class="cp-section cp-overview-grid">
-
       <!-- About -->
       <div class="cp-card" style="animation-delay:.05s">
         <div class="cp-card-title">About the College</div>
@@ -365,7 +639,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           Read more <i class="fa-solid fa-chevron-down" id="read-more-icon"></i>
         </div>
       </div>
-
       <!-- Key Facts -->
       <div class="cp-card" style="animation-delay:.08s">
         <div class="cp-card-title">Key Facts</div>
@@ -390,7 +663,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           <div class="cp-fact-text">ISO 9001:2015 Certified</div>
         </div>
       </div>
-
       <!-- Accreditations -->
       <div class="cp-card" style="animation-delay:.11s">
         <div class="cp-card-title">Accreditations</div>
@@ -411,7 +683,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           </div>
         </div>
       </div>
-
       <!-- Contact -->
       <div class="cp-card" style="animation-delay:.14s">
         <div class="cp-card-title">Contact</div>
@@ -428,9 +699,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           <div class="cp-contact-text"><a href="https://msrit.edu" target="_blank">https://msrit.edu</a></div>
         </div>
       </div>
-
     </div><!-- /overview grid -->
-
     <!-- Quick links at bottom -->
     <div class="cp-quick-links" style="margin:18px 0 0;">
       <div class="cp-quick-link">
@@ -458,9 +727,22 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
         <i class="fa-solid fa-chevron-right cp-ql-arrow"></i>
       </div>
     </div>
-
   </div><!-- /tab-overview -->
-
+  <!-- ══ STUDENT GALLERY ══ -->
+  <div id="tab-gallery" style="display:none;">
+    <div class="cp-section">
+      <div class="sg-header">
+        <div class="sg-header-left">
+          <div class="sg-header-title">Student Gallery</div>
+          <div class="sg-post-count">142 posts</div>
+        </div>
+        <button class="sg-upload-btn"><i class="fa-solid fa-plus"></i> Post</button>
+      </div>
+      <div class="sg-grid" id="sg-grid">
+        <!-- Posts are rendered by JS -->
+      </div>
+    </div>
+  </div><!-- /tab-gallery -->
   <!-- ══ PLACEMENTS ══ -->
   <div id="tab-placements" style="display:none;">
     <div class="cp-section">
@@ -468,7 +750,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
         <div style="font-size:.88rem;font-weight:700;">Placement Highlights</div>
         <div class="cp-view-link">View report →</div>
       </div>
-
       <div class="cp-pkg-row">
         <div class="cp-pkg-card">
           <div class="cp-pkg-label">Average Package</div>
@@ -483,7 +764,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           <div class="cp-pkg-val">₹ 9.0 LPA</div>
         </div>
       </div>
-
       <!-- Bar chart -->
       <div class="cp-card" style="margin-bottom:14px;">
         <div class="cp-chart-title">
@@ -498,7 +778,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
           <div class="cp-bar-wrap"><div class="cp-bar active" style="height:60px;" id="bar4"></div><div class="cp-bar-val" style="color:var(--accent);">12.5</div><div class="cp-bar-year" style="color:var(--accent);">2025</div></div>
         </div>
       </div>
-
       <!-- Top Recruiters -->
       <div class="cp-placement-header">
         <div style="font-size:.88rem;font-weight:700;">Top Recruiters</div>
@@ -517,7 +796,6 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       </div>
     </div>
   </div><!-- /placements -->
-
   <!-- ══ COMING SOON tabs ══ -->
   <div id="tab-courses" style="display:none;">
     <div class="cp-section" style="padding-top:40px;text-align:center;">
@@ -554,10 +832,106 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
       <div style="font-size:.76rem;color:var(--muted);line-height:1.6;max-width:260px;margin:0 auto;">College fests, tech events and competitions will be listed here.</div>
     </div>
   </div>
-
 </div><!-- /cp-body -->
-
+<!-- ═══════════════════════════════════════
+     POST VIEWER MODAL
+     ═══════════════════════════════════════ -->
+<div class="pv-modal-backdrop" id="pv-modal-backdrop">
+  <div class="pv-modal" id="pv-modal">
+    <div class="pv-drag-handle"></div>
+    <!-- Header -->
+    <div class="pv-header">
+      <div class="pv-header-pfp" id="pv-header-pfp"><img src="" alt=""></div>
+      <div class="pv-header-info">
+        <div class="pv-header-name">
+          <span id="pv-poster-name">—</span>
+          <span class="pv-badge"><i class="fa-solid fa-check"></i></span>
+        </div>
+        <div class="pv-header-meta">
+          <span id="pv-poster-handle">@handle</span>
+          <i class="fa-solid fa-circle" style="font-size:.18rem;"></i>
+          <span id="pv-post-time">2h ago</span>
+        </div>
+      </div>
+      <div class="pv-close-btn" onclick="closePostViewer()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <!-- Image -->
+    <div class="pv-image-area" id="pv-image-area">
+      <img id="pv-main-image" src="" alt="">
+      <div class="pv-dots" id="pv-dots"></div>
+    </div>
+    <!-- Actions -->
+    <div class="pv-actions">
+      <div class="pv-action-group">
+        <button class="pv-action-btn" id="pv-like-btn" onclick="toggleLike()">
+          <i class="fa-regular fa-heart"></i>
+          <span class="pv-action-count" id="pv-like-count">0</span>
+        </button>
+        <button class="pv-action-btn" onclick="openShareSheet()">
+          <i class="fa-regular fa-paper-plane"></i>
+        </button>
+      </div>
+      <div class="pv-action-right">
+        <button class="pv-action-btn" id="pv-bookmark-btn" onclick="toggleBookmark()">
+          <i class="fa-regular fa-bookmark"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Caption -->
+    <div class="pv-caption-area">
+      <div class="pv-caption-text" id="pv-caption-text"></div>
+      <div class="pv-caption-tags" id="pv-caption-tags"></div>
+    </div>
+    <!-- Contributor -->
+    <div class="pv-contributor">
+      <div class="pv-contributor-label">Contributed by</div>
+      <div class="pv-contributor-card">
+        <div class="pv-contributor-pfp" id="pv-contrib-pfp"><img src="" alt=""></div>
+        <div class="pv-contributor-info">
+          <div class="pv-contributor-name">
+            <span id="pv-contrib-name">—</span>
+          </div>
+          <div class="pv-contributor-handle" id="pv-contrib-handle">@handle</div>
+        </div>
+        <button class="pv-contributor-follow">Follow</button>
+      </div>
+      <div class="pv-cross-post">
+        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+        <span>Also posted on contributor's profile</span>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- SHARE SHEET -->
+<div class="pv-share-sheet-bg" id="pv-share-bg" onclick="closeShareSheet()"></div>
+<div class="pv-share-sheet" id="pv-share-sheet">
+  <div class="pv-drag-handle" style="margin-bottom:12px;"></div>
+  <div class="pv-share-title">Share Post</div>
+  <div class="pv-share-options">
+    <div class="pv-share-opt" onclick="closeShareSheet()">
+      <div class="pv-share-opt-icon" style="background:rgba(0,122,255,.15);color:var(--accent);"><i class="fa-solid fa-link"></i></div>
+      <div class="pv-share-opt-label">Copy Link</div>
+    </div>
+    <div class="pv-share-opt" onclick="closeShareSheet()">
+      <div class="pv-share-opt-icon" style="background:rgba(37,211,102,.12);color:#25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+      <div class="pv-share-opt-label">WhatsApp</div>
+    </div>
+    <div class="pv-share-opt" onclick="closeShareSheet()">
+      <div class="pv-share-opt-icon" style="background:rgba(29,161,242,.12);color:#1da1f2;"><i class="fa-brands fa-x-twitter"></i></div>
+      <div class="pv-share-opt-label">Twitter</div>
+    </div>
+    <div class="pv-share-opt" onclick="closeShareSheet()">
+      <div class="pv-share-opt-icon" style="background:rgba(225,48,108,.12);color:#e1306c;"><i class="fa-brands fa-instagram"></i></div>
+      <div class="pv-share-opt-label">Instagram</div>
+    </div>
+    <div class="pv-share-opt" onclick="closeShareSheet()">
+      <div class="pv-share-opt-icon" style="background:rgba(255,255,255,.08);color:#fff;"><i class="fa-solid fa-ellipsis"></i></div>
+      <div class="pv-share-opt-label">More</div>
+    </div>
+  </div>
+</div>
 <script>
+/* ── Existing functionality ── */
 let followed = false;
 function toggleFollow(){
   followed = !followed;
@@ -565,7 +939,6 @@ function toggleFollow(){
   btn.textContent = followed ? 'Following' : 'Follow';
   btn.classList.toggle('following', followed);
 }
-
 let aboutExpanded = false;
 const shortAbout = 'M S Ramaiah Institute of Technology (MSRIT) is one of the top autonomous engineering institutions in Bangalore, known for its academic excellence, industry connections, and state-of-the-art infrastructure.';
 const longAbout = shortAbout + ' Founded in 1962, MSRIT offers undergraduate, postgraduate and doctoral programs across 17 engineering departments. The institute is affiliated to VTU and is recognized by UGC and AICTE. With over 8,500 students, 600+ faculty members and consistent placement records, MSRIT stands among Karnataka\'s premier technical institutions.';
@@ -574,17 +947,349 @@ function toggleAbout(){
   document.getElementById('about-text').textContent = aboutExpanded ? longAbout : shortAbout;
   document.getElementById('read-more-icon').className = aboutExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
 }
-
 function setTab(el, id){
   document.querySelectorAll('.cp-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['overview','courses','cutoffs','placements','campus','reviews','events'].forEach(tab => {
-    const el = document.getElementById('tab-'+tab);
-    if(el) el.style.display = tab === id ? '' : 'none';
+  ['overview','courses','gallery','cutoffs','placements','campus','reviews','events'].forEach(tab => {
+    const tabEl = document.getElementById('tab-'+tab);
+    if(tabEl) tabEl.style.display = tab === id ? '' : 'none';
   });
 }
-
-
+/* ═══════════════════════════════════════════════
+   STUDENT GALLERY DATA & RENDERING
+   ═══════════════════════════════════════════════ */
+// Deterministic color generator for placeholder avatars
+function strToColor(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  const h = Math.abs(hash) % 360;
+  return `hsl(${h}, 55%, 45%)`;
+}
+// Generate placeholder avatar SVG data URI
+function avatarSvg(name) {
+  const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+  const color = strToColor(name);
+  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="${color}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="28" font-weight="700">${initials}</text></svg>`)}`;
+}
+// Generate placeholder post image SVG
+function postImageSvg(index) {
+  const palettes = [
+    ['#1a1a2e','#16213e','#0f3460','#e94560'],
+    ['#0d1b2a','#1b263b','#415a77','#778da9'],
+    ['#10002b','#240046','#3c096c','#5a189a'],
+    ['#03071e','#370617','#6a040f','#9d0208'],
+    ['#001219','#005f73','#0a9396','#94d2bd'],
+    ['#2b2d42','#8d99ae','#edf2f4','#ef233c'],
+    ['#0b090a','#161a1d','#660708','#a4161a'],
+    ['#1b1b2f','#162447','#1f4068','#e43f5a'],
+    ['#0c0032','#190061','#240090','#3500d3'],
+    ['#1a1a40','#270082','#7a0bc0','#fa58b6'],
+    ['#000000','#14213d','#fca311','#e5e5e5'],
+    ['#001524','#15616d','#ffecd1','#ff7d00'],
+  ];
+  const p = palettes[index % palettes.length];
+  const shapes = [];
+  // Create artistic composition
+  const seed = index * 7 + 3;
+  for (let i = 0; i < 5; i++) {
+    const cx = ((seed * (i + 1) * 37) % 300) + 50;
+    const cy = ((seed * (i + 2) * 23) % 380) + 30;
+    const r = ((seed * (i + 3) * 13) % 80) + 30;
+    const color = p[(i + 1) % p.length];
+    shapes.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color}" opacity=".6"/>`);
+  }
+  return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400"><rect width="300" height="400" fill="${p[0]}"/>${shapes.join('')}<rect x="0" y="300" width="300" height="100" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p[0]}" stop-opacity="0"/><stop offset="1" stop-color="${p[0]}" stop-opacity=".8"/></linearGradient></defs></svg>`)}`;
+}
+// Sample gallery data
+const galleryPosts = [
+  {
+    id: 1,
+    image: postImageSvg(0),
+    caption: '<strong>Astra 2025</strong> was absolutely electric! 🔥 The crowd energy during the DJ night was unreal.',
+    tags: ['#Astra2025', '#CollegeFest', '#MSRIT'],
+    likes: 234,
+    time: '2h ago',
+    contributor: { name: 'Arjun Mehta', handle: '@arjun.m', avatar: null },
+    multiImage: true
+  },
+  {
+    id: 2,
+    image: postImageSvg(1),
+    caption: '<strong>Hackathon Winners!</strong> 🏆 Team ByteForce took first place at the 36-hour national hackathon.',
+    tags: ['#Hackathon', '#Winners', '#CodeDay'],
+    likes: 412,
+    time: '5h ago',
+    contributor: { name: 'Priya Sharma', handle: '@priya.s', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 3,
+    image: postImageSvg(2),
+    caption: '<strong>Annual Sports Day</strong> 🏃 Inter-department athletics was fire this year.',
+    tags: ['#SportsDay', '#Athletics', '#MSRIT'],
+    likes: 178,
+    time: '1d ago',
+    contributor: { name: 'Rahul K', handle: '@rahulk', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 4,
+    image: postImageSvg(3),
+    caption: '<strong>Workshop on AI/ML</strong> 🤖 An incredible session by Google engineers on campus.',
+    tags: ['#AI', '#Workshop', '#GoogleOnCampus'],
+    likes: 567,
+    time: '2d ago',
+    contributor: { name: 'Neha Patil', handle: '@neha.p', avatar: null },
+    multiImage: true
+  },
+  {
+    id: 5,
+    image: postImageSvg(4),
+    caption: '<strong>Cultural Night</strong> 🎶 Classical fusion performance that left everyone speechless.',
+    tags: ['#CulturalNight', '#Music', '#MSRIT'],
+    likes: 321,
+    time: '3d ago',
+    contributor: { name: 'Karthik Rao', handle: '@karthik.r', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 6,
+    image: postImageSvg(5),
+    caption: '<strong>Freshers Day 2025</strong> 🎉 Welcoming the new batch in style!',
+    tags: ['#FreshersDay', '#Welcome2025'],
+    likes: 289,
+    time: '4d ago',
+    contributor: { name: 'Ananya Reddy', handle: '@ananya.r', avatar: null },
+    multiImage: true
+  },
+  {
+    id: 7,
+    image: postImageSvg(6),
+    caption: '<strong>Robotics Club</strong> 🤖 Our Mars Rover prototype ready for the national competition.',
+    tags: ['#Robotics', '#MarsRover', '#Engineering'],
+    likes: 445,
+    time: '5d ago',
+    contributor: { name: 'Vikram Singh', handle: '@vikram.s', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 8,
+    image: postImageSvg(7),
+    caption: '<strong>Convocation 2025</strong> 🎓 Proud graduates stepping into the real world.',
+    tags: ['#Convocation', '#Graduates', '#ClassOf2025'],
+    likes: 892,
+    time: '1w ago',
+    contributor: { name: 'Sneha Kumar', handle: '@sneha.k', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 9,
+    image: postImageSvg(8),
+    caption: '<strong>Photography Club</strong> 📸 Golden hour shots from the campus rooftop.',
+    tags: ['#Photography', '#GoldenHour', '#CampusVibes'],
+    likes: 367,
+    time: '1w ago',
+    contributor: { name: 'Aditya Nair', handle: '@aditya.n', avatar: null },
+    multiImage: true
+  },
+  {
+    id: 10,
+    image: postImageSvg(9),
+    caption: '<strong>Blood Donation Camp</strong> ❤️ 500+ units collected. MSRIT giving back to the community.',
+    tags: ['#BloodDonation', '#Community', '#NSS'],
+    likes: 523,
+    time: '2w ago',
+    contributor: { name: 'Meera Das', handle: '@meera.d', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 11,
+    image: postImageSvg(10),
+    caption: '<strong>TEDxMSRIT</strong> 🎤 Ideas worth spreading — incredible speakers this edition.',
+    tags: ['#TEDx', '#MSRIT', '#Ideas'],
+    likes: 678,
+    time: '2w ago',
+    contributor: { name: 'Rohan Gupta', handle: '@rohan.g', avatar: null },
+    multiImage: false
+  },
+  {
+    id: 12,
+    image: postImageSvg(11),
+    caption: '<strong>Squad Goals</strong> 👥 Last day of 7th sem with the homies.',
+    tags: ['#SquadGoals', '#FinalYear', '#Memories'],
+    likes: 934,
+    time: '3w ago',
+    contributor: { name: 'Divya Jain', handle: '@divya.j', avatar: null },
+    multiImage: false
+  },
+];
+// Render the gallery grid
+function renderGallery() {
+  const grid = document.getElementById('sg-grid');
+  grid.innerHTML = '';
+  galleryPosts.forEach((post, i) => {
+    const pfpSrc = post.contributor.avatar || avatarSvg(post.contributor.name);
+    const el = document.createElement('div');
+    el.className = 'sg-post';
+    el.style.animationDelay = `${i * 0.04}s`;
+    el.onclick = () => openPostViewer(post);
+    el.innerHTML = `
+      <img src="${post.image}" alt="" loading="lazy">
+      <div class="sg-post-overlay"></div>
+      <div class="sg-post-pfp"><img src="${pfpSrc}" alt=""></div>
+      ${post.multiImage ? '<div class="sg-multi-indicator"><i class="fa-solid fa-clone"></i></div>' : ''}
+    `;
+    grid.appendChild(el);
+  });
+}
+// Initialize gallery on load
+renderGallery();
+/* ═══════════════════════════════════════════════
+   POST VIEWER MODAL
+   ═══════════════════════════════════════════════ */
+let currentPost = null;
+let isLiked = false;
+let isBookmarked = false;
+let currentLikeCount = 0;
+function openPostViewer(post) {
+  currentPost = post;
+  isLiked = false;
+  isBookmarked = false;
+  currentLikeCount = post.likes;
+  const pfpSrc = post.contributor.avatar || avatarSvg(post.contributor.name);
+  // Header
+  document.querySelector('#pv-header-pfp img').src = pfpSrc;
+  document.getElementById('pv-poster-name').textContent = post.contributor.name;
+  document.getElementById('pv-poster-handle').textContent = post.contributor.handle;
+  document.getElementById('pv-post-time').textContent = post.time;
+  // Image
+  document.getElementById('pv-main-image').src = post.image;
+  // Dots
+  const dotsEl = document.getElementById('pv-dots');
+  if (post.multiImage) {
+    dotsEl.innerHTML = '<div class="pv-dot active"></div><div class="pv-dot"></div><div class="pv-dot"></div>';
+  } else {
+    dotsEl.innerHTML = '';
+  }
+  // Actions — reset
+  const likeBtn = document.getElementById('pv-like-btn');
+  likeBtn.classList.remove('liked');
+  likeBtn.querySelector('i').className = 'fa-regular fa-heart';
+  document.getElementById('pv-like-count').textContent = formatCount(currentLikeCount);
+  const bookmarkBtn = document.getElementById('pv-bookmark-btn');
+  bookmarkBtn.classList.remove('bookmarked');
+  bookmarkBtn.querySelector('i').className = 'fa-regular fa-bookmark';
+  // Caption
+  document.getElementById('pv-caption-text').innerHTML = post.caption;
+  const tagsEl = document.getElementById('pv-caption-tags');
+  tagsEl.innerHTML = post.tags.map(t => `<span class="pv-tag">${t}</span>`).join('');
+  // Contributor
+  document.querySelector('#pv-contrib-pfp img').src = pfpSrc;
+  document.getElementById('pv-contrib-name').textContent = post.contributor.name;
+  document.getElementById('pv-contrib-handle').textContent = post.contributor.handle;
+  // Show modal
+  const backdrop = document.getElementById('pv-modal-backdrop');
+  backdrop.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  // Force reflow then animate
+  backdrop.offsetHeight;
+  backdrop.classList.add('visible');
+}
+function closePostViewer() {
+  const backdrop = document.getElementById('pv-modal-backdrop');
+  backdrop.classList.remove('visible');
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    backdrop.style.display = 'none';
+  }, 350);
+}
+// Close on backdrop click
+document.getElementById('pv-modal-backdrop').addEventListener('click', function(e) {
+  if (e.target === this) closePostViewer();
+});
+// Like toggle
+function toggleLike() {
+  isLiked = !isLiked;
+  const btn = document.getElementById('pv-like-btn');
+  const icon = btn.querySelector('i');
+  const count = document.getElementById('pv-like-count');
+  if (isLiked) {
+    btn.classList.add('liked');
+    icon.className = 'fa-solid fa-heart';
+    currentLikeCount++;
+    // Heart pop animation
+    icon.style.transform = 'scale(1.3)';
+    setTimeout(() => icon.style.transform = '', 200);
+  } else {
+    btn.classList.remove('liked');
+    icon.className = 'fa-regular fa-heart';
+    currentLikeCount--;
+  }
+  count.textContent = formatCount(currentLikeCount);
+}
+// Bookmark toggle
+function toggleBookmark() {
+  isBookmarked = !isBookmarked;
+  const btn = document.getElementById('pv-bookmark-btn');
+  const icon = btn.querySelector('i');
+  if (isBookmarked) {
+    btn.classList.add('bookmarked');
+    icon.className = 'fa-solid fa-bookmark';
+    icon.style.transform = 'scale(1.3)';
+    setTimeout(() => icon.style.transform = '', 200);
+  } else {
+    btn.classList.remove('bookmarked');
+    icon.className = 'fa-regular fa-bookmark';
+  }
+}
+// Share sheet
+function openShareSheet() {
+  document.getElementById('pv-share-bg').classList.add('visible');
+  document.getElementById('pv-share-sheet').classList.add('visible');
+}
+function closeShareSheet() {
+  document.getElementById('pv-share-bg').classList.remove('visible');
+  document.getElementById('pv-share-sheet').classList.remove('visible');
+}
+// Format count (1.2K etc)
+function formatCount(n) {
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
+// Swipe-to-dismiss on modal (touch support)
+(function() {
+  const modal = document.getElementById('pv-modal');
+  let startY = 0, currentY = 0, isDragging = false;
+  modal.addEventListener('touchstart', function(e) {
+    // Only enable drag from the top area (drag handle)
+    const touch = e.touches[0];
+    const rect = modal.getBoundingClientRect();
+    if (touch.clientY - rect.top < 40) {
+      isDragging = true;
+      startY = touch.clientY;
+      modal.style.transition = 'none';
+    }
+  }, { passive: true });
+  modal.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    currentY = e.touches[0].clientY - startY;
+    if (currentY > 0) {
+      modal.style.transform = `translateY(${currentY}px)`;
+    }
+  }, { passive: true });
+  modal.addEventListener('touchend', function() {
+    if (!isDragging) return;
+    isDragging = false;
+    modal.style.transition = '';
+    if (currentY > 120) {
+      closePostViewer();
+    } else {
+      modal.style.transform = '';
+      // The visible class will handle the correct transform
+    }
+    currentY = 0;
+  });
+})();
 </script>
 </body>
 </html>
