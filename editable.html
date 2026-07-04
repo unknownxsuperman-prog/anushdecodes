@@ -38,134 +38,130 @@
         /* LAYOUT */
         .page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
 
-        /* ── BANNER HERO ── */
-        .banner{width:100%;height:240px;position:relative;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
+        /* ── BANNER ── */
+        .banner{width:100%;height:220px;position:relative;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
         .banner-img{width:100%;height:100%;object-fit:cover;opacity:.65;}
-        .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1) 0%,rgba(0,0,0,.0) 40%,var(--bg) 100%);}
-
-        /* three-dot over banner */
-        .hero-menu-wrap{position:absolute;top:16px;right:16px;z-index:10;}
-        .hero-menu-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:.8rem;}
-        .hero-menu-btn:active{background:rgba(0,0,0,.65);}
-        .dropdown-menu{position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:100;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fadeIn .2s;}
+        .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.08) 0%,rgba(0,0,0,.0) 30%,var(--bg) 100%);}
+        .dropdown-menu{position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:200;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:fadeIn .2s;}
         .dropdown-menu.active{display:block;}
         .menu-item{padding:10px 14px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-radius:10px;transition:.2s;}
         .menu-item:hover{background:var(--border);}
         .menu-item i{color:var(--accent);font-size:.85rem;}
 
-        /* ── iOS PROFILE CARD ── */
+        /* ── iOS CARD ── */
         .ios-card-wrap{
             padding:0 16px;
-            margin-top:-72px;
+            margin-top:-110px;  /* lifts card well up over banner */
             position:relative;
             z-index:10;
-            animation:slideUp .5s cubic-bezier(.32,.72,0,1) both;
+            animation:slideUp .45s cubic-bezier(.32,.72,0,1) both;
         }
         .ios-profile-card{
-            background:rgba(255,255,255,.055);
-            backdrop-filter:blur(40px) saturate(180%);
-            -webkit-backdrop-filter:blur(40px) saturate(180%);
-            border:1px solid rgba(255,255,255,.12);
-            border-radius:28px;
-            padding:20px 20px 18px;
+            background:rgba(18,18,18,.72);
+            backdrop-filter:blur(48px) saturate(180%);
+            -webkit-backdrop-filter:blur(48px) saturate(180%);
+            border:1px solid rgba(255,255,255,.11);
+            border-radius:26px;
+            padding:18px 18px 18px;
             box-shadow:
-                0 2px 0 rgba(255,255,255,.08) inset,
-                0 1px 0 rgba(255,255,255,.06),
-                0 24px 48px rgba(0,0,0,.55),
-                0 2px 8px rgba(0,0,0,.3);
+                0 1px 0 rgba(255,255,255,.07) inset,
+                0 28px 56px rgba(0,0,0,.7),
+                0 2px 8px rgba(0,0,0,.4);
             position:relative;
-            overflow:hidden;
-        }
-        /* subtle noise texture on card */
-        .ios-profile-card::before{
-            content:'';position:absolute;inset:0;
-            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
-            pointer-events:none;border-radius:28px;opacity:.6;
+            overflow:visible;
         }
 
-        /* top row: avatar left, follow btn right */
-        .ipc-top-row{
-            display:flex;align-items:flex-start;
-            justify-content:space-between;
-            margin-bottom:14px;
+        /* subtle grain */
+        .ios-profile-card::before{
+            content:'';position:absolute;inset:0;border-radius:26px;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+            pointer-events:none;opacity:.5;overflow:hidden;
         }
-        .avatar-wrap{width:76px;height:76px;position:relative;cursor:pointer;overflow:visible;flex-shrink:0;}
+
+        /* three-dot — square, top-right inside card */
+        .ipc-menu-wrap{
+            position:absolute;top:16px;right:16px;z-index:20;
+        }
+        .ipc-menu-btn{
+            width:34px;height:34px;
+            border-radius:10px;
+            background:rgba(255,255,255,.08);
+            border:1px solid rgba(255,255,255,.12);
+            display:flex;align-items:center;justify-content:center;
+            cursor:pointer;color:rgba(255,255,255,.7);font-size:.8rem;
+            transition:background .15s;
+        }
+        .ipc-menu-btn:active{background:rgba(255,255,255,.14);}
+
+        /* avatar row */
+        .ipc-avatar-row{margin-bottom:14px;}
+        .avatar-wrap{width:72px;height:72px;position:relative;cursor:pointer;overflow:visible;display:inline-block;}
         .avatar-wrap:active .avatar-img{transform:scale(.94);opacity:.85;}
-        .avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:2px solid rgba(255,255,255,.18);display:block;transition:transform .18s,opacity .18s;box-shadow:0 4px 16px rgba(0,0,0,.5);}
-        .pfp-badge{position:absolute;bottom:-3px;right:-3px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;z-index:10;}
-        .pfp-badge img,.pfp-badge svg{width:22px;height:22px;display:block;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
+        .avatar-img{width:100%;height:100%;border-radius:18px;object-fit:cover;border:2px solid rgba(255,255,255,.16);display:block;transition:transform .18s,opacity .18s;box-shadow:0 4px 16px rgba(0,0,0,.6);}
+        .pfp-badge{position:absolute;bottom:-3px;right:-3px;width:21px;height:21px;display:flex;align-items:center;justify-content:center;z-index:10;}
+        .pfp-badge img,.pfp-badge svg{width:21px;height:21px;display:block;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
         .pfp-badge.badge-none{display:none;}
         .sheet-verified{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:5px;vertical-align:middle;flex-shrink:0;}
         .sheet-verified img{width:16px;height:16px;display:block;object-fit:contain;}
         .sheet-verified.badge-none{display:none;}
 
-        /* follow button — top right of card */
+        /* name + follow on same line */
+        .ipc-name-row{
+            display:flex;align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            margin-bottom:16px;
+        }
+        .ipc-identity{flex:1;min-width:0;}
+        .name{font-size:1.22rem;font-weight:700;letter-spacing:-.02em;line-height:1.2;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .handle{font-size:.7rem;font-weight:500;color:rgba(255,255,255,.38);letter-spacing:.05em;margin-top:3px;}
+
+        /* follow button */
         .follow-btn{
-            padding:9px 22px;
+            flex-shrink:0;
+            padding:9px 20px;
             background:rgba(255,255,255,.92);color:#000;
-            border:none;border-radius:99px;
-            font-size:.78rem;font-weight:700;
+            border:none;border-radius:12px;
+            font-size:.76rem;font-weight:700;
             cursor:pointer;font-family:var(--font);
-            box-shadow:0 2px 12px rgba(0,0,0,.3);
-            transition:all .18s;
-            margin-top:4px;
-            letter-spacing:.02em;
+            box-shadow:0 2px 10px rgba(0,0,0,.3);
+            transition:all .18s;letter-spacing:.02em;
         }
         .follow-btn:active{transform:scale(.95);}
         .follow-btn.following{
-            background:rgba(255,255,255,.08);
-            color:rgba(255,255,255,.7);
-            border:1px solid rgba(255,255,255,.15);
-            box-shadow:none;
+            background:rgba(255,255,255,.07);
+            color:rgba(255,255,255,.6);
+            border:1px solid rgba(255,255,255,.13);
+            box-shadow:none;border-radius:12px;
         }
 
-        /* identity */
-        .ipc-identity{margin-bottom:16px;}
-        .name{font-size:1.28rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;color:#fff;}
-        .handle{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.4);letter-spacing:.05em;margin-top:3px;}
-
-        /* stats row */
+        /* stats */
         .ipc-stats{
             display:flex;align-items:center;
-            background:rgba(255,255,255,.04);
+            background:rgba(255,255,255,.045);
             border:1px solid rgba(255,255,255,.07);
-            border-radius:16px;
-            padding:14px 0;
+            border-radius:14px;
+            padding:13px 0;
             margin-bottom:14px;
         }
-        .ipc-stat{
-            flex:1;text-align:center;cursor:pointer;
-            transition:opacity .15s;
-        }
+        .ipc-stat{flex:1;text-align:center;cursor:pointer;transition:opacity .15s;}
         .ipc-stat:active{opacity:.6;}
-        .ipc-stat-val{
-            font-size:1.18rem;font-weight:700;
-            letter-spacing:-.03em;color:#fff;
-            line-height:1;margin-bottom:4px;
-        }
-        .ipc-stat-label{
-            font-size:.58rem;font-weight:600;
-            text-transform:uppercase;letter-spacing:.12em;
-            color:rgba(255,255,255,.32);
-        }
-        .ipc-stat-divider{
-            width:1px;height:32px;
-            background:rgba(255,255,255,.08);
-            flex-shrink:0;
-        }
+        .ipc-stat-val{font-size:1.12rem;font-weight:700;letter-spacing:-.03em;color:#fff;line-height:1;margin-bottom:4px;}
+        .ipc-stat-label{font-size:.56rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);}
+        .ipc-stat-divider{width:1px;height:28px;background:rgba(255,255,255,.08);flex-shrink:0;}
 
-        /* college link inside card */
-        .college-link-row{display:flex;align-items:center;gap:8px;cursor:pointer;max-width:100%;overflow:hidden;}
-        .college-link-icon{font-size:.72rem;color:rgba(255,255,255,.32);flex-shrink:0;}
+        /* college link */
+        .college-link-row{display:flex;align-items:center;gap:7px;cursor:pointer;max-width:100%;overflow:hidden;}
+        .college-link-icon{font-size:.7rem;color:rgba(255,255,255,.28);flex-shrink:0;}
         .college-link-name-wrap{overflow:hidden;max-width:240px;}
-        .college-link-name{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.32);white-space:nowrap;display:inline-block;}
-        .college-link-name.linked{color:rgba(255,255,255,.7);}
-        .college-link-icon.linked{color:rgba(255,255,255,.7);}
+        .college-link-name{font-size:.7rem;font-weight:500;color:rgba(255,255,255,.28);white-space:nowrap;display:inline-block;}
+        .college-link-name.linked{color:rgba(255,255,255,.65);}
+        .college-link-icon.linked{color:rgba(255,255,255,.65);}
         .college-link-name.marquee-anim{animation:clgMarquee 7s linear infinite;padding-right:40px;}
 
-        /* below card: bio, music, links */
-        .profile-below{padding:18px 20px 0;}
-        .bio{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:14px;font-weight:300;}
+        /* below card */
+        .profile-below{padding:16px 20px 0;}
+        .bio{font-size:.82rem;color:rgba(255,255,255,.62);line-height:1.65;margin-bottom:14px;font-weight:300;}
         .bio-music{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;}
         .bio-music-play{background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.7rem;flex-shrink:0;cursor:pointer;padding:0;}
         .bio-music-label{font-size:.78rem;color:var(--muted);white-space:nowrap;cursor:pointer;}
@@ -474,38 +470,41 @@
         <div class="banner" id="banner-hero">
             <img class="banner-img" id="banner-img" src="" alt="">
             <div class="banner-overlay"></div>
-            <!-- three-dot floats top-right over banner -->
-            <div class="hero-menu-wrap">
-                <div class="hero-menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
-                <div class="dropdown-menu" id="dropdown-menu">
-                    <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
-                    <div class="menu-item" onclick="openEditProfile()"><span>Edit Profile</span><i class="fa-solid fa-pen"></i></div>
-                    <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
-                    <div class="menu-item" onclick="openCollegeLinkSearch()"><span>Link College</span><i class="fa-solid fa-building-columns"></i></div>
-                </div>
-            </div>
         </div>
 
-        <!-- iOS PROFILE CARD -->
+        <!-- iOS PROFILE CARD — overlays banner -->
         <div class="ios-card-wrap">
             <div class="ios-profile-card">
 
-                <!-- avatar + follow row -->
-                <div class="ipc-top-row">
+                <!-- three-dot: absolute top-right inside card -->
+                <div class="ipc-menu-wrap">
+                    <div class="ipc-menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
+                        <div class="menu-item" onclick="openEditProfile()"><span>Edit Profile</span><i class="fa-solid fa-pen"></i></div>
+                        <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
+                        <div class="menu-item" onclick="openCollegeLinkSearch()"><span>Link College</span><i class="fa-solid fa-building-columns"></i></div>
+                    </div>
+                </div>
+
+                <!-- avatar row -->
+                <div class="ipc-avatar-row">
                     <div class="avatar-wrap" onclick="openPfpViewer()">
                         <img class="avatar-img" id="avatar-img" src="" alt="">
                         <div class="pfp-badge badge-none" id="pfp-badge"></div>
                     </div>
+                </div>
+
+                <!-- name + follow on same line -->
+                <div class="ipc-name-row">
+                    <div class="ipc-identity">
+                        <h1 class="name" id="display-name"></h1>
+                        <div class="handle" id="handle-display"></div>
+                    </div>
                     <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
                 </div>
 
-                <!-- name + handle -->
-                <div class="ipc-identity">
-                    <h1 class="name" id="display-name"></h1>
-                    <div class="handle" id="handle-display"></div>
-                </div>
-
-                <!-- stats row -->
+                <!-- stats -->
                 <div class="ipc-stats">
                     <div class="ipc-stat" id="followers-tap-target">
                         <div class="ipc-stat-val" id="follower-count">0</div>
