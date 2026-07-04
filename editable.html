@@ -37,40 +37,135 @@
 
         /* LAYOUT */
         .page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
-        .top-bar{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);}
-        .top-bar-brand{font-size:1.3rem;font-weight:700;letter-spacing:-.03em;color:#fff;line-height:1;}
-        .floating-menu-wrap{position:absolute;top:0;right:20px;z-index:90;}
-        .floating-menu-wrap .menu-btn{background:rgba(0,0,0,.35);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);color:#fff;}
-        .floating-menu-wrap .dropdown-menu{top:46px;}
-        .menu-btn{width:36px;height:36px;background:var(--glass);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);}
-        .dropdown-menu{position:absolute;top:50px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:100;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fadeIn .2s;}
+
+        /* ── BANNER HERO ── */
+        .banner{width:100%;height:240px;position:relative;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
+        .banner-img{width:100%;height:100%;object-fit:cover;opacity:.65;}
+        .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.1) 0%,rgba(0,0,0,.0) 40%,var(--bg) 100%);}
+
+        /* three-dot over banner */
+        .hero-menu-wrap{position:absolute;top:16px;right:16px;z-index:10;}
+        .hero-menu-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:.8rem;}
+        .hero-menu-btn:active{background:rgba(0,0,0,.65);}
+        .dropdown-menu{position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:100;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fadeIn .2s;}
         .dropdown-menu.active{display:block;}
         .menu-item{padding:10px 14px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-radius:10px;transition:.2s;}
         .menu-item:hover{background:var(--border);}
         .menu-item i{color:var(--accent);font-size:.85rem;}
-        .banner{width:100%;height:200px;position:relative;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
-        .banner-img{width:100%;height:100%;object-fit:cover;opacity:.55;}
-        .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%);}
-        .profile-section{padding:0 20px;margin-top:-52px;position:relative;animation:slideUp .6s var(--ease) both;}
-        .follow-btn{position:absolute;right:20px;top:65px;padding:10px 30px;background:rgba(255,255,255,.9);color:#000;border:none;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.4);font-family:var(--font);}
-        .follow-btn.following{background:var(--card);color:var(--text);border:1px solid var(--border);}
-        .avatar-wrap{width:84px;height:84px;position:relative;margin-bottom:14px;cursor:pointer;overflow:visible;}
-        .avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:1px solid var(--border);display:block;transition:transform .18s,opacity .18s;}
-        .pfp-badge{position:absolute;bottom:-3px;right:-3px;width:23px;height:23px;display:flex;align-items:center;justify-content:center;z-index:10;}
-        .pfp-badge img,.pfp-badge svg{width:23px;height:23px;display:block;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
+
+        /* ── iOS PROFILE CARD ── */
+        .ios-card-wrap{
+            padding:0 16px;
+            margin-top:-72px;
+            position:relative;
+            z-index:10;
+            animation:slideUp .5s cubic-bezier(.32,.72,0,1) both;
+        }
+        .ios-profile-card{
+            background:rgba(255,255,255,.055);
+            backdrop-filter:blur(40px) saturate(180%);
+            -webkit-backdrop-filter:blur(40px) saturate(180%);
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:28px;
+            padding:20px 20px 18px;
+            box-shadow:
+                0 2px 0 rgba(255,255,255,.08) inset,
+                0 1px 0 rgba(255,255,255,.06),
+                0 24px 48px rgba(0,0,0,.55),
+                0 2px 8px rgba(0,0,0,.3);
+            position:relative;
+            overflow:hidden;
+        }
+        /* subtle noise texture on card */
+        .ios-profile-card::before{
+            content:'';position:absolute;inset:0;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+            pointer-events:none;border-radius:28px;opacity:.6;
+        }
+
+        /* top row: avatar left, follow btn right */
+        .ipc-top-row{
+            display:flex;align-items:flex-start;
+            justify-content:space-between;
+            margin-bottom:14px;
+        }
+        .avatar-wrap{width:76px;height:76px;position:relative;cursor:pointer;overflow:visible;flex-shrink:0;}
+        .avatar-wrap:active .avatar-img{transform:scale(.94);opacity:.85;}
+        .avatar-img{width:100%;height:100%;border-radius:20px;object-fit:cover;border:2px solid rgba(255,255,255,.18);display:block;transition:transform .18s,opacity .18s;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+        .pfp-badge{position:absolute;bottom:-3px;right:-3px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;z-index:10;}
+        .pfp-badge img,.pfp-badge svg{width:22px;height:22px;display:block;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));}
         .pfp-badge.badge-none{display:none;}
         .sheet-verified{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:5px;vertical-align:middle;flex-shrink:0;}
         .sheet-verified img{width:16px;height:16px;display:block;object-fit:contain;}
         .sheet-verified.badge-none{display:none;}
-        .name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-        .name{font-size:1.35rem;font-weight:700;letter-spacing:-.01em;}
-        .handle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-        .handle{font-size:.72rem;font-weight:500;color:var(--accent);letter-spacing:.06em;}
-        .follower-stat{font-size:.72rem;color:var(--muted);display:flex;gap:12px;}
-        .follower-stat span{cursor:pointer;transition:color .2s;padding:4px 2px;}
-        .follower-stat span:hover{color:var(--text);}
-        .follower-stat b{color:var(--text);}
-        .bio{font-size:.82rem;color:rgba(255,255,255,.72);line-height:1.6;margin-bottom:14px;}
+
+        /* follow button — top right of card */
+        .follow-btn{
+            padding:9px 22px;
+            background:rgba(255,255,255,.92);color:#000;
+            border:none;border-radius:99px;
+            font-size:.78rem;font-weight:700;
+            cursor:pointer;font-family:var(--font);
+            box-shadow:0 2px 12px rgba(0,0,0,.3);
+            transition:all .18s;
+            margin-top:4px;
+            letter-spacing:.02em;
+        }
+        .follow-btn:active{transform:scale(.95);}
+        .follow-btn.following{
+            background:rgba(255,255,255,.08);
+            color:rgba(255,255,255,.7);
+            border:1px solid rgba(255,255,255,.15);
+            box-shadow:none;
+        }
+
+        /* identity */
+        .ipc-identity{margin-bottom:16px;}
+        .name{font-size:1.28rem;font-weight:700;letter-spacing:-.02em;line-height:1.15;color:#fff;}
+        .handle{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.4);letter-spacing:.05em;margin-top:3px;}
+
+        /* stats row */
+        .ipc-stats{
+            display:flex;align-items:center;
+            background:rgba(255,255,255,.04);
+            border:1px solid rgba(255,255,255,.07);
+            border-radius:16px;
+            padding:14px 0;
+            margin-bottom:14px;
+        }
+        .ipc-stat{
+            flex:1;text-align:center;cursor:pointer;
+            transition:opacity .15s;
+        }
+        .ipc-stat:active{opacity:.6;}
+        .ipc-stat-val{
+            font-size:1.18rem;font-weight:700;
+            letter-spacing:-.03em;color:#fff;
+            line-height:1;margin-bottom:4px;
+        }
+        .ipc-stat-label{
+            font-size:.58rem;font-weight:600;
+            text-transform:uppercase;letter-spacing:.12em;
+            color:rgba(255,255,255,.32);
+        }
+        .ipc-stat-divider{
+            width:1px;height:32px;
+            background:rgba(255,255,255,.08);
+            flex-shrink:0;
+        }
+
+        /* college link inside card */
+        .college-link-row{display:flex;align-items:center;gap:8px;cursor:pointer;max-width:100%;overflow:hidden;}
+        .college-link-icon{font-size:.72rem;color:rgba(255,255,255,.32);flex-shrink:0;}
+        .college-link-name-wrap{overflow:hidden;max-width:240px;}
+        .college-link-name{font-size:.72rem;font-weight:500;color:rgba(255,255,255,.32);white-space:nowrap;display:inline-block;}
+        .college-link-name.linked{color:rgba(255,255,255,.7);}
+        .college-link-icon.linked{color:rgba(255,255,255,.7);}
+        .college-link-name.marquee-anim{animation:clgMarquee 7s linear infinite;padding-right:40px;}
+
+        /* below card: bio, music, links */
+        .profile-below{padding:18px 20px 0;}
+        .bio{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:14px;font-weight:300;}
         .bio-music{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;}
         .bio-music-play{background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.7rem;flex-shrink:0;cursor:pointer;padding:0;}
         .bio-music-label{font-size:.78rem;color:var(--muted);white-space:nowrap;cursor:pointer;}
@@ -84,7 +179,7 @@
         .links-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
         .link-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,.65);font-size:.70rem;font-weight:500;white-space:nowrap;}
         .link-pill i{font-size:.78rem;flex-shrink:0;}
-        .posts-section{padding:0 16px 100px;}
+        .posts-section{padding:0 16px 100px;margin-top:4px;}
         .section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);margin-bottom:14px;display:block;}
         .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
         .post-thumb{aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--card);cursor:pointer;position:relative;transition:transform .15s,opacity .15s;}
@@ -374,35 +469,71 @@
 
     <!-- MAIN PAGE -->
     <div class="page">
-        <div class="top-bar"><div class="top-bar-brand">x<span>0</span>s.link</div></div>
-        <div class="floating-menu-wrap" style="position:absolute;top:56px;right:20px;">
-            <div class="menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
-            <div class="dropdown-menu" id="dropdown-menu">
-                <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
-                <div class="menu-item" onclick="openEditProfile()"><span>Edit Profile</span><i class="fa-solid fa-pen"></i></div>
-                <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
-                <div class="menu-item" onclick="openCollegeLinkSearch()"><span>Link College</span><i class="fa-solid fa-building-columns"></i></div>
-            </div>
-        </div>
-        <div class="banner"><img class="banner-img" id="banner-img" src="" alt=""><div class="banner-overlay"></div></div>
-        <section class="profile-section">
-            <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
-            <div class="avatar-wrap" onclick="openPfpViewer()">
-                <img class="avatar-img" id="avatar-img" src="" alt="">
-                <div class="pfp-badge badge-none" id="pfp-badge"></div>
-            </div>
-            <div class="name-row"><h1 class="name" id="display-name"></h1></div>
-            <div class="handle-row">
-                <div class="handle" id="handle-display"></div>
-                <div class="follower-stat">
-                    <span id="followers-tap-target"><b id="follower-count">0</b> followers</span>
-                    <span id="following-tap-target"><b id="following-count">0</b> following</span>
+
+        <!-- BANNER HERO -->
+        <div class="banner" id="banner-hero">
+            <img class="banner-img" id="banner-img" src="" alt="">
+            <div class="banner-overlay"></div>
+            <!-- three-dot floats top-right over banner -->
+            <div class="hero-menu-wrap">
+                <div class="hero-menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="menu-item" onclick="openEditProfile()"><span>Edit Profile</span><i class="fa-solid fa-pen"></i></div>
+                    <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
+                    <div class="menu-item" onclick="openCollegeLinkSearch()"><span>Link College</span><i class="fa-solid fa-building-columns"></i></div>
                 </div>
             </div>
-            <div class="college-link-row" id="college-link-row" onclick="handleCollegeLinkClick()">
-                <i class="fa-solid fa-building-columns college-link-icon" id="college-link-icon"></i>
-                <div class="college-link-name-wrap"><span class="college-link-name" id="college-link-name">+ Link College</span></div>
+        </div>
+
+        <!-- iOS PROFILE CARD -->
+        <div class="ios-card-wrap">
+            <div class="ios-profile-card">
+
+                <!-- avatar + follow row -->
+                <div class="ipc-top-row">
+                    <div class="avatar-wrap" onclick="openPfpViewer()">
+                        <img class="avatar-img" id="avatar-img" src="" alt="">
+                        <div class="pfp-badge badge-none" id="pfp-badge"></div>
+                    </div>
+                    <button class="follow-btn" id="follow-btn" onclick="toggleFollow()">Follow</button>
+                </div>
+
+                <!-- name + handle -->
+                <div class="ipc-identity">
+                    <h1 class="name" id="display-name"></h1>
+                    <div class="handle" id="handle-display"></div>
+                </div>
+
+                <!-- stats row -->
+                <div class="ipc-stats">
+                    <div class="ipc-stat" id="followers-tap-target">
+                        <div class="ipc-stat-val" id="follower-count">0</div>
+                        <div class="ipc-stat-label">Followers</div>
+                    </div>
+                    <div class="ipc-stat-divider"></div>
+                    <div class="ipc-stat" id="following-tap-target">
+                        <div class="ipc-stat-val" id="following-count">0</div>
+                        <div class="ipc-stat-label">Following</div>
+                    </div>
+                    <div class="ipc-stat-divider"></div>
+                    <div class="ipc-stat">
+                        <div class="ipc-stat-val" id="posts-count">0</div>
+                        <div class="ipc-stat-label">Posts</div>
+                    </div>
+                </div>
+
+                <!-- college link -->
+                <div class="college-link-row" id="college-link-row" onclick="handleCollegeLinkClick()">
+                    <i class="fa-solid fa-building-columns college-link-icon" id="college-link-icon"></i>
+                    <div class="college-link-name-wrap"><span class="college-link-name" id="college-link-name">+ Link College</span></div>
+                </div>
+
             </div>
+        </div>
+
+        <!-- BIO + MUSIC + LINKS below card -->
+        <section class="profile-below">
             <p class="bio" id="bio-text"></p>
             <div class="bio-music">
                 <div class="bio-music-play" onclick="toggleBioMusic(event)"><i class="fa-solid fa-play" id="bio-play-icon"></i></div>
@@ -568,6 +699,7 @@
         document.getElementById('music-play-icon').className='fa-solid fa-play';document.getElementById('music-progress').value=0;
         document.getElementById('music-current').textContent='0:00';document.getElementById('music-duration').textContent='0:00';
         initCollegeLink();renderPosts();
+        const pc=document.getElementById('posts-count');if(pc)pc.textContent=POSTS.length;
         const fc=followerBase+(isFollowing?1:0);
         document.getElementById('fo-followers-count').textContent=fc>=1000?(fc/1000).toFixed(1)+'k':fc;
         document.getElementById('fo-following-count').textContent=followingBase>=1000?(followingBase/1000).toFixed(1)+'k':followingBase;
