@@ -36,12 +36,12 @@
         @keyframes clgMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
         /* LAYOUT */
-        .page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding-top:200px;}
+        .page{max-width:480px;margin:0 auto;min-height:100vh;position:relative;}
 
         /* ── BANNER ── */
-        .banner{width:100%;height:100vh;position:fixed;top:0;left:0;right:0;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
+        .banner{width:100%;height:260px;position:relative;overflow:hidden;background:linear-gradient(135deg,#000814 0%,#001d3d 60%,#000 100%);}
         .banner-img{width:100%;height:100%;object-fit:cover;opacity:.65;}
-        .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.25) 0%,rgba(0,0,0,.1) 50%,rgba(0,0,0,.82) 100%);}
+        .banner-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15) 0%,transparent 40%,rgba(0,0,0,.6) 100%);}
         .dropdown-menu{position:absolute;top:44px;right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px;display:none;z-index:200;min-width:170px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:fadeIn .2s;}
         .dropdown-menu.active{display:block;}
         .menu-item{padding:10px 14px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-radius:10px;transition:.2s;}
@@ -51,7 +51,7 @@
         /* ── iOS CARD ── */
         .ios-card-wrap{
             padding:0 16px;
-            margin-top:-200px;
+            margin-top:-80px;
             position:relative;
             z-index:11;
             animation:slideUp .45s cubic-bezier(.32,.72,0,1) both;
@@ -160,7 +160,7 @@
         .college-link-name.marquee-anim{animation:clgMarquee 7s linear infinite;padding-right:40px;}
 
         /* below card */
-        .profile-below{padding:16px 20px 0;position:relative;z-index:5;}
+        .profile-below{padding:16px 20px 0;}
         .bio{font-size:.82rem;color:rgba(255,255,255,.62);line-height:1.65;margin-bottom:14px;font-weight:300;}
         .bio-music{display:inline-flex;align-items:center;gap:9px;margin-bottom:14px;}
         .bio-music-play{background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.7rem;flex-shrink:0;cursor:pointer;padding:0;}
@@ -175,7 +175,7 @@
         .links-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:16px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
         .link-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;text-decoration:none;color:rgba(255,255,255,.65);font-size:.70rem;font-weight:500;white-space:nowrap;}
         .link-pill i{font-size:.78rem;flex-shrink:0;}
-        .posts-section{padding:0 16px 100px;margin-top:4px;background:var(--bg);position:relative;z-index:5;}
+        .posts-section{padding:0 16px 100px;margin-top:4px;}
         .section-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--muted);margin-bottom:14px;display:block;}
         .posts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
         .post-thumb{aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--card);cursor:pointer;position:relative;transition:transform .15s,opacity .15s;}
