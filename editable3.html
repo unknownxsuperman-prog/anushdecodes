@@ -757,7 +757,6 @@
         document.getElementById('music-play-icon').className='fa-solid fa-play';document.getElementById('music-progress').value=0;
         document.getElementById('music-current').textContent='0:00';document.getElementById('music-duration').textContent='0:00';
         initCollegeLink();renderPosts();const pc=document.getElementById("posts-count");if(pc)pc.textContent=POSTS.length;
-        const pc=document.getElementById('posts-count');if(pc)pc.textContent=POSTS.length;
         const fc=followerBase+(isFollowing?1:0);
         document.getElementById('fo-followers-count').textContent=fc>=1000?(fc/1000).toFixed(1)+'k':fc;
         document.getElementById('fo-following-count').textContent=followingBase>=1000?(followingBase/1000).toFixed(1)+'k':followingBase;
