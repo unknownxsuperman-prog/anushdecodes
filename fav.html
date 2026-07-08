@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Favorites · x0s</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        /* ─── VARIABLES ─── */
+        :root {
+            --bg: #090909;
+            --card: #141414;
+            --card2: #1b1b1b;
+            --border: #232323;
+            --border2: rgba(255, 255, 255, .06);
+            --accent: #007aff;
+            --text: #fff;
+            --muted: #666;
+            --muted2: #3a3a3a;
+            --glass: rgba(20, 20, 20, .85);
+            --ease: cubic-bezier(.4, 0, .2, 1);
+            --spring: cubic-bezier(.32, .72, 0, 1);
+            --font: 'Space Grotesk', sans-serif;
+            --badge-blue: #1d9bf0;
+            --badge-green: #25D366;
+        }
+        .light-mode {
+            --bg: #f2f2f7;
+            --card: #ffffff;
+            --card2: #f8f8f8;
+            --border: #e5e5ea;
+            --border2: rgba(0, 0, 0, .07);
+            --text: #000;
+            --muted: #8e8e93;
+            --muted2: #c7c7cc;
+            --glass: rgba(255, 255, 255, .88);
+        }
+        .light-mode .wallpaper-fade {
+            background: linear-gradient(to bottom, rgba(242, 242, 247, 0) 0%, rgba(242, 242, 247, 0) 50%, rgba(242, 242, 247, .6) 78%, rgba(242, 242, 247, .98) 100%);
+        }
+        .light-mode .fav-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, .08);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .9) inset, 0 2px 4px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .1);
+        }
+        .light-mode .fav-card .title {
+            color: #000;
+        }
+        .light-mode .fav-card .sub {
+            color: rgba(0, 0, 0, .45);
+        }
+        .light-mode .fav-card .meta {
+            color: rgba(0, 0, 0, .28);
+        }
+        .light-mode .fav-card .play-btn {
+            background: #000;
+            color: #fff;
+        }
+        .light-mode .fav-card .play-btn.playing {
+            background: var(--accent);
+            color: #fff;
+        }
+        .light-mode .section-tabs {
+            background: #f2f2f7;
+            border: 1px solid rgba(0, 0, 0, .06);
+        }
+        .light-mode .section-tab {
+            color: rgba(0, 0, 0, .4);
+        }
+        .light-mode .section-tab.active {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        }
+        .light-mode .fav-section-label {
+            color: rgba(0, 0, 0, .28);
+        }
+        .light-mode .top-bar {
+            background: rgba(242, 242, 247, .82);
+            border-bottom: 1px solid rgba(0, 0, 0, .08);
+        }
+        .light-mode .back-btn {
+            background: rgba(255, 255, 255, .55);
+            border: 1px solid rgba(0, 0, 0, .1);
+            color: rgba(0, 0, 0, .7);
+        }
+        .light-mode .page-title {
+            color: #000;
+        }
+        .light-mode .music-player-bar {
+            background: rgba(255, 255, 255, .92);
+            border: 1px solid rgba(0, 0, 0, .08);
+        }
+        .light-mode .music-player-bar .mp-title {
+            color: #000;
+        }
+        .light-mode .music-player-bar .mp-artist {
+            color: rgba(0, 0, 0, .45);
+        }
+        .light-mode .music-player-bar .mp-time {
+            color: rgba(0, 0, 0, .3);
+        }
+        .light-mode .music-player-bar .mp-control {
+            color: #000;
+        }
+        .light-mode .mp-progress-track {
+            background: rgba(0, 0, 0, .12);
+        }
+        .light-mode .mp-progress-fill {
+            background: #000;
+        }
+
+        /* ─── RESET ─── */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes slideUp {
+            from {
+                transform: translateY(24px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes eqBar {
+            from {
+                height: 2px;
+            }
+            to {
+                height: 10px;
+            }
+        }
+        @keyframes rowFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 122, 255, .2);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(0, 122, 255, 0);
+            }
+        }
+
+        /* ─── PAGE ─── */
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+        }
+
+        /* ─── WALLPAPER ─── */
+        .wallpaper {
+            width: 100%;
+            height: 28vh;
+            min-height: 180px;
+            max-height: 260px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 50%, #050510 100%);
+        }
+        .wallpaper-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: .75;
+        }
+        .wallpaper-fade {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(9, 9, 9, 0) 0%, rgba(9, 9, 9, 0) 50%, rgba(9, 9, 9, .55) 78%, rgba(9, 9, 9, .97) 100%);
+        }
+
+        /* ─── TOP BAR ─── */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 14px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(9, 9, 9, .4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            z-index: 20;
+        }
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, .38);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, .1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, .85);
+            font-size: .82rem;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+        .back-btn:active {
+            background: rgba(0, 0, 0, .6);
+        }
+        .page-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -.02em;
+            color: #fff;
+            flex: 1;
+        }
+        .page-sub {
+            font-size: .62rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, .28);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        /* ─── CONTENT WRAP ─── */
+        .content-wrap {
+            padding: 0 16px;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ─── SECTION TABS ─── */
+        .section-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 20px;
+            animation: slideUp .44s var(--spring) both;
+        }
+        .section-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            font-size: .72rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .32);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all .22s var(--ease);
+            letter-spacing: .02em;
+            user-select: none;
+        }
+        .section-tab.active {
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .2);
+        }
+        .section-tab:active {
+            transform: scale(.96);
+        }
+        .section-tab i {
+            margin-right: 6px;
+            font-size: .7rem;
+        }
+
+        /* ─── SECTION PANELS ─── */
+        .section-panel {
+            display: none;
+            animation: slideUp .38s var(--spring) both;
+        }
+        .section-panel.active {
+            display: block;
+        }
+
+        /* ─── FAV SECTION LABEL ─── */
+        .fav-section-label {
+            display: block;
+            font-size: .58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .22em;
+            color: rgba(255, 255, 255, .18);
+            margin: 20px 0 12px 2px;
+        }
+        .fav-section-label:first-of-type {
+            margin-top: 0;
+        }
+
+        /* ─── FAV GRID ─── */
+        .fav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .fav-grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* ─── FAV CARD ─── */
+        .fav-card {
+            background: #141414;
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform .15s var(--ease), border-color .15s var(--ease);
+            cursor: pointer;
+            position: relative;
+            animation: rowFadeIn .34s var(--ease) both;
+        }
+        .fav-card:active {
+            transform: scale(.96);
+            border-color: rgba(255, 255, 255, .12);
+        }
+        .fav-card .art {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            display: block;
+            background: var(--card2);
+        }
+        .fav-card .art-wrap {
+            position: relative;
+            overflow: hidden;
+        }
+        .fav-card .play-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, .1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: .7rem;
+            cursor: pointer;
+            transition: background .18s, transform .18s;
+            z-index: 2;
+        }
+        .fav-card .play-btn:active {
+            transform: scale(.85);
+        }
+        .fav-card .play-btn.playing {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .fav-card .play-btn .pulse-ring {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 122, 255, .25);
+            animation: pulseGlow 1.6s ease-in-out infinite;
+        }
+        .fav-card .info {
+            padding: 10px 10px 12px;
+        }
+        .fav-card .title {
+            font-size: .74rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: -.01em;
+        }
+        .fav-card .sub {
+            font-size: .62rem;
+            color: rgba(255, 255, 255, .38);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .fav-card .meta {
+            font-size: .55rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .2);
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .fav-card .badge-tag {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: .5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            background: rgba(0, 0, 0, .55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: rgba(255, 255, 255, .75);
+            z-index: 2;
+        }
+        .fav-card .badge-tag.anime {
+            background: rgba(255, 70, 150, .25);
+            border-color: rgba(255, 70, 150, .2);
+            color: #ff6b9d;
+        }
+        .fav-card .badge-tag.movie {
+            background: rgba(255, 200, 50, .2);
+            border-color: rgba(255, 200, 50, .15);
+            color: #ffd866;
+        }
+        .fav-card .badge-tag.series {
+            background: rgba(50, 200, 255, .2);
+            border-color: rgba(50, 200, 255, .15);
+            color: #66d9ff;
+        }
+        .fav-card .badge-tag.shoes {
+            background: rgba(255, 120, 50, .2);
+            border-color: rgba(255, 120, 50, .15);
+            color: #ff8a5c;
+        }
+        .fav-card .badge-tag.music {
+            background: rgba(0, 200, 150, .2);
+            border-color: rgba(0, 200, 150, .15);
+            color: #4dd9b0;
+        }
+
+        /* ─── MUSIC PLAYER BAR ─── */
+        .music-player-bar {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 440px;
+            width: calc(100% - 32px);
+            background: rgba(20, 20, 20, .92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 20px;
+            padding: 10px 14px 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            box-shadow: 0 4px 32px rgba(0, 0, 0, .6);
+            animation: slideUp .5s var(--spring) both;
+            transition: transform .3s var(--ease), opacity .3s var(--ease);
+        }
+        .music-player-bar.hidden {
+            transform: translateX(-50%) translateY(80px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .music-player-bar .mp-art {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--card2);
+            border: 1px solid rgba(255, 255, 255, .06);
+        }
+        .music-player-bar .mp-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .music-player-bar .mp-title {
+            font-size: .76rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .music-player-bar .mp-artist {
+            font-size: .6rem;
+            color: rgba(255, 255, 255, .38);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 1px;
+        }
+        .music-player-bar .mp-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .music-player-bar .mp-control {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, .6);
+            font-size: .82rem;
+            cursor: pointer;
+            transition: color .15s, transform .15s;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .music-player-bar .mp-control:active {
+            transform: scale(.85);
+        }
+        .music-player-bar .mp-control.play {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-size: .7rem;
+            border: none;
+        }
+        .music-player-bar .mp-control.play:active {
+            transform: scale(.88);
+        }
+        .music-player-bar .mp-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: transparent;
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+        }
+        .music-player-bar .mp-progress-track {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, .08);
+            position: relative;
+        }
+        .music-player-bar .mp-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            border-radius: 0 0 0 20px;
+            transition: width .3s linear;
+        }
+        .music-player-bar .mp-time {
+            font-size: .5rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, .2);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: .04em;
+            flex-shrink: 0;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        /* ─── RESPONSIVE TWEAKS ─── */
+        @media (max-width: 400px) {
+            .fav-grid {
+                gap: 6px;
+            }
+            .fav-card .info {
+                padding: 8px 8px 10px;
+            }
+            .fav-card .title {
+                font-size: .68rem;
+            }
+            .fav-card .sub {
+                font-size: .56rem;
+            }
+            .music-player-bar {
+                padding: 8px 12px 8px 10px;
+                border-radius: 16px;
+            }
+            .music-player-bar .mp-art {
+                width: 34px;
+                height: 34px;
+            }
+            .music-player-bar .mp-title {
+                font-size: .7rem;
+            }
+            .section-tab {
+                font-size: .64rem;
+                padding: 8px 0;
+            }
+            .section-tab i {
+                margin-right: 4px;
+                font-size: .62rem;
+            }
+        }
+        @media (min-width: 480px) {
+            .fav-grid {
+                gap: 10px;
+            }
+            .fav-card .info {
+                padding: 12px 12px 14px;
+            }
+        }
+
+        /* ─── UTILITY ─── */
+        .mt-0 {
+            margin-top: 0 !important;
+        }
+        .mb-0 {
+            margin-bottom: 0 !important;
+        }
+        .gap-4 {
+            gap: 4px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .op-4 {
+            opacity: .4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page" id="app">
+
+        <!-- WALLPAPER -->
+        <div class="wallpaper">
+            <img class="wallpaper-img" id="wallpaper-img" src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=400&fit=crop&crop=center" alt="" />
+            <div class="wallpaper-fade"></div>
+
+            <!-- TOP BAR -->
+            <div class="top-bar">
+                <div class="back-btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="page-title">Favorites <span class="page-sub">· x0s</span></div>
+                <div style="width:36px;"></div>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content-wrap">
+
+            <!-- TABS -->
+            <div class="section-tabs" id="section-tabs">
+                <div class="section-tab active" data-tab="music" onclick="switchTab('music')">
+                    <i class="fa-solid fa-music"></i> Music
+                </div>
+                <div class="section-tab" data-tab="favorites" onclick="switchTab('favorites')">
+                    <i class="fa-solid fa-heart"></i> Favorites
+                </div>
+            </div>
+
+            <!-- PANEL: MUSIC -->
+            <div class="section-panel active" id="panel-music">
+                <span class="fav-section-label">Top Tracks</span>
+                <div class="fav-grid" id="music-grid"></div>
+                <span class="fav-section-label">Albums</span>
+                <div class="fav-grid" id="album-grid"></div>
+            </div>
+
+            <!-- PANEL: FAVORITES -->
+            <div class="section-panel" id="panel-favorites">
+                <!-- sub-tabs for favorites -->
+                <div class="section-tabs" style="margin-bottom:16px;border-radius:12px;padding:3px;gap:2px;background:rgba(255,255,255,.03);">
+                    <div class="section-tab active" data-subtab="movies" onclick="switchSubTab('movies')" style="padding:7px 0;font-size:.64rem;">Movies</div>
+                    <div class="section-tab" data-subtab="series" onclick="switchSubTab('series')" style="padding:7px 0;font-size:.64rem;">Series</div>
+                    <div class="section-tab" data-subtab="anime" onclick="switchSubTab('anime')" style="padding:7px 0;font-size:.64rem;">Anime</div>
+                    <div class="section-tab" data-subtab="shoes" onclick="switchSubTab('shoes')" style="padding:7px 0;font-size:.64rem;">Shoes</div>
+                </div>
+
+                <div id="favorites-grid-wrap">
+                    <div class="fav-grid fav-grid-2" id="favorites-grid"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MUSIC PLAYER BAR -->
+        <div class="music-player-bar hidden" id="music-player-bar">
+            <div class="mp-progress">
+                <div class="mp-progress-track">
+                    <div class="mp-progress-fill" id="mp-progress-fill"></div>
+                </div>
+            </div>
+            <img class="mp-art" id="mp-art" src="" alt="" />
+            <div class="mp-info">
+                <div class="mp-title" id="mp-title">Track Name</div>
+                <div class="mp-artist" id="mp-artist">Artist</div>
+            </div>
+            <div class="mp-time" id="mp-time">0:00</div>
+            <div class="mp-controls">
+                <button class="mp-control" id="mp-prev" title="Previous"><i class="fa-solid fa-backward"></i></button>
+                <button class="mp-control play" id="mp-play"><i class="fa-solid fa-play" id="mp-play-icon"></i></button>
+                <button class="mp-control" id="mp-next" title="Next"><i class="fa-solid fa-forward"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="player-audio" preload="none"></audio>
+
+    <script>
+        // ─── DATA ────────────────────────────────────────────────
+
+        const MUSIC_DATA = {
+            tracks: [{
+                id: 't1',
+                title: 'Blinding Lights',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36',
+                stream: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+                year: 2020,
+                genre: 'Pop'
+            }, {
+                id: 't2',
+                title: 'Starboy',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2734718e2b124f79258be7a4529',
+                stream: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+                year: 2016,
+                genre: 'R&B'
+            }, {
+                id: 't3',
+                title: 'Save Your Tears',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2735e6c1e0d4e7d8a0f9b8c2d3e',
+                stream: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+                year: 2021,
+                genre: 'Pop'
+            }, {
+                id: 't4',
+                title: 'Die For You',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2737f1c3e9a5b8d4e6f0c1a2b3c',
+                stream: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+                year: 2016,
+                genre: 'R&B'
+            }, {
+                id: 't5',
+                title: 'The Hills',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2738d4e6f0c1a2b3c4d5e6f7a8b',
+                stream: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+                year: 2015,
+                genre: 'R&B'
+            }, {
+                id: 't6',
+                title: 'Can\'t Feel My Face',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2739a8b7c6d5e4f3a2b1c0d9e8f',
+                stream: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+                year: 2015,
+                genre: 'Pop'
+            }],
+            albums: [{
+                id: 'a1',
+                title: 'After Hours',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2738863bc11d2aa12b54f5aeb36',
+                year: 2020,
+                tracks: 14
+            }, {
+                id: 'a2',
+                title: 'Starboy',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2734718e2b124f79258be7a4529',
+                year: 2016,
+                tracks: 18
+            }, {
+                id: 'a3',
+                title: 'Beauty Behind the Madness',
+                artist: 'The Weeknd',
+                artwork: 'https://i.scdn.co/image/ab67616d0000b2738d4e6f0c1a2b3c4d5e6f7a8b',
+                year: 2015,
+                tracks: 14
+            }]
+        };
+
+        const FAVORITES_DATA = {
+            movies: [{
+                id: 'm1',
+                title: 'Inception',
+                subtitle: 'Christopher Nolan',
+                artwork: 'https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg',
+                year: 2010,
+                rating: '9.0',
+                tag: 'movie',
+                tagLabel: 'Sci-Fi'
+            }, {
+                id: 'm2',
+                title: 'The Dark Knight',
+                subtitle: 'Christopher Nolan',
+                artwork: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
+                year: 2008,
+                rating: '9.2',
+                tag: 'movie',
+                tagLabel: 'Action'
+            }, {
+                id: 'm3',
+                title: 'Interstellar',
+                subtitle: 'Christopher Nolan',
+                artwork: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+                year: 2014,
+                rating: '8.7',
+                tag: 'movie',
+                tagLabel: 'Sci-Fi'
+            }, {
+                id: 'm4',
+                title: 'Parasite',
+                subtitle: 'Bong Joon-ho',
+                artwork: 'https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg',
+                year: 2019,
+                rating: '8.6',
+                tag: 'movie',
+                tagLabel: 'Drama'
+            }],
+            series: [{
+                id: 's1',
+                title: 'Breaking Bad',
+                subtitle: 'Vince Gilligan',
+                artwork: 'https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',
+                year: 2008,
+                rating: '9.5',
+                tag: 'series',
+                tagLabel: 'Crime'
+            }, {
+                id: 's2',
+                title: 'Stranger Things',
+                subtitle: 'The Duffer Brothers',
+                artwork: 'https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',
+                year: 2016,
+                rating: '8.7',
+                tag: 'series',
+                tagLabel: 'Sci-Fi'
+            }, {
+                id: 's3',
+                title: 'The Crown',
+                subtitle: 'Peter Morgan',
+                artwork: 'https://image.tmdb.org/t/p/w500/3FSeYiI7kqo2bYNs7PJN8dHJc9N.jpg',
+                year: 2016,
+                rating: '8.6',
+                tag: 'series',
+                tagLabel: 'Drama'
+            }],
+            anime: [{
+                id: 'an1',
+                title: 'Attack on Titan',
+                subtitle: 'Hajime Isayama',
+                artwork: 'https://image.tmdb.org/t/p/w500/hB7H0j2LhVdE6o7K6o5A5v5L5Z5.jpg',
+                year: 2013,
+                rating: '9.1',
+                tag: 'anime',
+                tagLabel: 'Action'
+            }, {
+                id: 'an2',
+                title: 'Demon Slayer',
+                subtitle: 'Koyoharu Gotouge',
+                artwork: 'https://image.tmdb.org/t/p/w500/9nW9I8tA8x6z5L5Z5v5A5v5L5Z5.jpg',
+                year: 2019,
+                rating: '8.8',
+                tag: 'anime',
+                tagLabel: 'Fantasy'
+            }, {
+                id: 'an3',
+                title: 'Jujutsu Kaisen',
+                subtitle: 'Gege Akutami',
+                artwork: 'https://image.tmdb.org/t/p/w500/5r6A5v5L5Z5v5A5v5L5Z5v5A5v5.jpg',
+                year: 2020,
+                rating: '8.6',
+                tag: 'anime',
+                tagLabel: 'Action'
+            }, {
+                id: 'an4',
+                title: 'One Piece',
+                subtitle: 'Eiichiro Oda',
+                artwork: 'https://image.tmdb.org/t/p/w500/6A5v5L5Z5v5A5v5L5Z5v5A5v5L5.jpg',
+                year: 1999,
+                rating: '9.0',
+                tag: 'anime',
+                tagLabel: 'Adventure'
+            }],
+            shoes: [{
+                id: 'sh1',
+                title: 'Air Jordan 1',
+                subtitle: 'Chicago',
+                artwork: 'https://images.unsplash.com/photo-1556906781-9a4120e7a7a0?w=400&h=400&fit=crop',
+                year: 1985,
+                rating: '4.9',
+                tag: 'shoes',
+                tagLabel: 'Retro'
+            }, {
+                id: 'sh2',
+                title: 'Yeezy 350 V2',
+                subtitle: 'Zebra',
+                artwork: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&h=400&fit=crop',
+                year: 2016,
+                rating: '4.8',
+                tag: 'shoes',
+                tagLabel: 'Boost'
+            }, {
+                id: 'sh3',
+                title: 'New Balance 990v5',
+                subtitle: 'Grey',
+                artwork: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=400&h=400&fit=crop',
+                year: 2019,
+                rating: '4.7',
+                tag: 'shoes',
+                tagLabel: 'Comfort'
+            }, {
+                id: 'sh4',
+                title: 'Nike Dunk Low',
+                subtitle: 'Panda',
+                artwork: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
+                year: 2021,
+                rating: '4.6',
+                tag: 'shoes',
+                tagLabel: 'Lifestyle'
+            }]
+        };
+
+        // ─── STATE ────────────────────────────────────────────────
+
+        let currentTab = 'music';
+        let currentSubTab = 'movies';
+        let currentTrackIndex = -1;
+        let isPlaying = false;
+        let playerQueue = [];
+        let playerProgressInterval = null;
+
+        const audio = document.getElementById('player-audio');
+        const bar = document.getElementById('music-player-bar');
+        const playBtn = document.getElementById('mp-play');
+        const playIcon = document.getElementById('mp-play-icon');
+        const progressFill = document.getElementById('mp-progress-fill');
+        const timeDisplay = document.getElementById('mp-time');
+
+        // ─── RENDER ────────────────────────────────────────────────
+
+        function renderMusic() {
+            const grid = document.getElementById('music-grid');
+            grid.innerHTML = MUSIC_DATA.tracks.map((t, i) => `
+                    <div class="fav-card" style="animation-delay:${i * 40}ms" data-track-index="${i}">
+                        <div class="art-wrap">
+                            <img class="art" src="${t.artwork}" alt="${t.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400/141414/555?text=🎵'" />
+                            <div class="badge-tag music">${t.genre}</div>
+                            <div class="play-btn" data-index="${i}" onclick="event.stopPropagation();toggleTrack(${i})">
+                                <i class="fa-solid fa-play" id="play-icon-${i}"></i>
+                            </div>
+                        </div>
+                        <div class="info">
+                            <div class="title">${t.title}</div>
+                            <div class="sub">${t.artist}</div>
+                            <div class="meta">${t.year}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            const albumGrid = document.getElementById('album-grid');
+            albumGrid.innerHTML = MUSIC_DATA.albums.map((a, i) => `
+                    <div class="fav-card" style="animation-delay:${(i + MUSIC_DATA.tracks.length) * 40}ms">
+                        <div class="art-wrap">
+                            <img class="art" src="${a.artwork}" alt="${a.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400/141414/555?text=💿'" />
+                            <div class="badge-tag music">${a.tracks} tracks</div>
+                        </div>
+                        <div class="info">
+                            <div class="title">${a.title}</div>
+                            <div class="sub">${a.artist}</div>
+                            <div class="meta">${a.year}</div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function renderFavorites(type) {
+            const grid = document.getElementById('favorites-grid');
+            const data = FAVORITES_DATA[type] || [];
+            const labelMap = { movies: 'movie', series: 'series', anime: 'anime', shoes: 'shoes' };
+            const tagClass = labelMap[type] || 'movie';
+
+            grid.innerHTML = data.map((item, i) => `
+                    <div class="fav-card" style="animation-delay:${i * 50}ms">
+                        <div class="art-wrap">
+                            <img class="art" src="${item.artwork}" alt="${item.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/400/141414/555?text=🎬'" />
+                            <div class="badge-tag ${tagClass}">${item.tagLabel}</div>
+                            <div style="position:absolute;bottom:8px;right:8px;padding:2px 8px;border-radius:6px;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.06);font-size:.5rem;font-weight:700;color:rgba(255,255,255,.6);z-index:2;">
+                                ⭐ ${item.rating}
+                            </div>
+                        </div>
+                        <div class="info">
+                            <div class="title">${item.title}</div>
+                            <div class="sub">${item.subtitle}</div>
+                            <div class="meta">${item.year}</div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // ─── TAB SWITCHING ──────────────────────────────────────
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.section-tab[data-tab]').forEach(el => {
+                el.classList.toggle('active', el.dataset.tab === tab);
+            });
+            document.querySelectorAll('.section-panel').forEach(el => {
+                el.classList.toggle('active', el.id === 'panel-' + tab);
+            });
+            // re-trigger animation
+            const panel = document.getElementById('panel-' + tab);
+            if (panel) {
+                panel.style.animation = 'none';
+                requestAnimationFrame(() => {
+                    panel.style.animation = 'slideUp .38s var(--spring) both';
+                });
+            }
+        }
+
+        function switchSubTab(sub) {
+            currentSubTab = sub;
+            document.querySelectorAll('.section-tab[data-subtab]').forEach(el => {
+                el.classList.toggle('active', el.dataset.subtab === sub);
+            });
+            renderFavorites(sub);
+            const wrap = document.getElementById('favorites-grid-wrap');
+            wrap.style.animation = 'none';
+            requestAnimationFrame(() => {
+                wrap.style.animation = 'slideUp .34s var(--spring) both';
+            });
+        }
+
+        // ─── MUSIC PLAYER ──────────────────────────────────────
+
+        function toggleTrack(index) {
+            const track = MUSIC_DATA.tracks[index];
+            if (!track) return;
+
+            if (currentTrackIndex === index && isPlaying) {
+                pauseTrack();
+                return;
+            }
+
+            if (currentTrackIndex === index && !isPlaying) {
+                resumeTrack();
+                return;
+            }
+
+            // new track
+            currentTrackIndex = index;
+            playerQueue = MUSIC_DATA.tracks;
+            playTrack(track);
+        }
+
+        function playTrack(track) {
+            const idx = MUSIC_DATA.tracks.indexOf(track);
+            if (idx === -1) return;
+
+            audio.src = track.stream;
+            audio.load();
+            audio.play().catch(() => {});
+            isPlaying = true;
+
+            // update UI
+            document.getElementById('mp-art').src = track.artwork;
+            document.getElementById('mp-title').textContent = track.title;
+            document.getElementById('mp-artist').textContent = track.artist;
+            playIcon.className = 'fa-solid fa-pause';
+            bar.classList.remove('hidden');
+
+            // update play buttons
+            document.querySelectorAll('.play-btn').forEach(el => {
+                const i = parseInt(el.dataset.index);
+                const icon = document.getElementById('play-icon-' + i);
+                if (i === currentTrackIndex) {
+                    el.classList.add('playing');
+                    if (icon) icon.className = 'fa-solid fa-pause';
+                } else {
+                    el.classList.remove('playing');
+                    if (icon) icon.className = 'fa-solid fa-play';
+                }
+            });
+
+            startProgress();
+        }
+
+        function pauseTrack() {
+            audio.pause();
+            isPlaying = false;
+            playIcon.className = 'fa-solid fa-play';
+            const icon = document.getElementById('play-icon-' + currentTrackIndex);
+            if (icon) icon.className = 'fa-solid fa-play';
+            const btn = document.querySelector(`.play-btn[data-index="${currentTrackIndex}"]`);
+            if (btn) btn.classList.remove('playing');
+            clearInterval(playerProgressInterval);
+        }
+
+        function resumeTrack() {
+            audio.play().catch(() => {});
+            isPlaying = true;
+            playIcon.className = 'fa-solid fa-pause';
+            const icon = document.getElementById('play-icon-' + currentTrackIndex);
+            if (icon) icon.className = 'fa-solid fa-pause';
+            const btn = document.querySelector(`.play-btn[data-index="${currentTrackIndex}"]`);
+            if (btn) btn.classList.add('playing');
+            startProgress();
+        }
+
+        function togglePlayPause() {
+            if (currentTrackIndex === -1) {
+                // play first track
+                toggleTrack(0);
+                return;
+            }
+            if (isPlaying) {
+                pauseTrack();
+            } else {
+                resumeTrack();
+            }
+        }
+
+        function nextTrack() {
+            if (playerQueue.length === 0) return;
+            const nextIdx = (currentTrackIndex + 1) % playerQueue.length;
+            toggleTrack(nextIdx);
+        }
+
+        function prevTrack() {
+            if (playerQueue.length === 0) return;
+            const prevIdx = (currentTrackIndex - 1 + playerQueue.length) % playerQueue.length;
+            toggleTrack(prevIdx);
+        }
+
+        function startProgress() {
+            clearInterval(playerProgressInterval);
+            playerProgressInterval = setInterval(() => {
+                if (!audio.duration || isNaN(audio.duration) || audio.duration === 0) {
+                    progressFill.style.width = '0%';
+                    timeDisplay.textContent = '0:00';
+                    return;
+                }
+                const pct = (audio.currentTime / audio.duration) * 100;
+                progressFill.style.width = pct + '%';
+                timeDisplay.textContent = formatTime(audio.currentTime);
+            }, 200);
+        }
+
+        function formatTime(sec) {
+            if (!sec || isNaN(sec)) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return m + ':' + String(s).padStart(2, '0');
+        }
+
+        // audio events
+        audio.addEventListener('ended', () => {
+            nextTrack();
+        });
+
+        audio.addEventListener('pause', () => {
+            if (isPlaying) {
+                // user paused via system
+                isPlaying = false;
+                playIcon.className = 'fa-solid fa-play';
+                const icon = document.getElementById('play-icon-' + currentTrackIndex);
+                if (icon) icon.className = 'fa-solid fa-play';
+                const btn = document.querySelector(`.play-btn[data-index="${currentTrackIndex}"]`);
+                if (btn) btn.classList.remove('playing');
+                clearInterval(playerProgressInterval);
+            }
+        });
+
+        audio.addEventListener('play', () => {
+            if (!isPlaying) {
+                isPlaying = true;
+                playIcon.className = 'fa-solid fa-pause';
+                const icon = document.getElementById('play-icon-' + currentTrackIndex);
+                if (icon) icon.className = 'fa-solid fa-pause';
+                const btn = document.querySelector(`.play-btn[data-index="${currentTrackIndex}"]`);
+                if (btn) btn.classList.add('playing');
+                startProgress();
+            }
+        });
+
+        // player controls
+        document.getElementById('mp-play').addEventListener('click', togglePlayPause);
+        document.getElementById('mp-next').addEventListener('click', nextTrack);
+        document.getElementById('mp-prev').addEventListener('click', prevTrack);
+
+        // click on card to play
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.fav-card[data-track-index]');
+            if (card) {
+                const idx = parseInt(card.dataset.trackIndex);
+                if (!isNaN(idx)) toggleTrack(idx);
+            }
+        });
+
+        // ─── BACK ──────────────────────────────────────────────
+
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'about:blank';
+            }
+        }
+
+        // ─── INIT ──────────────────────────────────────────────
+
+        function init() {
+            renderMusic();
+            renderFavorites('movies');
+
+            // set wallpaper from unsplash (fallback)
+            const wallpapers = [
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&h=400&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop&crop=center',
+                'https://images.unsplash.com/photo-1470071459604-7b5ec3d8b6d4?w=800&h=400&fit=crop&crop=center'
+            ];
+            const img = document.getElementById('wallpaper-img');
+            img.src = wallpapers[Math.floor(Math.random() * wallpapers.length)];
+
+            // check if there's a track from URL param
+            const params = new URLSearchParams(window.location.search);
+            const autoPlay = params.get('play');
+            if (autoPlay) {
+                const idx = parseInt(autoPlay);
+                if (!isNaN(idx) && idx >= 0 && idx < MUSIC_DATA.tracks.length) {
+                    setTimeout(() => toggleTrack(idx), 400);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        // expose for inline onclick
+        window.switchTab = switchTab;
+        window.switchSubTab = switchSubTab;
+        window.toggleTrack = toggleTrack;
+        window.goBack = goBack;
+        window.nextTrack = nextTrack;
+        window.prevTrack = prevTrack;
+        window.togglePlayPause = togglePlayPause;
+    </script>
+
+</body>
+</html>
