@@ -267,8 +267,9 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
    Movies/Series/Anime: TMDB API
 ════════════════════════════════ */
 
-const TMDB_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e'; // replace with real key
+const TMDB_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e'; // optional: replace with real TMDB key
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w342';
+const TMDB_PLACEHOLDER_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e';
 
 /* ── STATE ── */
 let editMode = false;
@@ -453,6 +454,84 @@ function onSearchInput(val){
   searchTimer=setTimeout(()=>doSearch(val.trim()),420);
 }
 
+function hasTmdbKey(){
+  return TMDB_KEY && TMDB_KEY !== TMDB_PLACEHOLDER_KEY && !/^your[_-]?tmdb[_-]?key$/i.test(TMDB_KEY);
+}
+
+function encodeForInline(value){
+  return encodeURIComponent(JSON.stringify(value)).replace(/'/g,'%27');
+}
+
+async function searchTmdbShows(q,type){
+  if(!hasTmdbKey()) throw new Error('Missing TMDB key');
+  const typeMap={movies:'movie',series:'tv',anime:'tv'};
+  const tmdbType=typeMap[type]||'movie';
+  const animeQuery=type==='anime'?q+' anime':q;
+  const r=await fetch(`https://api.themoviedb.org/3/search/${tmdbType}?api_key=${TMDB_KEY}&query=${encodeURIComponent(animeQuery)}&include_adult=false`);
+  const d=await r.json();
+  if(!r.ok||d.success===false) throw new Error(d.status_message||'TMDB search failed');
+  return (d.results||[]).slice(0,10).map(item=>{
+    const year=item.release_date?item.release_date.substring(0,4):(item.first_air_date?item.first_air_date.substring(0,4):'');
+    return {
+      id:'tmdb_'+item.id,
+      title:item.title||item.name||'—',
+      subtitle:item.overview?item.overview.substring(0,40)+'...':'',
+      artwork:item.poster_path?TMDB_IMG+item.poster_path:'https://placehold.co/48x64/141414/444?text=🎬',
+      year:year,
+      rating:item.vote_average?item.vote_average.toFixed(1):'—',
+      type:type
+    };
+  });
+}
+
+async function searchPublicShows(q,type){
+  if(type==='movies'){
+    const r=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&entity=movie&limit=10`);
+    const d=await r.json();
+    return (d.results||[]).map(item=>({
+      id:'itunes_movie_'+item.trackId,
+      title:item.trackName||'—',
+      subtitle:item.primaryGenreName||'',
+      artwork:(item.artworkUrl100||'').replace('100x100','400x600')||'https://placehold.co/48x64/141414/444?text=🎬',
+      year:item.releaseDate?item.releaseDate.substring(0,4):'',
+      rating:item.contentAdvisoryRating||'—',
+      type:type
+    }));
+  }
+  if(type==='anime'){
+    const r=await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=10`);
+    const d=await r.json();
+    return (d.data||[]).map(item=>({
+      id:'jikan_'+item.mal_id,
+      title:item.title_english||item.title||'—',
+      subtitle:(item.synopsis||'').substring(0,40)+(item.synopsis&&item.synopsis.length>40?'...':''),
+      artwork:item.images?.jpg?.image_url||'https://placehold.co/48x64/141414/444?text=🎬',
+      year:item.year||((item.aired?.from||'').substring(0,4)),
+      rating:item.score?item.score.toFixed(1):'—',
+      type:type
+    }));
+  }
+  const r=await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
+  const d=await r.json();
+  return (d||[]).slice(0,10).map(({show})=>({
+    id:'tvmaze_'+show.id,
+    title:show.name||'—',
+    subtitle:(show.genres||[]).slice(0,2).join(', '),
+    artwork:show.image?.medium||show.image?.original||'https://placehold.co/48x64/141414/444?text=🎬',
+    year:show.premiered?show.premiered.substring(0,4):'',
+    rating:show.rating?.average?show.rating.average.toFixed(1):'—',
+    type:type
+  }));
+}
+
+async function searchShows(q,type){
+  try{
+    return await searchTmdbShows(q,type);
+  }catch(e){
+    return searchPublicShows(q,type);
+  }
+}
+
 async function doSearch(q){
   const res=document.getElementById('search-results');
   try{
@@ -478,36 +557,25 @@ async function doSearch(q){
             <div class="search-result-sub">${sub}</div>
             <div class="search-result-meta">${meta} ${year?'· '+year:''}</div>
           </div>
-          <div class="search-add-btn ${already?'added':''}" onclick="addMusicItem('${searchType}','${encodeURIComponent(JSON.stringify({id:id,title:title,artist:sub,artwork:art,stream:stream,year:year,genre:item.primaryGenreName||'',trackCount:item.trackCount||0}))}',this)">
+          <div class="search-add-btn ${already?'added':''}" onclick="addMusicItem('${searchType}','${encodeForInline({id:id,title:title,artist:sub,artwork:art,stream:stream,year:year,genre:item.primaryGenreName||'',trackCount:item.trackCount||0})}',this)">
             <i class="fa-solid ${already?'fa-check':'fa-plus'}"></i>
           </div>
         </div>`;
       }).join('');
     } else {
-      // TMDB search
-      const typeMap={movies:'movie',series:'tv',anime:'tv'};
-      const tmdbType=typeMap[searchType]||'movie';
-      const animeQuery=searchType==='anime'?q+' anime':q;
-      const r=await fetch(`https://api.themoviedb.org/3/search/${tmdbType}?api_key=${TMDB_KEY}&query=${encodeURIComponent(animeQuery)}&include_adult=false`);
-      const d=await r.json();
-      const results=(d.results||[]).slice(0,10);
+      const results=await searchShows(q,searchType);
       if(!results.length){res.innerHTML='<div class="empty"><i class="fa-solid fa-face-meh"></i><p>No results</p></div>';return;}
       const existing=getData(searchType).map(x=>x.id);
       res.innerHTML=results.map((item,i)=>{
-        const id='tmdb_'+item.id;
-        const already=existing.includes(id);
-        const title=item.title||item.name||'—';
-        const sub=item.release_date?item.release_date.substring(0,4):(item.first_air_date?item.first_air_date.substring(0,4):'');
-        const rating=item.vote_average?item.vote_average.toFixed(1):'—';
-        const art=item.poster_path?TMDB_IMG+item.poster_path:'https://placehold.co/48x64/141414/444?text=🎬';
+        const already=existing.includes(item.id);
         return `<div class="search-result-item" style="animation-delay:${i*30}ms">
-          <img class="search-result-img" src="${art}" alt="" onerror="this.src='https://placehold.co/48x64/141414/444?text=🎬'">
+          <img class="search-result-img" src="${item.artwork}" alt="" onerror="this.src='https://placehold.co/48x64/141414/444?text=🎬'">
           <div class="search-result-info">
-            <div class="search-result-title">${title}</div>
-            <div class="search-result-sub">⭐ ${rating}</div>
-            <div class="search-result-meta">${searchType} ${sub?'· '+sub:''}</div>
+            <div class="search-result-title">${item.title}</div>
+            <div class="search-result-sub">⭐ ${item.rating}</div>
+            <div class="search-result-meta">${searchType} ${item.year?'· '+item.year:''}</div>
           </div>
-          <div class="search-add-btn ${already?'added':''}" onclick="addShowItem('${searchType}','${encodeURIComponent(JSON.stringify({id:id,title:title,subtitle:item.overview?item.overview.substring(0,40)+'…':'',artwork:art,year:sub,rating:rating,type:searchType}))}',this)">
+          <div class="search-add-btn ${already?'added':''}" onclick="addShowItem('${searchType}','${encodeForInline(item)}',this)">
             <i class="fa-solid ${already?'fa-check':'fa-plus'}"></i>
           </div>
         </div>`;
