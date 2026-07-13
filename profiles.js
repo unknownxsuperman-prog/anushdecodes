@@ -58,6 +58,34 @@ window.XOS_PROFILES = {
       }
     ]
   },
+   raghavendra: {
+    userid: 'raghavendra',
+    handle: 'raghavendra@x0s',
+    displayName: 'Raghavendra',
+    verified: 'green',
+    banner: 'Picsart_26-04-18_23-43-21-546.jpg',
+    avatar: 'Screenshot_20260418-234611.png',
+    bio: 'natty',
+    followers: ['anush'],
+    following: ['anush'],
+    audioTrack: {
+      title: 'Wait a Minute!',
+      artist: 'Willow',
+      streamUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview112/v4/5e/3c/52/5e3c526f-72e9-63e0-4a16-1cf3a94e7c38/mzaf_5923832917512396829.plus.aac.ep.m4a',
+      artworkUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e5/07/8e/e5078e3b-77fe-1c78-3cb9-d39b6cf8b0f4/22UMGIM77352.rgb.jpg/600x600bb.jpg'
+    },
+    links: [
+      { icon: 'fa-arattai', label: 'Arattai', url: 'https://aratt.ai/user/@nikhilb', color: 'color-arattai', arattai: true },
+      { icon: 'fa-brands fa-github', label: 'GitHub', url: 'https://github.com/xbit-proton', color: 'color-github' },
+      { icon: 'fa-brands fa-instagram', label: 'Instagram', url: 'https://www.instagram.com/x0s.nikh_07', color: 'color-instagram' },
+      { icon: 'fa-brands fa-x-twitter', label: 'X', url: 'https://x.com/Nikhil_X7', color: 'color-twitter' },
+      { icon: 'fa-brands fa-linkedin-in', label: 'LinkedIn', url: 'https://linkedin.com/in/nikhil-b-b41641363', color: 'color-linkedin' },
+      { icon: 'fa-brands fa-discord', label: 'Discord', url: 'https://discord.gg/QyHXBqS3H', color: 'color-discord' },
+      { icon: 'fa-solid fa-link', label: 'x0s.link', url: 'personalpage.html', color: 'color-globe' }
+    ],
+    posts: [
+    ]
+  },
 
     niranjan: { // Swapped key to lowercase for routing mapping consistency
     userid: 'niranjan',
