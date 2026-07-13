@@ -7,7 +7,7 @@
 window.XOS_PROFILES = {
 
   nikhil: {
-    userid: 'nikhil',
+    userid: 'anush',
     handle: 'anush@x0s',
     displayName: 'Anush Decodes',
     verified: 'gold',
