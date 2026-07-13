@@ -1,28 +1,16 @@
-/**
- * xos-favourites-data.js
- *
- * ONE object per user, keyed by userid:
- *
- * {
- *   "nikhil": {
- *     userid: "nikhil",
- *     favourites: {
- *       music:  ["Blinding Lights", "Starboy"],
- *       album:  ["After Hours"],
- *       movie:  ["Inception"],
- *       series: ["Breaking Bad"],
- *       anime:  ["Attack on Titan"]
- *     }
- *   },
- *   "gemini": { userid: "gemini", favourites: {...} }
- * }
- *
- * All of this lives under a single localStorage key: xos_favourites_store
- * Every array only ever stores the plain name/title string — no ids,
- * no thumbnails, no metadata. The HTML page decodes names into display
- * data at render time.
- */
-
+ {
+    "anush": {
+     userid: "anush",
+      favourites: {
+        music:  ["Blinding Lights", "Starboy"],
+        album:  ["After Hours"],
+        movie:  ["Inception"],
+        series: ["Breaking Bad"],
+        anime:  ["Attack on Titan"]
+      }
+    },
+   "gemini": { userid: "gemini", favourites: {...} }
+ }
 window.XOS_FAV = {
 
   _storeKey: 'xos_favourites_store',
