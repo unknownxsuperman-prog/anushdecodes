@@ -7,12 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /* ── Reset & base ── */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
         :root {
             --bg: #090909;
             --card: #141414;
             --card2: #1b1b1b;
             --border: #232323;
-            --border2: rgba(255, 255, 255, .06);
             --accent: #007aff;
             --text: #fff;
             --muted: #666;
@@ -20,12 +26,6 @@
             --ease: cubic-bezier(.4, 0, .2, 1);
             --spring: cubic-bezier(.32, .72, 0, 1);
             --font: 'Space Grotesk', sans-serif;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
         }
         html,
         body {
@@ -39,54 +39,62 @@
             display: none;
         }
 
+        /* ── Animations ── */
         @keyframes slideUp {
             from {
                 transform: translateY(20px);
-                opacity: 0
+                opacity: 0;
             }
             to {
                 transform: translateY(0);
-                opacity: 1
-            }
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-8px)
-            }
-            to {
                 opacity: 1;
-                transform: translateY(0)
             }
         }
         @keyframes rowIn {
             from {
                 opacity: 0;
-                transform: translateY(10px)
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0)
+                transform: translateY(0);
             }
         }
         @keyframes pulse {
             0%,
             100% {
-                box-shadow: 0 0 0 0 rgba(0, 122, 255, .25)
+                box-shadow: 0 0 0 0 rgba(0, 122, 255, .25);
             }
             50% {
-                box-shadow: 0 0 0 8px rgba(0, 122, 255, 0)
+                box-shadow: 0 0 0 8px rgba(0, 122, 255, 0);
             }
         }
         @keyframes shimmer {
             0% {
-                transform: translateX(-100%)
+                transform: translateX(-100%);
             }
             100% {
-                transform: translateX(100%)
+                transform: translateX(100%);
+            }
+        }
+        @keyframes searchUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        @keyframes searchDown {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(100%);
             }
         }
 
+        /* ── Page ── */
         .page {
             max-width: 480px;
             margin: 0 auto;
@@ -94,6 +102,7 @@
             padding-bottom: 120px;
         }
 
+        /* ── Wallpaper ── */
         .wallpaper {
             width: 100%;
             height: 36vh;
@@ -116,6 +125,7 @@
             background: linear-gradient(to bottom, rgba(9, 9, 9, .0) 0%, rgba(9, 9, 9, .0) 45%, rgba(9, 9, 9, .65) 78%, rgba(9, 9, 9, 1) 100%);
         }
 
+        /* ── Top bar ── */
         .top-bar {
             position: absolute;
             top: 0;
@@ -127,7 +137,6 @@
             gap: 12px;
             background: rgba(9, 9, 9, .3);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, .04);
             z-index: 20;
         }
@@ -188,6 +197,7 @@
             transform: scale(.9);
         }
 
+        /* ── Content ── */
         .content {
             padding: 0 16px;
             margin-top: -56px;
@@ -195,6 +205,7 @@
             z-index: 10;
         }
 
+        /* ── Tabs ── */
         .tabs {
             display: flex;
             gap: 3px;
@@ -239,6 +250,7 @@
             animation: slideUp .36s var(--spring) both;
         }
 
+        /* ── Sub-tabs ── */
         .sub-tabs {
             display: flex;
             gap: 3px;
@@ -268,6 +280,7 @@
             transform: scale(.95);
         }
 
+        /* ── Labels ── */
         .section-lbl {
             display: block;
             font-size: .58rem;
@@ -281,6 +294,7 @@
             margin-top: 0;
         }
 
+        /* ── Grids ── */
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -292,6 +306,7 @@
             gap: 10px;
         }
 
+        /* ── Cards ── */
         .card {
             background: #141414;
             border: 1px solid rgba(255, 255, 255, .06);
@@ -533,22 +548,7 @@
             transform: scale(.9);
         }
 
-        @keyframes searchUp {
-            from {
-                transform: translateY(100%)
-            }
-            to {
-                transform: translateY(0)
-            }
-        }
-        @keyframes searchDown {
-            from {
-                transform: translateY(0)
-            }
-            to {
-                transform: translateY(100%)
-            }
-        }
+        /* ── Search overlay ── */
         .search-overlay {
             position: fixed;
             inset: 0;
@@ -737,6 +737,7 @@
             font-size: .78rem;
         }
 
+        /* ── Player bar ── */
         .player-bar {
             position: fixed;
             bottom: 12px;
@@ -948,23 +949,26 @@
 
     <audio id="audio-player" preload="none"></audio>
 
-    <!-- ═══ DATA LAYER ═══ -->
+    <!-- ═══ DATA LAYER (must be loaded first) ═══ -->
     <script src="xos-favourites-data.js"></script>
 
     <!-- ═══ APP LOGIC ═══ -->
     <script>
         /* ═══════════════════════════════════════════════════
            FAVOURITES APP — uses XOS_FAV from xos-favourites-data.js
-           Music: iTunes API
-           Movies/Series/Anime: TMDB API (with public fallback)
+           Search: iTunes for music, TMDB (with public fallback) for shows
         ═══════════════════════════════════════════════════ */
 
         // ── Config ──
-        const TMDB_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e'; // replace with your real TMDB key
+        const TMDB_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e'; // replace with your real TMDB key for better results
         const TMDB_IMG = 'https://image.tmdb.org/t/p/w342';
         const TMDB_PLACEHOLDER = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e';
 
         // ── Current user ──
+        function getUserIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('user') || 'nikhil';
+        }
         const USER_ID = getUserIdFromURL();
 
         // ── State ──
@@ -984,15 +988,23 @@
 
         // ── DOM refs ──
         const $ = id => document.getElementById(id);
-        const topTitle = $('top-title');
         const userBadge = $('user-badge');
 
-        // ── Helpers ──
-        function getUserIdFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('user') || 'nikhil';
-        }
+        // ── Show user in header ──
+        userBadge.textContent = '· @' + USER_ID;
+        document.querySelector('.top-title').innerHTML = 'Favourites <span class="user-badge">· @' + USER_ID + '</span>';
 
+        // ── Wallpaper ──
+        (function() {
+            const imgs = [
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80',
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+                'https://images.unsplash.com/photo-1470071459604-7b5ec3d8b6d4?w=800&q=80'
+            ];
+            $('wallpaper-img').src = imgs[Math.floor(Math.random() * imgs.length)];
+        })();
+
+        // ── Helpers ──
         function esc(s) {
             return (s || '').toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
                 "'": '&#39;' } [m]));
@@ -1011,27 +1023,13 @@
             return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
         }
 
-        // ── Show user in header ──
-        userBadge.textContent = '· @' + USER_ID;
-        topTitle.innerHTML = 'Favourites <span class="user-badge">· @' + USER_ID + '</span>';
-
-        // ── Wallpaper ──
-        (function() {
-            const imgs = [
-                'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80',
-                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-                'https://images.unsplash.com/photo-1470071459604-7b5ec3d8b6d4?w=800&q=80'
-            ];
-            $('wallpaper-img').src = imgs[Math.floor(Math.random() * imgs.length)];
-        })();
-
         // ── Tabs ──
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
             document.querySelectorAll('.panel').forEach(el => el.classList.toggle('active', el.id === 'panel-' + tab));
             if (tab === 'shows') renderShows();
-            // update search type tabs to match
+            // Update search type to match tab
             updateSearchTypeFromTab();
         }
 
@@ -1039,11 +1037,12 @@
             currentSub = sub;
             document.querySelectorAll('.sub-tab').forEach(el => el.classList.toggle('active', el.dataset.sub === sub));
             renderShows();
+            // Update search type
+            updateSearchTypeFromTab();
         }
 
         function updateSearchTypeFromTab() {
             if (currentTab === 'music') {
-                // keep current search type or default to tracks
                 if (!['tracks', 'albums'].includes(searchType)) switchSearchType('tracks');
             } else {
                 const map = { movies: 'movies', series: 'series', anime: 'anime' };
@@ -1062,7 +1061,8 @@
             const tracks = XOS_FAV.get(USER_ID, 'tracks');
             const grid = $('music-tracks-grid');
             if (!tracks.length) {
-                grid.innerHTML = `<div class="empty empty-grid"><i class="fa-solid fa-music"></i><p>No tracks yet</p><div class="empty-sub">Tap + to add</div></div>`;
+                grid.innerHTML =
+                    `<div class="empty empty-grid"><i class="fa-solid fa-music"></i><p>No tracks yet</p><div class="empty-sub">Tap + to add</div></div>`;
                 return;
             }
             grid.innerHTML = tracks.map((t, i) => `
@@ -1078,7 +1078,6 @@
               <div class="info"><div class="title">${esc(t.title)}</div><div class="sub">${esc(t.artist)}</div><div class="meta">${t.year || ''}</div></div>
             </div>
           `).join('');
-            // Update queue
             queue = tracks;
         }
 
@@ -1086,7 +1085,8 @@
             const albums = XOS_FAV.get(USER_ID, 'albums');
             const grid = $('music-albums-grid');
             if (!albums.length) {
-                grid.innerHTML = `<div class="empty empty-grid"><i class="fa-solid fa-compact-disc"></i><p>No albums yet</p></div>`;
+                grid.innerHTML =
+                    `<div class="empty empty-grid"><i class="fa-solid fa-compact-disc"></i><p>No albums yet</p></div>`;
                 return;
             }
             grid.innerHTML = albums.map((a, i) => `
@@ -1129,7 +1129,6 @@
             XOS_FAV.remove(USER_ID, key, idx);
             if (key === 'tracks' || key === 'albums') renderMusic();
             else renderShows();
-            // if the key is 'tracks', also update the queue
             if (key === 'tracks') {
                 queue = XOS_FAV.get(USER_ID, 'tracks');
                 if (currentIdx >= queue.length) currentIdx = -1;
@@ -1146,9 +1145,8 @@
             if (editMode) openSearch();
         }
 
-        // ── Search ──
+        // ── Search overlay ──
         function openSearch() {
-            // Set search type based on current tab
             updateSearchTypeFromTab();
             searchOpen = true;
             const el = document.getElementById('search-overlay');
@@ -1177,20 +1175,20 @@
             type));
             const q = document.getElementById('search-input').value.trim();
             if (q) doSearch(q);
-            else document.getElementById('search-results').innerHTML = '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add</p></div>';
+            else document.getElementById('search-results').innerHTML =
+                '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add</p></div>';
         }
 
         function onSearchInput(val) {
             clearTimeout(searchTimer);
             const el = document.getElementById('search-results');
-            if (!val.trim()) { el.innerHTML = '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add</p></div>'; return; }
+            if (!val.trim()) { el.innerHTML =
+                    '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add</p></div>'; return; }
             el.innerHTML = '<div class="search-loading">Searching…</div>';
             searchTimer = setTimeout(() => doSearch(val.trim()), 420);
         }
 
         // ── Search APIs ──
-
-        // TMDB search (throws on failure)
         async function searchTmdbShows(q, type) {
             if (!hasTmdbKey()) throw new Error('Missing TMDB key');
             const typeMap = { movies: 'movie', series: 'tv', anime: 'tv' };
@@ -1217,7 +1215,6 @@
             });
         }
 
-        // Public fallback APIs (no key required)
         async function searchPublicShows(q, type) {
             if (type === 'movies') {
                 const r = await fetch(
@@ -1453,7 +1450,7 @@
 
         audio.addEventListener('ended', nextTrack);
 
-        // ── Popstate for search overlay ──
+        // ── Popstate for search ──
         window.addEventListener('popstate', () => {
             if (searchOpen) closeSearch();
         });
@@ -1469,7 +1466,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderMusic();
             renderShows();
-            // Ensure search type matches current tab
             updateSearchTypeFromTab();
         });
 
