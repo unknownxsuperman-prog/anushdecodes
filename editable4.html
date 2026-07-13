@@ -598,6 +598,7 @@
                 <div class="wp-menu-btn" onclick="toggleMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></div>
                 <div class="dropdown-menu" id="dropdown-menu">
                     <div class="menu-item" onclick="shareProfile()"><span>Share</span><i class="fa-solid fa-share-nodes"></i></div>
+                    <div class="menu-item" onclick="openFavourites()"><span>My Favourites</span><i class="fa-solid fa-heart"></i></div>
                     <div class="menu-item" onclick="openEditProfile()"><span>Edit Profile</span><i class="fa-solid fa-pen"></i></div>
                     <div class="menu-item" onclick="toggleDarkMode()"><span>Appearance</span><i class="fa-solid fa-circle-half-stroke"></i></div>
                     <div class="menu-item" onclick="openCollegeLinkSearch()"><span>Link College</span><i class="fa-solid fa-building-columns"></i></div>
@@ -818,7 +819,10 @@
     window.onclick=()=>document.getElementById('dropdown-menu').classList.remove('active');
     let followerBase=0,followingBase=0,isFollowing=false;
     function updateFollowUI(){const d=followerBase+(isFollowing?1:0);document.getElementById('follower-count').innerText=d>=1000?(d/1000).toFixed(1)+'k':d;document.getElementById('following-count').innerText=followingBase;const fc2=document.getElementById('fo-followers-count');const fg2=document.getElementById('fo-following-count');if(fc2)fc2.textContent=d>=1000?(d/1000).toFixed(1)+'k':d;if(fg2)fg2.textContent=followingBase>=1000?(followingBase/1000).toFixed(1)+'k':followingBase;const b=document.getElementById('follow-btn');b.innerText=isFollowing?'Following':'Follow';b.classList.toggle('following',isFollowing);}
-    function toggleFollow(){isFollowing=!isFollowing;lsSet('is_following',isFollowing);updateFollowUI();}
+    function openFavourites(){
+        document.getElementById('dropdown-menu').classList.remove('active');
+        window.location.href='xos-favourites.html?user='+activeUsername;
+    }
 
     let followOverlayOpen=false,currentFollowTab='followers',followSearchQuery='';
     function showFollowList(type){currentFollowTab=type;followSearchQuery='';document.getElementById('fo-search-input').value='';updateFollowTabUI();renderFollowList();followOverlayOpen=true;const el=document.getElementById('follow-overlay');el.style.display='flex';el.classList.remove('closing');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));history.pushState({modal:'follow-list'},'');}
