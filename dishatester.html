@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual">
+<title>Disha · x0s.link</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#000;--card:#0a0a0a;--border:#1a1a1a;--border2:rgba(255,255,255,.06);
+  --accent:#007aff;--text:#fff;--muted:#666;--muted2:#333;
+  --glass:rgba(10,10,10,.85);--ease:cubic-bezier(.4,0,.2,1);
+  --font:'Space Grotesk',sans-serif;
+  --nav-h:62px;--top-h:0px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);height:100%;overflow:hidden;}
+::-webkit-scrollbar{display:none;}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sparkSpin{0%{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.15)}100%{transform:rotate(360deg) scale(1)}}
+@keyframes chipIn{from{opacity:0;transform:translateX(8px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.disha-screen{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;background:var(--bg);}
+/* ── TOP BAR ── */
+.disha-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;flex-shrink:0;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+}
+.disha-back{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text);font-size:.82rem;cursor:pointer;}
+.disha-back:active{background:rgba(255,255,255,.1);}
+.disha-brand{display:flex;align-items:center;gap:7px;font-size:1.05rem;font-weight:700;letter-spacing:-.02em;}
+.disha-brand-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#007aff,#00c6ff);box-shadow:0 0 8px rgba(0,122,255,.4);}
+/* ── MESSAGES ── */
+.disha-messages{flex:1;overflow-y:auto;padding:24px 16px 16px;display:flex;flex-direction:column;gap:16px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;min-height:0;}
+/* ── GREETING ── */
+.disha-greeting{display:flex;flex-direction:column;align-items:center;padding:40px 20px 20px;gap:14px;}
+.disha-greeting-icon{width:62px;height:62px;border-radius:20px;background:rgba(0,122,255,.1);border:1px solid rgba(0,122,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--accent);overflow:hidden;flex-shrink:0;}
+.disha-greeting-icon i{animation:sparkSpin 4s linear infinite;}
+.disha-greeting-text{text-align:center;}
+.disha-hey{font-size:1.35rem;font-weight:700;margin-bottom:6px;}
+.disha-sub{font-size:.88rem;color:var(--muted);margin-bottom:2px;}
+.disha-sub2{font-size:.78rem;color:var(--muted2);}
+/* hint tag */
+.disha-hint{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:12px;padding:6px 14px;border-radius:99px;
+  background:rgba(0,122,255,.08);border:1px solid rgba(0,122,255,.15);
+  font-size:.68rem;font-weight:600;color:var(--accent);
+  animation:chipIn .4s var(--ease) .3s both;
+}
+.disha-hint i{font-size:.6rem;}
+.disha-hash-highlight{
+  background:linear-gradient(135deg,var(--accent),#00c6ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-weight:700;font-size:.78rem;
+}
+/* ── BUBBLES ── */
+.es-bubble-user{align-self:flex-end;background:var(--accent);color:#fff;padding:10px 16px;border-radius:18px 18px 4px 18px;font-size:.84rem;font-weight:500;max-width:75%;animation:msgIn .28s var(--ease);}
+.es-bubble-sys{align-self:flex-start;max-width:88%;animation:msgIn .28s var(--ease);}
+.es-bubble-sys-text{font-size:.82rem;color:var(--muted);margin-bottom:10px;font-weight:400;}
+/* ── SUGGESTIONS ── */
+.disha-suggestions{padding:8px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-top:1px solid var(--border2);background:rgba(0,0,0,.95);}
+.disha-suggestions::-webkit-scrollbar{display:none;}
+.disha-chip{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:.72rem;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--text);animation:chipIn .3s var(--ease) both;}
+.disha-chip:nth-child(1){animation-delay:.05s;}
+.disha-chip:nth-child(2){animation-delay:.1s;}
+.disha-chip:nth-child(3){animation-delay:.15s;}
+.disha-chip:nth-child(4){animation-delay:.2s;}
+.disha-chip:nth-child(5){animation-delay:.25s;}
+.disha-chip:active{background:rgba(255,255,255,.12);}
+.disha-chip i{font-size:.7rem;color:var(--accent);}
+.disha-chip.music-chip i{color:#4dd9b0;}
+.disha-chip.movie-chip i{color:#ffd866;}
+.disha-chip.anime-chip i{color:#ff6b9d;}
+.disha-chip.series-chip i{color:#66d9ff;}
+.disha-chip .hash{color:var(--accent);font-weight:700;}
+/* ── INPUT ── */
+.disha-input-wrap{padding:10px 16px 12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));background:rgba(0,0,0,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border2);flex-shrink:0;position:relative;}
+.disha-input-bar{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:16px;padding:11px 14px;transition:border-color .2s;}
+.disha-input-bar:focus-within{border-color:rgba(0,122,255,.3);}
+.disha-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:.88rem;font-family:var(--font);caret-color:var(--accent);}
+.disha-input::placeholder{color:var(--muted);}
+.disha-send{width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;cursor:pointer;opacity:0;transition:opacity .18s,transform .15s;flex-shrink:0;}
+.disha-send.visible{opacity:1;}
+.disha-send:active{transform:scale(.88);}
+.disha-hash-btn{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:.8rem;font-weight:700;
+  cursor:pointer;flex-shrink:0;transition:.15s;
+  font-family:var(--font);
+}
+.disha-hash-btn:active{background:rgba(0,122,255,.15);color:var(--accent);}
+.disha-fallback{align-self:flex-start;max-width:88%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px 18px 18px 4px;padding:12px 16px;font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.6;animation:msgIn .28s var(--ease);}
+</style>
+</head>
+<body>
+<div class="disha-screen">
+  <div class="disha-topbar">
+    <div class="disha-back" onclick="history.back()"><i class="fa-solid fa-chevron-left"></i></div>
+    <div class="disha-brand"><div class="disha-brand-dot"></div> Disha</div>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="disha-messages" id="disha-messages">
+    <div class="disha-greeting" id="disha-greeting">
+      <div class="disha-greeting-icon"><i class="fa-solid fa-sparkles"></i></div>
+      <div class="disha-greeting-text">
+        <div class="disha-hey">Hey there 👋</div>
+        <div class="disha-sub">I'm Disha. Ask me anything!</div>
+        <div class="disha-sub2">Search someone's favourites using <span class="disha-hash-highlight">#username</span></div>
+        <div class="disha-hint"><i class="fa-solid fa-hashtag"></i> Type <b>#anush</b> to explore favourites</div>
+      </div>
+    </div>
+  </div>
+  <div class="disha-suggestions" id="disha-suggestions">
+    <div class="disha-chip music-chip" onclick="askDisha('#anush Blinding Lights')">
+      <i class="fa-solid fa-music"></i> <span class="hash">#</span>anush Blinding Lights
+    </div>
+    <div class="disha-chip movie-chip" onclick="askDisha('#anush Inception')">
+      <i class="fa-solid fa-film"></i> <span class="hash">#</span>anush Inception
+    </div>
+    <div class="disha-chip anime-chip" onclick="askDisha('#anush anime')">
+      <i class="fa-solid fa-dragon"></i> <span class="hash">#</span>anush anime
+    </div>
+    <div class="disha-chip series-chip" onclick="askDisha('#anush series')">
+      <i class="fa-solid fa-tv"></i> <span class="hash">#</span>anush series
+    </div>
+    <div class="disha-chip music-chip" onclick="askDisha('#anush songs')">
+      <i class="fa-solid fa-headphones"></i> <span class="hash">#</span>anush songs
+    </div>
+  </div>
+  <div class="disha-input-wrap" id="disha-input-wrap">
+    <div class="disha-input-bar">
+      <div class="disha-hash-btn" onclick="insertHash()" title="Search favourites">#</div>
+      <input class="disha-input" id="disha-input" type="text" placeholder="Type #username to search favourites…" autocomplete="off"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();sendDisha();}"
+        oninput="document.getElementById('disha-send').classList.toggle('visible',this.value.trim().length>0)">
+      <div class="disha-send" id="disha-send" onclick="sendDisha()">
+        <i class="fa-solid fa-arrow-up"></i>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="xos-favourites-data.js"></script>
+<script src="disha-favourites.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════
+   DISHA DEMO v2 — #user autocomplete integration
+   ═══════════════════════════════════════════════════════ */
+try{ window.XOS_FAV.seedDefaults('nikhil'); }catch(e){ console.error('FAV seed failed:', e); }
+const msgContainer = document.getElementById('disha-messages');
+const inputEl      = document.getElementById('disha-input');
+const sendBtn      = document.getElementById('disha-send');
+const suggestions  = document.getElementById('disha-suggestions');
+const inputWrap    = document.getElementById('disha-input-wrap');
+// ── Bind autocomplete to input ──
+window.DISHA_FAV.bindAutocomplete(inputWrap, inputEl);
+function insertHash(){
+  inputEl.value = '#';
+  inputEl.focus();
+  inputEl.dispatchEvent(new Event('input'));
+  sendBtn.classList.add('visible');
+}
+function askDisha(text){
+  inputEl.value = text;
+  sendBtn.classList.add('visible');
+  sendDisha();
+}
+async function sendDisha(){
+  const text = inputEl.value.trim();
+  if(!text) return;
+  window.DISHA_FAV.hideDropdown();
+  // Hide greeting
+  const greeting = document.getElementById('disha-greeting');
+  if(greeting) greeting.style.display = 'none';
+  suggestions.style.display = 'none';
+  // User bubble
+  const userBubble = document.createElement('div');
+  userBubble.className = 'es-bubble-user';
+  userBubble.textContent = text;
+  msgContainer.appendChild(userBubble);
+  inputEl.value = '';
+  sendBtn.classList.remove('visible');
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+  // Try favourites handler
+  const handled = await window.DISHA_FAV.handleQuery(text, msgContainer);
+  if(!handled){
+    const fallback = document.createElement('div');
+    fallback.className = 'disha-fallback';
+    fallback.innerHTML = `To search favourites, type <b style="color:var(--accent);">#username</b> followed by what you're looking for.<br><br>
+      Examples:<br>
+      • <b>#anush Blinding Lights</b><br>
+      • <b>#anush movies</b><br>
+      • <b>#anush</b> (shows everything)`;
+    msgContainer.appendChild(fallback);
+  }
+  setTimeout(()=>{
+    suggestions.style.display = 'flex';
+    updateChips(text);
+  }, 600);
+  msgContainer.scrollTop = msgContainer.scrollHeight;
+}
+function updateChips(lastQuery){
+  const chips = [
+    { text:'#anush Starboy',           icon:'fa-solid fa-music',        cls:'music-chip' },
+    { text:'#anush The Dark Knight',   icon:'fa-solid fa-film',         cls:'movie-chip' },
+    { text:'#anush Death Note',        icon:'fa-solid fa-dragon',       cls:'anime-chip' },
+    { text:'#anush movies',            icon:'fa-solid fa-clapperboard', cls:'movie-chip' },
+    { text:'#anush albums',            icon:'fa-solid fa-compact-disc', cls:'music-chip' },
+    { text:'#anush Breaking Bad',      icon:'fa-solid fa-tv',           cls:'series-chip' },
+    { text:'#anush Demon Slayer',      icon:'fa-solid fa-dragon',       cls:'anime-chip' },
+    { text:'#anush Save Your Tears',   icon:'fa-solid fa-headphones',   cls:'music-chip' },
+    { text:'#anush Stranger Things',   icon:'fa-solid fa-tv',           cls:'series-chip' },
+    { text:'#anush Interstellar',      icon:'fa-solid fa-film',         cls:'movie-chip' },
+    { text:'#anush anime',             icon:'fa-solid fa-dragon',       cls:'anime-chip' },
+    { text:'#anush Dawn FM',           icon:'fa-solid fa-compact-disc', cls:'music-chip' },
+    { text:'#anush Attack on Titan',   icon:'fa-solid fa-dragon',       cls:'anime-chip' },
+    { text:'#anush After Hours',       icon:'fa-solid fa-compact-disc', cls:'music-chip' },
+  ];
+  const lq = lastQuery.toLowerCase();
+  const filtered = chips.filter(c => {
+    const item = c.text.replace('#anush ','').toLowerCase();
+    return !lq.includes(item);
+  });
+  const picked = filtered.sort(()=>Math.random()-.5).slice(0,5);
+  suggestions.innerHTML = picked.map((c,i) => `
+    <div class="disha-chip ${c.cls}" onclick="askDisha('${c.text}')" style="animation-delay:${i*0.05}s;">
+      <i class="${c.icon}"></i> <span class="hash">#</span>${c.text.substring(1)}
+    </div>`).join('');
+}
+setTimeout(()=> inputEl.focus(), 500);
+</script>
+</body>
+</html>
