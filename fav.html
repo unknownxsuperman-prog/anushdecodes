@@ -196,7 +196,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
    ════════════════════════════════════════════════════════════
    SEARCH APIs used (all free, no key, CORS-friendly):
      Music/Albums : iTunes Search API
-     Movies       : TVMaze (primary) + iTunes Movies (fallback)
+     Movies       : iTunes IN + US parallel (Bollywood + Hollywood)
      Series       : TVMaze
      Anime        : Jikan v4 (primary) + Kitsu (fallback)
    ════════════════════════════════════════════════════════════ */
@@ -338,9 +338,26 @@ async function tmdbFind(name, type){
 }
 /* ══════════════ PUBLIC FIND (single lookup) — FIXED ══════════════ */
 async function publicFind(name, type){
-  /* ── MOVIE: TVMaze primary → iTunes fallback ── */
+  /* ── MOVIE: iTunes IN + US parallel search for best coverage ── */
   if(type==='movie'){
-    // Try TVMaze first (reliable, CORS-friendly, same as working series)
+    try{
+      // Search Indian & US iTunes stores in parallel
+      const [inRes, usRes] = await Promise.allSettled([
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&media=movie&entity=movie&limit=1&country=IN`).then(r=>r.json()),
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&media=movie&entity=movie&limit=1`).then(r=>r.json())
+      ]);
+      const inItem = inRes.status==='fulfilled' ? (inRes.value.results||[])[0] : null;
+      const usItem = usRes.status==='fulfilled' ? (usRes.value.results||[])[0] : null;
+      const item = inItem || usItem;
+      if(item) return {
+        title: item.trackName || name,
+        subtitle: item.primaryGenreName || '',
+        artwork: (item.artworkUrl100||'').replace('100x100','600x600'),
+        year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
+        rating: item.contentAdvisoryRating || '—'
+      };
+    }catch(e){ console.warn('[movie lookup] iTunes IN+US failed:', e.message); }
+    // Last-resort: TVMaze (might find TV adaptations)
     try{
       const r = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(name)}`);
       const d = await r.json();
@@ -355,20 +372,7 @@ async function publicFind(name, type){
           rating: show.rating?.average ? show.rating.average.toFixed(1) : '—'
         };
       }
-    }catch(e){ console.warn('[movie lookup] TVMaze failed:', e.message); }
-    // Fallback: iTunes
-    try{
-      const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&media=movie&entity=movie&limit=1`);
-      const d = await r.json();
-      const item = (d.results||[])[0];
-      if(item) return {
-        title: item.trackName || name,
-        subtitle: item.primaryGenreName || '',
-        artwork: (item.artworkUrl100||'').replace('100x100','400x600'),
-        year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
-        rating: item.contentAdvisoryRating || '—'
-      };
-    }catch(e){ console.warn('[movie lookup] iTunes fallback failed:', e.message); }
+    }catch(e){ console.warn('[movie lookup] TVMaze fallback failed:', e.message); }
     return null;
   }
   /* ── ANIME: Jikan primary → Kitsu fallback ── */
@@ -592,9 +596,34 @@ async function tmdbSearchAll(q, type){
   });
 }
 async function publicSearchAll(q, type){
-  /* ── MOVIE: TVMaze primary (same engine as working series) → iTunes fallback ── */
+  /* ── MOVIE: iTunes India + US parallel → TVMaze last-resort ── */
   if(type==='movie'){
-    // Primary: TVMaze — same reliable API that powers the working series search
+    // Primary: search BOTH Indian & US iTunes stores in parallel for max coverage
+    try{
+      const [inRes, usRes] = await Promise.allSettled([
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&entity=movie&limit=10&country=IN`).then(r=>r.json()),
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&entity=movie&limit=10`).then(r=>r.json())
+      ]);
+      const inResults = inRes.status==='fulfilled' ? (inRes.value.results||[]) : [];
+      const usResults = usRes.status==='fulfilled' ? (usRes.value.results||[]) : [];
+      // Merge & deduplicate by title
+      const seen = new Set();
+      const combined = [...inResults, ...usResults].filter(item => {
+        const key = (item.trackName||'').toLowerCase();
+        if(!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      const results = combined.slice(0,12).map(item=>({
+        title: item.trackName || '—',
+        subtitle: item.primaryGenreName || '',
+        artwork: (item.artworkUrl100||'').replace('100x100','600x600'),
+        year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
+        rating: item.contentAdvisoryRating || '—'
+      }));
+      if(results.length) return results;
+    }catch(e){ console.warn('[movie search] iTunes IN+US failed:', e.message); }
+    // Last-resort: TVMaze (TV shows only — won't find movies but won't crash)
     try{
       const r = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
       if(!r.ok) throw new Error('TVMaze HTTP '+r.status);
@@ -607,21 +636,7 @@ async function publicSearchAll(q, type){
         rating: show.rating?.average ? show.rating.average.toFixed(1) : '—'
       }));
       if(results.length) return results;
-    }catch(e){ console.warn('[movie search] TVMaze failed:', e.message); }
-    // Fallback: iTunes Movies
-    try{
-      const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&entity=movie&limit=12`);
-      if(!r.ok) throw new Error('iTunes HTTP '+r.status);
-      const d = await r.json();
-      const results = (d.results||[]).map(item=>({
-        title: item.trackName || '—',
-        subtitle: item.primaryGenreName || '',
-        artwork: (item.artworkUrl100||'').replace('100x100','400x600'),
-        year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
-        rating: item.contentAdvisoryRating || '—'
-      }));
-      if(results.length) return results;
-    }catch(e){ console.warn('[movie search] iTunes fallback failed:', e.message); }
+    }catch(e){ console.warn('[movie search] TVMaze fallback failed:', e.message); }
     return [];
   }
   /* ── ANIME: Jikan primary → Kitsu fallback ── */
