@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════
-   DISHA FAVOURITES INTELLIGENCE  v3
+   DISHA FAVOURITES INTELLIGENCE  v3.1
    ─────────────────────────────────────────────────────────────
    Trigger: user types   #username <anything, including full sentences>
      ▸ #anush                              → shows ALL favourites alphabetically
@@ -8,16 +8,14 @@
      ▸ #anush movies                       → all movies
      ▸ does #anush like xyz movie?         → understood as: category=movie, term="xyz"
      ▸ #anush like xyz music?              → understood as: category=music, term="xyz"
-   Filler/question words (does, is, like, ?, the, a, ...) and category
-   words (movie/music/series/anime/...) are stripped out as "signal"
+   Filler/question words and category words are stripped out as "signal"
    words — whatever's left over is treated as the actual item name.
-   Autocomplete suggestions are ranked the way Google-style search-as-you-type
-   ranks things (exact > starts-with > word-start > contains > fuzzy),
-   not alphabetically.
+   Autocomplete suggestions are ranked Google-style (exact > starts-with > word-start > contains > fuzzy).
    ════════════════════════════════════════════════════════════════ */
+
 window.DISHA_FAV = (function(){
   /* ── CONFIG ── */
-  const DEFAULT_USERID  = 'nikhil';
+  const DEFAULT_USERID  = null;   // no hard‑coded default; uses dynamic resolver
   const CATEGORIES      = ['music','album','movie','series','anime'];
   const CAT_KEYWORDS    = {
     music:['music','songs','song','tracks','track'],
@@ -34,8 +32,7 @@ window.DISHA_FAV = (function(){
     'my','me','i','want','wanna','got','get','favourite','favorite','fav',
     'favourites','favorites','if','you','think','with','and','or'
   ]);
-  /* map any known display-name → userid */
-  const USER_MAP = { anush:'nikhil', nikhil:'nikhil' };
+
   /* ── CATEGORY META ── */
   const CAT_META = {
     music:  { icon:'fa-solid fa-music',        label:'Track',  color:'#4dd9b0', bg:'rgba(0,200,150,.12)',  border:'rgba(0,200,150,.2)' },
@@ -45,15 +42,40 @@ window.DISHA_FAV = (function(){
     anime:  { icon:'fa-solid fa-dragon',        label:'Anime',  color:'#ff6b9d', bg:'rgba(255,70,150,.12)', border:'rgba(255,70,150,.2)' },
   };
 
+  /* ── DYNAMIC USER RESOLVER ──
+     Builds the mapping live from window.XOS_PROFILES.
+     Matches on userId, handle, or displayName.
+  */
+  function resolveUserId(typed) {
+    if (!typed) return null;
+    const t = typed.toLowerCase().replace(/[^\w]/g, '');
+    const profiles = window.XOS_PROFILES || {};
+    for (const [uid, p] of Object.entries(profiles)) {
+      if (uid.toLowerCase() === t) return uid;
+      if ((p.handle || '').toLowerCase().replace(/[^\w@]/g, '').replace('@x0s', '').replace('@xos', '') === t) return uid;
+      if ((p.displayName || '').toLowerCase().replace(/[^\w]/g, '') === t) return uid;
+    }
+    // fallback: partial match on displayName (e.g. "#anush" matching "Anush Decodes")
+    for (const [uid, p] of Object.entries(profiles)) {
+      if ((p.displayName || '').toLowerCase().replace(/[^\w]/g, '').startsWith(t)) return uid;
+    }
+    return null;
+  }
+
+  function allTypedUsernames() {
+    const profiles = window.XOS_PROFILES || {};
+    const set = new Set();
+    for (const [uid, p] of Object.entries(profiles)) {
+      set.add(uid);
+      if (p.handle) set.add(p.handle.replace(/^@/, ''));
+      if (p.displayName) set.add(p.displayName);
+    }
+    return Array.from(set).filter(Boolean);
+  }
+
   /* ════════════════════════════════════════════
      NATURAL-LANGUAGE TOKEN CLASSIFIER
-     ════════════════════════════════════════════
-     Splits any free-text tail (after "#user ") into:
-       - categoryKey   : the first recognised category word, if any
-       - searchTerm    : everything left over, in original order/casing
-       - fillerCount   : how many filler/intent words were found
-       - hasQuestionMark
-  */
+     ════════════════════════════════════════════ */
   function classifyTokens(text){
     const tokens = (text || '').split(/\s+/).filter(Boolean);
     const contentTokens = [];
@@ -85,9 +107,7 @@ window.DISHA_FAV = (function(){
 
   /* ════════════════════════════════════════════
      RELEVANCE SCORING  —  Google-suggest style
-     ════════════════════════════════════════════
-     Higher = better match. -1 = no match at all.
-  */
+     ════════════════════════════════════════════ */
   function scoreMatch(name, query){
     if(!query) return 0;
     const n = name.toLowerCase();
@@ -100,7 +120,7 @@ window.DISHA_FAV = (function(){
     }
     const idx = n.indexOf(q);
     if(idx !== -1) return 600 - idx - (n.length - q.length) * 0.5;
-    // fuzzy subsequence fallback (handles typos / partial words)
+    // fuzzy subsequence fallback
     let qi = 0;
     for(let i = 0; i < n.length && qi < q.length; i++){
       if(n[i] === q[qi]) qi++;
@@ -112,13 +132,10 @@ window.DISHA_FAV = (function(){
   /* ════════════════════════════════════════════
      AUTOCOMPLETE  —  live dropdown as user types
      ════════════════════════════════════════════ */
-  let _dropdownEl = null;   // the autocomplete container
-  let _inputEl    = null;   // the Disha text input
-  let _onPick     = null;   // callback(text) when a suggestion is tapped
-  /** Call once to bind autocomplete to a text input.
-   *  container  = element to mount the dropdown in (usually input's parent)
-   *  input      = the <input> element
-   *  onPick(t)  = called when user taps a suggestion */
+  let _dropdownEl = null;
+  let _inputEl    = null;
+  let _onPick     = null;
+
   function bindAutocomplete(container, input, onPick){
     _inputEl = input;
     _onPick  = onPick;
@@ -132,24 +149,26 @@ window.DISHA_FAV = (function(){
     input.addEventListener('input', _onInputChange);
     input.addEventListener('blur', ()=> setTimeout(hideDropdown, 180));
   }
+
   function _onInputChange(){
     const val = _inputEl.value;
     const hashIdx = val.lastIndexOf('#');
     if(hashIdx === -1){ hideDropdown(); return; }
-    const afterHash = val.substring(hashIdx + 1); // e.g. "anush does she like blin"
+    const afterHash = val.substring(hashIdx + 1);
     const spaceIdx = afterHash.search(/\s/);
     const typedUserRaw = spaceIdx === -1 ? afterHash : afterHash.substring(0, spaceIdx);
     const typedUser = typedUserRaw.toLowerCase().replace(/[^\w]/g,'');
     if(!typedUser){ showUserSuggestions(''); return; }
-    const matchedUserId = USER_MAP[typedUser];
+    const matchedUserId = resolveUserId(typedUser);
     if(!matchedUserId){ showUserSuggestions(typedUser); return; }
     const rest = spaceIdx === -1 ? '' : afterHash.substring(spaceIdx + 1);
     showFavSuggestions(matchedUserId, typedUserRaw, rest, hashIdx);
   }
+
   function showUserSuggestions(partial){
-    const users = Object.keys(USER_MAP);
+    const users = allTypedUsernames();
     const filtered = partial
-      ? users.filter(u => u.startsWith(partial)).sort()
+      ? users.filter(u => u.toLowerCase().startsWith(partial.toLowerCase())).sort()
       : users.sort();
     if(!filtered.length){ hideDropdown(); return; }
     _dropdownEl.innerHTML = filtered.map(u =>
@@ -161,10 +180,10 @@ window.DISHA_FAV = (function(){
     _dropdownEl.classList.add('open');
     _attachItemClicks();
   }
+
   function showFavSuggestions(userId, displayUser, rawAfterUser, hashIdx){
     try{ window.XOS_FAV.seedDefaults(userId); }catch{}
     const { searchTerm, categoryKey } = classifyTokens(rawAfterUser);
-    // Gather all favourites
     let pool = [];
     for(const cat of CATEGORIES){
       const items = window.XOS_FAV.get(userId, cat) || [];
@@ -174,7 +193,6 @@ window.DISHA_FAV = (function(){
       pool = pool.filter(p => p.category === categoryKey);
     }
     if(searchTerm){
-      // Google-suggest style ranking, not alphabetical
       pool = pool
         .map(p => ({ ...p, _score: scoreMatch(p.name, searchTerm) }))
         .filter(p => p._score > -1)
@@ -220,6 +238,7 @@ window.DISHA_FAV = (function(){
     _dropdownEl.classList.add('open');
     _attachItemClicks();
   }
+
   function _attachItemClicks(){
     _dropdownEl.querySelectorAll('[data-val]').forEach(el => {
       el.addEventListener('mousedown', e => {
@@ -230,13 +249,14 @@ window.DISHA_FAV = (function(){
         hideDropdown();
         _inputEl.dispatchEvent(new Event('input'));
         if(_onPick && !v.endsWith(' ') && v.split(/\s+/).length > 1){
-          // Don't auto-send, let user press enter
+          // let user press enter
         } else {
           setTimeout(()=> _onInputChange(), 50);
         }
       });
     });
   }
+
   function hideDropdown(){
     if(_dropdownEl) _dropdownEl.classList.remove('open');
   }
@@ -253,7 +273,7 @@ window.DISHA_FAV = (function(){
     const spaceIdx = afterHash.search(/\s/);
     const typedUser = (spaceIdx === -1 ? afterHash : afterHash.substring(0, spaceIdx))
       .toLowerCase().replace(/[^\w]/g,'');
-    const userId = USER_MAP[typedUser];
+    const userId = resolveUserId(typedUser);
     if(!userId) return null;
     const rest = spaceIdx === -1 ? '' : afterHash.substring(spaceIdx + 1).trim();
 
@@ -263,10 +283,9 @@ window.DISHA_FAV = (function(){
 
     const { searchTerm, categoryKey, fillerCount, hasQuestionMark } = classifyTokens(rest);
     const signalScore = fillerCount + (categoryKey ? 1 : 0) + (hasQuestionMark ? 1 : 0);
-    const intentQuestion = signalScore >= 2 && !!searchTerm; // e.g. "does #anush like xyz movie?"
+    const intentQuestion = signalScore >= 2 && !!searchTerm;
 
     if(categoryKey && !searchTerm){
-      // e.g. "#anush movies"
       return { userId, displayUser: typedUser, type: categoryKey, searchTerm: null, listAll: true, intentQuestion: false };
     }
     if(searchTerm){
@@ -292,18 +311,18 @@ window.DISHA_FAV = (function(){
       return out;
     };
     let results = collect(categoryFilter ? [categoryFilter] : CATEGORIES);
-    // If a category was guessed from the sentence but nothing matched there,
-    // fall back to searching everywhere else before giving up.
     if(!results.length && categoryFilter){
       results = collect(CATEGORIES.filter(c => c !== categoryFilter));
     }
     results.sort((a,b) => b._score - a._score);
     return results;
   }
+
   function listCategory(userId, category){
     if(!window.XOS_FAV) return [];
     return (window.XOS_FAV.get(userId, category)||[]).map(name => ({ name, category }));
   }
+
   function listAll(userId){
     if(!window.XOS_FAV) return [];
     const all = [];
@@ -312,6 +331,7 @@ window.DISHA_FAV = (function(){
     }
     return all.sort((a,b) => a.name.localeCompare(b.name));
   }
+
   /* ════════════════════════════════════════════
      API LOOKUPS (iTunes / Jikan / Kitsu / TVMaze)
      ════════════════════════════════════════════ */
@@ -339,18 +359,21 @@ window.DISHA_FAV = (function(){
     try{ localStorage.setItem(`xos_fav_cache_${category}_${name.toLowerCase()}`, JSON.stringify({info,t:Date.now()})); }catch{}
     return info;
   }
+
   async function _lookupMusic(n){
     const r=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(n)}&entity=song&limit=1&media=music`);
     const d=await r.json(); const i=(d.results||[])[0]; if(!i) return null;
     return { title:i.trackName||n, subtitle:i.artistName||'', artwork:(i.artworkUrl100||'').replace('100x100','400x400'),
       year:i.releaseDate?i.releaseDate.substring(0,4):'', genre:i.primaryGenreName||'', preview:i.previewUrl||'' };
   }
+
   async function _lookupAlbum(n){
     const r=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(n)}&entity=album&limit=1&media=music`);
     const d=await r.json(); const i=(d.results||[])[0]; if(!i) return null;
     return { title:i.collectionName||n, subtitle:i.artistName||'', artwork:(i.artworkUrl100||'').replace('100x100','400x400'),
       year:i.releaseDate?i.releaseDate.substring(0,4):'', trackCount:i.trackCount||0, preview:'' };
   }
+
   async function _lookupAnime(n){
     try{
       const r=await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(n)}&limit=1`);
@@ -367,6 +390,7 @@ window.DISHA_FAV = (function(){
         year:a.startDate?a.startDate.substring(0,4):'', rating:a.averageRating?(parseFloat(a.averageRating)/10).toFixed(1):'', preview:'' };
     }catch{} return null;
   }
+
   async function _lookupSeries(n){
     const r=await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(n)}`);
     const d=await r.json(); const f=(d||[])[0]; if(!f) return null; const s=f.show;
@@ -374,6 +398,7 @@ window.DISHA_FAV = (function(){
       artwork:s.image?.medium||s.image?.original||'',
       year:s.premiered?s.premiered.substring(0,4):'', rating:s.rating?.average?s.rating.average.toFixed(1):'', preview:'' };
   }
+
   async function _lookupMovie(n){
     const [a,b]=await Promise.allSettled([
       fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(n)}&media=movie&entity=movie&limit=1&country=IN`).then(r=>r.json()),
@@ -384,17 +409,21 @@ window.DISHA_FAV = (function(){
     return { title:i.trackName||n, subtitle:i.primaryGenreName||'', artwork:(i.artworkUrl100||'').replace('100x100','600x600'),
       year:i.releaseDate?i.releaseDate.substring(0,4):'', rating:i.contentAdvisoryRating||'', preview:i.previewUrl||'' };
   }
+
   /* ════════════════════════════════════════════
      HTML RENDERERS
      ════════════════════════════════════════════ */
   function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
   function getSearchUrl(name, cat){
     return (cat==='music'||cat==='album')
       ? `https://www.youtube.com/results?search_query=${encodeURIComponent(name)}`
       : `https://www.google.com/search?q=${encodeURIComponent(name+' '+(cat||''))}`;
   }
+
   function getSearchIcon(cat){ return (cat==='music'||cat==='album') ? 'fa-brands fa-youtube' : 'fa-brands fa-google'; }
   function getSearchLabel(cat){ return (cat==='music'||cat==='album') ? 'Search on YouTube' : 'Search on Google'; }
+
   function buildFoundCard(item, info, category){
     const m = CAT_META[category]||CAT_META.music;
     const hasPreview = info.preview && (category==='music'||category==='movie');
@@ -440,6 +469,7 @@ window.DISHA_FAV = (function(){
       </div>
     </div>`;
   }
+
   function buildNotFoundCard(term, displayUser){
     return `
     <div class="es-bubble-sys" style="animation:msgIn .28s var(--ease);">
@@ -452,6 +482,7 @@ window.DISHA_FAV = (function(){
       </div>
     </div>`;
   }
+
   function buildListCards(items, infos, displayUser, categoryLabel){
     const groupedByCat = !categoryLabel;
     let html = `<div class="es-bubble-sys" style="animation:msgIn .28s var(--ease);">
@@ -496,6 +527,7 @@ window.DISHA_FAV = (function(){
     html += `</div>`;
     return html;
   }
+
   function buildLoading(){
     return `<div class="es-bubble-sys disha-fav-loading" style="animation:msgIn .28s var(--ease);">
       <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:18px;
@@ -504,10 +536,12 @@ window.DISHA_FAV = (function(){
         <span style="font-size:.78rem;color:rgba(255,255,255,.4);">Searching favourites…</span>
       </div></div>`;
   }
+
   /* ════════════════════════════════════════════
      AUDIO PREVIEW
      ════════════════════════════════════════════ */
   let _audio = null, _playBtn = null;
+
   function playPreview(el){
     const url = el.dataset.previewUrl;
     if(!url) return;
@@ -521,21 +555,24 @@ window.DISHA_FAV = (function(){
     _audio.onended = ()=>{ _setPlayIcon(el,'play'); _playBtn=null; };
     _audio.onerror = ()=>{ _setPlayIcon(el,'play'); _playBtn=null; };
   }
+
   function _setPlayIcon(el,state){
     if(!el) return; const i=el.querySelector('i'); if(i) i.className=`fa-solid fa-${state}`;
   }
+
   /* ════════════════════════════════════════════
      WEB SEARCH
      ════════════════════════════════════════════ */
   function webSearch(name, cat){
     window.open(getSearchUrl(name, cat), '_blank');
   }
+
   /* ════════════════════════════════════════════
      MAIN HANDLER  —  called on message submit
      ════════════════════════════════════════════ */
   async function handleQuery(rawQuery, msgContainer){
     const parsed = parseQuery(rawQuery);
-    if(!parsed) return false; // not a #user query → let Disha handle normally
+    if(!parsed) return false;
     hideDropdown();
     const { userId, displayUser } = parsed;
     try{ window.XOS_FAV.seedDefaults(userId); }catch{}
@@ -558,8 +595,6 @@ window.DISHA_FAV = (function(){
         d.innerHTML = buildNotFoundCard(parsed.searchTerm, displayUser);
         msgContainer.appendChild(d.firstElementChild);
       } else if(parsed.searchTerm && (parsed.intentQuestion || items.length <= 2)){
-        // Natural-language question ("does #anush like xyz movie?") → give one
-        // definitive best-match answer instead of a pile of options.
         const topItems = parsed.intentQuestion ? items.slice(0, 1) : items;
         for(const it of topItems){
           const info = await lookupItem(it.name, it.category);
@@ -591,6 +626,7 @@ window.DISHA_FAV = (function(){
     msgContainer.scrollTop = msgContainer.scrollHeight;
     return true;
   }
+
   /* ════════════════════════════════════════════
      INJECT STYLES
      ════════════════════════════════════════════ */
@@ -684,6 +720,20 @@ window.DISHA_FAV = (function(){
     `;
     document.head.appendChild(s);
   })();
+
   /* ── PUBLIC API ── */
-  return { handleQuery, playPreview, webSearch, bindAutocomplete, hideDropdown, parseQuery, searchFavourites, scoreMatch, classifyTokens };
+  return {
+    handleQuery,
+    playPreview,
+    webSearch,
+    bindAutocomplete,
+    hideDropdown,
+    parseQuery,
+    searchFavourites,
+    scoreMatch,
+    classifyTokens,
+    // Expose resolver for debugging (optional)
+    resolveUserId,
+    allTypedUsernames
+  };
 })();
