@@ -14,7 +14,7 @@ window.XOS_FAV = (function () {
   // Starter favourites — edit these to match what you actually want
   // pre-loaded per user. Add more userIds here as needed.
   const DEFAULTS = {
-    nikhil: {
+    anush: {
       music:  ['Blinding Lights', 'Levitating', 'Die For You'],
       album:  ['After Hours', 'Future Nostalgia'],
       movie:  ['Inception', 'Interstellar', 'The Dark Knight'],
