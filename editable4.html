@@ -769,187 +769,972 @@
 <script src="profiles.js"></script>
     <script src="colleges.js"></script>
     <script>
-    const urlParams=new URLSearchParams(window.location.search);
-    const activeUsername=urlParams.get('user')||'nikhil';
-    const ALL_PROFILES=window.XOS_PROFILES||{};
-    const activeProfile=ALL_PROFILES[activeUsername]||ALL_PROFILES['nikhil']||null;
-    if(!activeProfile){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-family:\'Space Grotesk\',sans-serif;">No profile data.</div>';throw new Error('XOS_PROFILES not found');}
-    const LS_SCOPE=activeUsername;
-    function lsGet(k,fb){const r=localStorage.getItem(`xos_${k}_${LS_SCOPE}`);if(r===null)return fb;try{return JSON.parse(r);}catch(e){return r;}}
-    function lsSet(k,v){localStorage.setItem(`xos_${k}_${LS_SCOPE}`,JSON.stringify(v));}
-    let POSTS=activeProfile.posts||[];
-    const BADGE_SRC={gold:'badge-gold.png',blue:'badge-blue.svg',green:'badge-green.svg'};
-    function buildBadgeHTML(t){if(!t||t==='none')return '';const b=BADGE_SRC[t]?t:'gold';return `<span class="sheet-verified badge-${b}"><img src="${BADGE_SRC[b]}" alt=""></span>`;}
-    function setPfpBadge(t){const el=document.getElementById('pfp-badge');if(!t||t==='none'){el.className='pfp-badge badge-none';el.innerHTML='';return;}const b=BADGE_SRC[t]?t:'gold';el.className=`pfp-badge badge-${b}`;el.innerHTML=`<img src="${BADGE_SRC[b]}" alt="">`;}
-    function makeFoBadge(t){if(!t||t==='none')return '';const b=BADGE_SRC[t]?t:'gold';return `<span style="display:inline-flex;align-items:center;"><img src="${BADGE_SRC[b]}" style="width:13px;height:13px;object-fit:contain;" alt=""></span>`;}
+    // ─── FALLBACK: grab first available profile instead of hardcoding 'nikhil' ───
+    const ALL_PROFILES = window.XOS_PROFILES || {};
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeUsername = urlParams.get('user') || Object.keys(ALL_PROFILES)[0] || '';
+    const activeProfile = ALL_PROFILES[activeUsername] || Object.values(ALL_PROFILES)[0] || null;
 
-    function renderProfile(){
-        const p=activeProfile;POSTS=p.posts||[];
-        const sN=lsGet('edit_name',null),sB=lsGet('edit_bio',null),sAv=lsGet('edit_avatar',null),sBn=lsGet('edit_banner',null),sT=lsGet('edit_track',null),sL=lsGet('edit_links',null);
-        const dn=sN||p.displayName,av=sAv||p.avatar||'',bn=sBn||p.banner||'',bio=sB!==null?sB:(p.bio||'');
-        document.getElementById('page-title').textContent=dn+' | x0s.link';document.title=dn+' | x0s.link';
-        document.getElementById('banner-img').src=bn;document.getElementById('avatar-img').src=av;document.getElementById('pfp-viewer-img').src=av;document.getElementById('sheet-avatar-img').src=av;document.getElementById('comment-avatar-img').src=av;
-        document.getElementById('display-name').textContent=dn;document.getElementById('handle-display').textContent=p.handle;
-        document.getElementById('sheet-display-name').innerHTML=dn+buildBadgeHTML(p.verified);document.getElementById('sheet-handle-tag').textContent=p.handle;
-        document.getElementById('bio-text').textContent=bio;setPfpBadge(p.verified);
-        const track=sT||p.audioTrack||{};
-        document.getElementById('bio-music-label').textContent=(track.title||'Track')+' \u2022 '+(track.artist||'Artist');
-        document.getElementById('music-title-display').textContent=track.title||'Track Title';
-        document.getElementById('music-artist-display').textContent=track.artist||'Artist';
-        document.getElementById('bio-audio').src=track.streamUrl||'';
-        document.getElementById('music-audio-player').src=track.streamUrl||'';
-        document.getElementById('music-thumb').src=track.artworkUrl||av;
-        const links=sL!==null?sL:(p.links||[]);
-        document.getElementById('links-row').innerHTML=links.map(l=>{const iH=l.arattai?`<img src="arattai.png" style="width:13px;height:13px;object-fit:contain;display:block;flex-shrink:0;" alt="">`:`<i class="${l.icon||'fa-solid fa-link'} ${l.color||'color-globe'}"></i>`;return `<a href="${l.url||'#'}" class="link-pill" target="_blank">${iH}${l.label}</a>`;}).join('');
-        followerBase=window.xosFollowerCount?window.xosFollowerCount(activeUsername):0;
-        followingBase=window.xosFollowingCount?window.xosFollowingCount(activeUsername):0;
-        isFollowing=lsGet('is_following',false);updateFollowUI();
-        ['bio-audio','music-audio-player'].forEach(id=>{const a=document.getElementById(id);a.pause();a.currentTime=0;});
-        document.getElementById('bio-play-icon').className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');
-        document.getElementById('music-play-icon').className='fa-solid fa-play';document.getElementById('music-progress').value=0;
-        document.getElementById('music-current').textContent='0:00';document.getElementById('music-duration').textContent='0:00';
-        initCollegeLink();renderPosts();const pc=document.getElementById("posts-count");if(pc)pc.textContent=POSTS.length;
-        const fc=followerBase+(isFollowing?1:0);
-        document.getElementById('fo-followers-count').textContent=fc>=1000?(fc/1000).toFixed(1)+'k':fc;
-        document.getElementById('fo-following-count').textContent=followingBase>=1000?(followingBase/1000).toFixed(1)+'k':followingBase;
+    if (!activeProfile) {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#fff;font-family:\'Space Grotesk\',sans-serif;">No profiles found in XOS_PROFILES.</div>';
+        throw new Error('XOS_PROFILES is empty');
     }
 
-    function toggleMenu(e){e.stopPropagation();document.getElementById('dropdown-menu').classList.toggle('active');}
-    function toggleDarkMode(){document.body.classList.toggle('light-mode');document.getElementById('dropdown-menu').classList.remove('active');}
-    window.onclick=()=>document.getElementById('dropdown-menu').classList.remove('active');
-    let followerBase=0,followingBase=0,isFollowing=false;
-    function updateFollowUI(){const d=followerBase+(isFollowing?1:0);document.getElementById('follower-count').innerText=d>=1000?(d/1000).toFixed(1)+'k':d;document.getElementById('following-count').innerText=followingBase;const fc2=document.getElementById('fo-followers-count');const fg2=document.getElementById('fo-following-count');if(fc2)fc2.textContent=d>=1000?(d/1000).toFixed(1)+'k':d;if(fg2)fg2.textContent=followingBase>=1000?(followingBase/1000).toFixed(1)+'k':followingBase;const b=document.getElementById('follow-btn');b.innerText=isFollowing?'Following':'Follow';b.classList.toggle('following',isFollowing);}
-    function openFavourites(){
+    const LS_SCOPE = activeUsername;
+    function lsGet(k, fb) {
+        const r = localStorage.getItem(`xos_${k}_${LS_SCOPE}`);
+        if (r === null) return fb;
+        try { return JSON.parse(r); } catch (e) { return r; }
+    }
+    function lsSet(k, v) {
+        localStorage.setItem(`xos_${k}_${LS_SCOPE}`, JSON.stringify(v));
+    }
+    let POSTS = activeProfile.posts || [];
+    const BADGE_SRC = { gold: 'badge-gold.png', blue: 'badge-blue.svg', green: 'badge-green.svg' };
+    function buildBadgeHTML(t) {
+        if (!t || t === 'none') return '';
+        const b = BADGE_SRC[t] ? t : 'gold';
+        return `<span class="sheet-verified badge-${b}"><img src="${BADGE_SRC[b]}" alt=""></span>`;
+    }
+    function setPfpBadge(t) {
+        const el = document.getElementById('pfp-badge');
+        if (!t || t === 'none') {
+            el.className = 'pfp-badge badge-none';
+            el.innerHTML = '';
+            return;
+        }
+        const b = BADGE_SRC[t] ? t : 'gold';
+        el.className = `pfp-badge badge-${b}`;
+        el.innerHTML = `<img src="${BADGE_SRC[b]}" alt="">`;
+    }
+    function makeFoBadge(t) {
+        if (!t || t === 'none') return '';
+        const b = BADGE_SRC[t] ? t : 'gold';
+        return `<span style="display:inline-flex;align-items:center;"><img src="${BADGE_SRC[b]}" style="width:13px;height:13px;object-fit:contain;" alt=""></span>`;
+    }
+
+    function renderProfile() {
+        const p = activeProfile;
+        POSTS = p.posts || [];
+        const sN = lsGet('edit_name', null),
+            sB = lsGet('edit_bio', null),
+            sAv = lsGet('edit_avatar', null),
+            sBn = lsGet('edit_banner', null),
+            sT = lsGet('edit_track', null),
+            sL = lsGet('edit_links', null);
+        const dn = sN || p.displayName,
+            av = sAv || p.avatar || '',
+            bn = sBn || p.banner || '',
+            bio = sB !== null ? sB : (p.bio || '');
+        document.getElementById('page-title').textContent = dn + ' | x0s.link';
+        document.title = dn + ' | x0s.link';
+        document.getElementById('banner-img').src = bn;
+        document.getElementById('avatar-img').src = av;
+        document.getElementById('pfp-viewer-img').src = av;
+        document.getElementById('sheet-avatar-img').src = av;
+        document.getElementById('comment-avatar-img').src = av;
+        document.getElementById('display-name').textContent = dn;
+        document.getElementById('handle-display').textContent = p.handle;
+        document.getElementById('sheet-display-name').innerHTML = dn + buildBadgeHTML(p.verified);
+        document.getElementById('sheet-handle-tag').textContent = p.handle;
+        document.getElementById('bio-text').textContent = bio;
+        setPfpBadge(p.verified);
+        const track = sT || p.audioTrack || {};
+        document.getElementById('bio-music-label').textContent = (track.title || 'Track') + ' \u2022 ' + (track.artist || 'Artist');
+        document.getElementById('music-title-display').textContent = track.title || 'Track Title';
+        document.getElementById('music-artist-display').textContent = track.artist || 'Artist';
+        document.getElementById('bio-audio').src = track.streamUrl || '';
+        document.getElementById('music-audio-player').src = track.streamUrl || '';
+        document.getElementById('music-thumb').src = track.artworkUrl || av;
+        const links = sL !== null ? sL : (p.links || []);
+        document.getElementById('links-row').innerHTML = links.map(l => {
+            const iH = l.arattai ? `<img src="arattai.png" style="width:13px;height:13px;object-fit:contain;display:block;flex-shrink:0;" alt="">` :
+                `<i class="${l.icon || 'fa-solid fa-link'} ${l.color || 'color-globe'}"></i>`;
+            return `<a href="${l.url || '#'}" class="link-pill" target="_blank">${iH}${l.label}</a>`;
+        }).join('');
+        followerBase = window.xosFollowerCount ? window.xosFollowerCount(activeUsername) : 0;
+        followingBase = window.xosFollowingCount ? window.xosFollowingCount(activeUsername) : 0;
+        isFollowing = lsGet('is_following', false);
+        updateFollowUI();
+        ['bio-audio', 'music-audio-player'].forEach(id => {
+            const a = document.getElementById(id);
+            a.pause();
+            a.currentTime = 0;
+        });
+        document.getElementById('bio-play-icon').className = 'fa-solid fa-play';
+        document.getElementById('bio-eq').classList.add('paused');
+        document.getElementById('music-play-icon').className = 'fa-solid fa-play';
+        document.getElementById('music-progress').value = 0;
+        document.getElementById('music-current').textContent = '0:00';
+        document.getElementById('music-duration').textContent = '0:00';
+        initCollegeLink();
+        renderPosts();
+        const pc = document.getElementById("posts-count");
+        if (pc) pc.textContent = POSTS.length;
+        const fc = followerBase + (isFollowing ? 1 : 0);
+        document.getElementById('fo-followers-count').textContent = fc >= 1000 ? (fc / 1000).toFixed(1) + 'k' : fc;
+        document.getElementById('fo-following-count').textContent = followingBase >= 1000 ? (followingBase / 1000).toFixed(1) + 'k' : followingBase;
+    }
+
+    function toggleMenu(e) { e.stopPropagation();
+        document.getElementById('dropdown-menu').classList.toggle('active'); }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('light-mode');
         document.getElementById('dropdown-menu').classList.remove('active');
-        window.location.href='xos-favourites.html?user='+activeUsername;
+    }
+    window.onclick = () => document.getElementById('dropdown-menu').classList.remove('active');
+    let followerBase = 0,
+        followingBase = 0,
+        isFollowing = false;
+
+    function updateFollowUI() {
+        const d = followerBase + (isFollowing ? 1 : 0);
+        document.getElementById('follower-count').innerText = d >= 1000 ? (d / 1000).toFixed(1) + 'k' : d;
+        document.getElementById('following-count').innerText = followingBase;
+        const fc2 = document.getElementById('fo-followers-count');
+        const fg2 = document.getElementById('fo-following-count');
+        if (fc2) fc2.textContent = d >= 1000 ? (d / 1000).toFixed(1) + 'k' : d;
+        if (fg2) fg2.textContent = followingBase >= 1000 ? (followingBase / 1000).toFixed(1) + 'k' : followingBase;
+        const b = document.getElementById('follow-btn');
+        b.innerText = isFollowing ? 'Following' : 'Follow';
+        b.classList.toggle('following', isFollowing);
     }
 
-    let followOverlayOpen=false,currentFollowTab='followers',followSearchQuery='';
-    function showFollowList(type){currentFollowTab=type;followSearchQuery='';document.getElementById('fo-search-input').value='';updateFollowTabUI();renderFollowList();followOverlayOpen=true;const el=document.getElementById('follow-overlay');el.style.display='flex';el.classList.remove('closing');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));history.pushState({modal:'follow-list'},'');}
-    function updateFollowTabUI(){const isF=currentFollowTab==='followers';document.getElementById('fo-tab-followers').classList.toggle('active',isF);document.getElementById('fo-tab-following').classList.toggle('active',!isF);document.getElementById('fo-title-text').textContent=isF?'Followers':'Following';}
-    function switchFollowTab(t){if(currentFollowTab===t)return;currentFollowTab=t;followSearchQuery='';document.getElementById('fo-search-input').value='';updateFollowTabUI();renderFollowList();}
-    function onFollowSearch(v){followSearchQuery=v.trim().toLowerCase();renderFollowList();}
-    function renderFollowList(){const isF=currentFollowTab==='followers';let u=[];try{u=isF?(window.xosGetFollowers?window.xosGetFollowers(activeUsername):[]):(window.xosGetFollowing?window.xosGetFollowing(activeUsername):[]);}catch(e){u=[];}document.getElementById('fo-subtitle-text').textContent=u.length+' people';if(followSearchQuery)u=u.filter(x=>(x.displayName||'').toLowerCase().includes(followSearchQuery)||(x.userid||'').toLowerCase().includes(followSearchQuery));const list=document.getElementById('fo-list');if(!u.length){list.innerHTML=`<div class="fo-empty"><i class="fa-solid fa-user-group"></i><p>${followSearchQuery?'No results':'Nothing here yet'}</p></div>`;return;}list.innerHTML=u.map((x,i)=>`<div class="fo-user-row" style="animation-delay:${i*38}ms" onclick="navigateToUser('${x.userid}')"><div class="fo-pfp-wrap"><img class="fo-pfp" src="${x.avatar||''}" onerror="this.src=''" alt=""></div><div class="fo-user-info"><div class="fo-name">${x.displayName||x.userid}${makeFoBadge(x.verified)}</div><div class="fo-handle">${x.handle||'@'+x.userid}</div></div><button class="fo-action-btn mutual" onclick="event.stopPropagation()">Mutual</button></div>${i<u.length-1?'<div class="fo-divider"></div>':''}`).join('');}
-    function closeFollowList(fromPop){if(!followOverlayOpen)return;followOverlayOpen=false;const el=document.getElementById('follow-overlay');el.classList.remove('open');el.classList.add('closing');if(!fromPop)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},380);}
-    function navigateToUser(u){window.location.href=window.location.pathname+'?user='+u;}
+    function openFavourites() {
+        document.getElementById('dropdown-menu').classList.remove('active');
+        window.location.href = 'xos-favourites.html?user=' + activeUsername;
+    }
 
-    let gridIntervals=[];
-    function renderPosts(){const grid=document.getElementById('posts-grid');if(!grid)return;gridIntervals.forEach(clearInterval);gridIntervals=[];grid.innerHTML=POSTS.map((p,i)=>`<div class="post-thumb" onclick="openPost(${i})">${p.type==='video'?`<video src="${p.files[0]}" muted autoplay loop playsinline></video><div class="vid-badge">&#9658; VIDEO</div>`:`<img src="${p.files[0]}" id="thumb-${i}" loading="lazy">`}${p.files.length>1?`<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>`:''}</div>`).join('');POSTS.forEach((p,i)=>{if(p.files.length>1&&p.type==='image'){let idx=0;gridIntervals.push(setInterval(()=>{idx=(idx+1)%p.files.length;const el=document.getElementById(`thumb-${i}`);if(el)el.src=p.files[idx];},2200));}});}
+    let followOverlayOpen = false,
+        currentFollowTab = 'followers',
+        followSearchQuery = '';
 
-    let currentPost=-1,currentFile=0,modalOpen=false,likedPosts={},videoMuted=false,suppressMuteFlash=false;
-    function openPost(idx){if(modalOpen||pfpOpen)return;currentPost=idx;currentFile=0;modalOpen=true;const p=POSTS[idx];likedPosts[idx]=lsGet('liked_'+idx,false);document.getElementById('like-count').textContent=(p.likes||0)+(likedPosts[idx]?1:0);document.getElementById('comment-count').textContent=lsGet('comments_'+idx,p.comments||0);updateLikeUI();document.getElementById('sheet-caption').textContent=p.caption||'';document.getElementById('sheet-time').textContent=p.time||'just now';document.getElementById('comment-input').value='';document.getElementById('comment-send').classList.remove('visible');videoMuted=false;suppressMuteFlash=true;loadModalMedia();initSwipeToClose();history.pushState({modal:'post',idx},'');const bd=document.getElementById('post-modal');bd.style.display='flex';requestAnimationFrame(()=>requestAnimationFrame(()=>{bd.classList.add('active');setTimeout(()=>{suppressMuteFlash=false;},500);}));}
-    function closePostModal(fromPop){if(!modalOpen)return;modalOpen=false;const bd=document.getElementById('post-modal');bd.classList.remove('active');const v=document.getElementById('sheet-video');v.pause();v.src='';if(!fromPop)history.back();setTimeout(()=>{bd.style.display='none';},420);}
-    let pfpOpen=false;
-    function openPfpViewer(){if(pfpOpen||modalOpen)return;pfpOpen=true;const el=document.getElementById('pfp-viewer');el.style.display='flex';requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('active')));history.pushState({modal:'pfp'},'');}
-    function closePfpViewer(fp){if(!pfpOpen)return;pfpOpen=false;const el=document.getElementById('pfp-viewer');el.classList.add('closing');el.classList.remove('active');if(!fp)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},280);}
+    function showFollowList(type) {
+        currentFollowTab = type;
+        followSearchQuery = '';
+        document.getElementById('fo-search-input').value = '';
+        updateFollowTabUI();
+        renderFollowList();
+        followOverlayOpen = true;
+        const el = document.getElementById('follow-overlay');
+        el.style.display = 'flex';
+        el.classList.remove('closing');
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('open')));
+        history.pushState({ modal: 'follow-list' }, '');
+    }
 
-    window.addEventListener('popstate',e=>{if(editOverlayOpen){closeEditProfile(true);return;}if(followOverlayOpen){closeFollowList(true);return;}if(clgProfileOpen){closeCollegeProfile(true);return;}if(clgSearchOpen){closeCollegeLinkSearch(true);return;}if(modalOpen){closePostModal(true);return;}if(pfpOpen){closePfpViewer(true);return;}});
+    function updateFollowTabUI() {
+        const isF = currentFollowTab === 'followers';
+        document.getElementById('fo-tab-followers').classList.toggle('active', isF);
+        document.getElementById('fo-tab-following').classList.toggle('active', !isF);
+        document.getElementById('fo-title-text').textContent = isF ? 'Followers' : 'Following';
+    }
 
-    function getNeighbours(p,i){const f=p.files;return{prev:f[(i-1+f.length)%f.length],curr:f[i],next:f[(i+1)%f.length]};}
-    function loadModalMedia(){const p=POSTS[currentPost];const file=p.files[currentFile];const vid=document.getElementById('sheet-video');const strip=document.getElementById('carousel-strip');const isV=p.type==='video'||(file&&file.endsWith('.mp4'));strip.style.transition='none';strip.style.transform='translateX(-33.333%)';if(isV){document.getElementById('img-curr').style.display='none';document.getElementById('img-prev').src='';document.getElementById('img-next').src='';vid.style.display='block';vid.src=file;vid.muted=videoMuted;vid.loop=true;vid.play().catch(()=>{vid.muted=true;videoMuted=true;showMuteIndicator();vid.play();});}else{vid.pause();vid.src='';vid.style.display='none';document.getElementById('img-curr').style.display='block';const{prev,curr,next}=getNeighbours(p,currentFile);document.getElementById('img-prev').src=p.files.length>1?prev:'';document.getElementById('img-curr').src=curr;document.getElementById('img-next').src=p.files.length>1?next:'';}document.getElementById('mute-tap-zone').style.display=isV?'block':'none';updateCounterDots();}
-    function updateCounterDots(){const p=POSTS[currentPost];const ce=document.getElementById('sheet-counter');const de=document.getElementById('sheet-dots');if(p.files.length>1){ce.style.display='block';ce.textContent=`${currentFile+1} / ${p.files.length}`;}else ce.style.display='none';de.innerHTML='';if(p.files.length>1)p.files.forEach((_,i)=>{const d=document.createElement('div');d.className='sheet-dot'+(i===currentFile?' active':'');de.appendChild(d);});}
-    (()=>{const media=document.getElementById('sheet-media');const strip=document.getElementById('carousel-strip');const W=()=>media.offsetWidth;let sx=0,sy=0,isH=null,dragging=false,lastX=0,lastT=0,vel=0;const BASE=-33.333;function toPct(px){return(px/(W()*3))*100;}function ssp(pct,tr){strip.style.transition=tr||'none';strip.style.transform=`translateX(${pct}%)`;}media.addEventListener('touchstart',e=>{const p=POSTS[currentPost];if(!p||p.type==='video'||p.files.length<=1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;lastT=Date.now();lastX=sx;vel=0;isH=null;dragging=true;strip.style.transition='none';},{passive:true});media.addEventListener('touchmove',e=>{if(!dragging)return;const cx=e.touches[0].clientX,cy=e.touches[0].clientY,dx=cx-sx,dy=cy-sy;if(isH===null){if(Math.abs(dx)<5&&Math.abs(dy)<5)return;isH=Math.abs(dx)>Math.abs(dy);if(!isH){dragging=false;return;}}if(!isH)return;const now=Date.now();vel=(cx-lastX)/Math.max(now-lastT,1);lastX=cx;lastT=now;ssp(BASE+toPct(dx));},{passive:true});media.addEventListener('touchend',e=>{if(!dragging||!isH){dragging=false;return;}dragging=false;const p=POSTS[currentPost];const dx=e.changedTouches[0].clientX-sx;const thr=W()*.22;const fast=Math.abs(vel)>.4;const gN=dx<-thr||(fast&&vel<0),gP=dx>thr||(fast&&vel>0);const cN=currentFile<p.files.length-1,cP=currentFile>0;if(gN&&cN){ssp(BASE+toPct(-W()),'transform .32s cubic-bezier(.25,.72,.35,1)');setTimeout(()=>{currentFile++;loadModalMedia();updateCounterDots();},320);}else if(gP&&cP){ssp(BASE+toPct(W()),'transform .32s cubic-bezier(.25,.72,.35,1)');setTimeout(()=>{currentFile--;loadModalMedia();updateCounterDots();},320);}else ssp(BASE,'transform .38s cubic-bezier(.25,.72,.35,1)');},{passive:true});})();
-    function initSwipeToClose(){const s=document.getElementById('post-sheet');let sy=0,sx=0,dr=false,raf=null;s.addEventListener('touchstart',e=>{sy=e.touches[0].clientY;sx=e.touches[0].clientX;dr=true;s.style.transition='none';},{passive:true});s.addEventListener('touchmove',e=>{if(!dr)return;const dy=e.touches[0].clientY-sy,dx=e.touches[0].clientX-sx;if(Math.abs(dx)>Math.abs(dy))return;if(dy<=0)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{s.style.transform=`translateY(${dy}px)`;});},{passive:true});s.addEventListener('touchend',e=>{if(!dr)return;dr=false;const dy=e.changedTouches[0].clientY-sy;s.style.transition='';if(dy>90){s.style.transform='';closePostModal();}else s.style.transform='';},{passive:true});}
-    let lastTap=0,tapTimer=null;
-    document.getElementById('mute-tap-zone').addEventListener('click',e=>{const now=Date.now(),gap=now-lastTap;lastTap=now;if(gap<300&&gap>0){clearTimeout(tapTimer);lastTap=0;triggerDoubleTapLike(e);}else tapTimer=setTimeout(toggleMute,260);});
-    function toggleMute(){const v=document.getElementById('sheet-video');if(!v||v.style.display==='none')return;videoMuted=!videoMuted;v.muted=videoMuted;showMuteIndicator();}
-    function showMuteIndicator(){if(suppressMuteFlash)return;const ind=document.getElementById('mute-indicator');document.getElementById('mute-icon').className=videoMuted?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}
-    function triggerDoubleTapLike(){if(currentPost<0)return;if(!likedPosts[currentPost]){likedPosts[currentPost]=true;lsSet('liked_'+currentPost,true);document.getElementById('like-count').textContent=(POSTS[currentPost].likes||0)+1;updateLikeUI();}const ind=document.getElementById('dt-indicator');ind.classList.remove('flash');void ind.offsetWidth;ind.classList.add('flash');}
-    function toggleLike(){if(currentPost<0)return;likedPosts[currentPost]=!likedPosts[currentPost];lsSet('liked_'+currentPost,likedPosts[currentPost]);document.getElementById('like-count').textContent=(POSTS[currentPost].likes||0)+(likedPosts[currentPost]?1:0);updateLikeUI();}
-    function updateLikeUI(){const liked=likedPosts[currentPost]||false;document.getElementById('like-btn').classList.toggle('liked',liked);document.getElementById('like-icon').className=liked?'fa-solid fa-heart':'fa-regular fa-heart';}
-    function focusComment(){document.getElementById('comment-input').focus();}
-    function onCommentInput(el){document.getElementById('comment-send').classList.toggle('visible',el.value.trim().length>0);}
-    function onCommentKey(e){if(e.key==='Enter')sendComment();}
-    function sendComment(){const inp=document.getElementById('comment-input');if(!inp.value.trim())return;const cc=document.getElementById('comment-count');cc.textContent=parseInt(cc.textContent)+1;lsSet('comments_'+currentPost,parseInt(cc.textContent));inp.value='';inp.blur();document.getElementById('comment-send').classList.remove('visible');}
-    function sharePost(){if(navigator.share)navigator.share({title:activeProfile.displayName+' | x0s.link',url:window.location.href});}
+    function switchFollowTab(t) {
+        if (currentFollowTab === t) return;
+        currentFollowTab = t;
+        followSearchQuery = '';
+        document.getElementById('fo-search-input').value = '';
+        updateFollowTabUI();
+        renderFollowList();
+    }
+
+    function onFollowSearch(v) {
+        followSearchQuery = v.trim().toLowerCase();
+        renderFollowList();
+    }
+
+    function renderFollowList() {
+        const isF = currentFollowTab === 'followers';
+        let u = [];
+        try {
+            u = isF ? (window.xosGetFollowers ? window.xosGetFollowers(activeUsername) : []) :
+                (window.xosGetFollowing ? window.xosGetFollowing(activeUsername) : []);
+        } catch (e) { u = []; }
+        document.getElementById('fo-subtitle-text').textContent = u.length + ' people';
+        if (followSearchQuery) u = u.filter(x => (x.displayName || '').toLowerCase().includes(followSearchQuery) || (x.userid || '').toLowerCase().includes(followSearchQuery));
+        const list = document.getElementById('fo-list');
+        if (!u.length) {
+            list.innerHTML =
+                `<div class="fo-empty"><i class="fa-solid fa-user-group"></i><p>${followSearchQuery ? 'No results' : 'Nothing here yet'}</p></div>`;
+            return;
+        }
+        list.innerHTML = u.map((x, i) =>
+            `<div class="fo-user-row" style="animation-delay:${i * 38}ms" onclick="navigateToUser('${x.userid}')"><div class="fo-pfp-wrap"><img class="fo-pfp" src="${x.avatar || ''}" onerror="this.src=''" alt=""></div><div class="fo-user-info"><div class="fo-name">${x.displayName || x.userid}${makeFoBadge(x.verified)}</div><div class="fo-handle">${x.handle || '@' + x.userid}</div></div><button class="fo-action-btn mutual" onclick="event.stopPropagation()">Mutual</button></div>${i < u.length - 1 ? '<div class="fo-divider"></div>' : ''}`
+        ).join('');
+    }
+
+    function closeFollowList(fromPop) {
+        if (!followOverlayOpen) return;
+        followOverlayOpen = false;
+        const el = document.getElementById('follow-overlay');
+        el.classList.remove('open');
+        el.classList.add('closing');
+        if (!fromPop) history.back();
+        setTimeout(() => { el.style.display = 'none';
+            el.classList.remove('closing'); }, 380);
+    }
+
+    function navigateToUser(u) { window.location.href = window.location.pathname + '?user=' + u; }
+
+    let gridIntervals = [];
+
+    function renderPosts() {
+        const grid = document.getElementById('posts-grid');
+        if (!grid) return;
+        gridIntervals.forEach(clearInterval);
+        gridIntervals = [];
+        grid.innerHTML = POSTS.map((p, i) =>
+            `<div class="post-thumb" onclick="openPost(${i})">${p.type === 'video' ? `<video src="${p.files[0]}" muted autoplay loop playsinline></video><div class="vid-badge">&#9658; VIDEO</div>` : `<img src="${p.files[0]}" id="thumb-${i}" loading="lazy">`}${p.files.length > 1 ? `<div class="multi-badge"><i class="fa-solid fa-clone"></i></div>` : ''}</div>`
+        ).join('');
+        POSTS.forEach((p, i) => {
+            if (p.files.length > 1 && p.type === 'image') {
+                let idx = 0;
+                gridIntervals.push(setInterval(() => {
+                    idx = (idx + 1) % p.files.length;
+                    const el = document.getElementById(`thumb-${i}`);
+                    if (el) el.src = p.files[idx];
+                }, 2200));
+            }
+        });
+    }
+
+    let currentPost = -1,
+        currentFile = 0,
+        modalOpen = false,
+        likedPosts = {},
+        videoMuted = false,
+        suppressMuteFlash = false;
+
+    function openPost(idx) {
+        if (modalOpen || pfpOpen) return;
+        currentPost = idx;
+        currentFile = 0;
+        modalOpen = true;
+        const p = POSTS[idx];
+        likedPosts[idx] = lsGet('liked_' + idx, false);
+        document.getElementById('like-count').textContent = (p.likes || 0) + (likedPosts[idx] ? 1 : 0);
+        document.getElementById('comment-count').textContent = lsGet('comments_' + idx, p.comments || 0);
+        updateLikeUI();
+        document.getElementById('sheet-caption').textContent = p.caption || '';
+        document.getElementById('sheet-time').textContent = p.time || 'just now';
+        document.getElementById('comment-input').value = '';
+        document.getElementById('comment-send').classList.remove('visible');
+        videoMuted = false;
+        suppressMuteFlash = true;
+        loadModalMedia();
+        initSwipeToClose();
+        history.pushState({ modal: 'post', idx }, '');
+        const bd = document.getElementById('post-modal');
+        bd.style.display = 'flex';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            bd.classList.add('active');
+            setTimeout(() => { suppressMuteFlash = false; }, 500);
+        }));
+    }
+
+    function closePostModal(fromPop) {
+        if (!modalOpen) return;
+        modalOpen = false;
+        const bd = document.getElementById('post-modal');
+        bd.classList.remove('active');
+        const v = document.getElementById('sheet-video');
+        v.pause();
+        v.src = '';
+        if (!fromPop) history.back();
+        setTimeout(() => { bd.style.display = 'none'; }, 420);
+    }
+    let pfpOpen = false;
+
+    function openPfpViewer() {
+        if (pfpOpen || modalOpen) return;
+        pfpOpen = true;
+        const el = document.getElementById('pfp-viewer');
+        el.style.display = 'flex';
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('active')));
+        history.pushState({ modal: 'pfp' }, '');
+    }
+
+    function closePfpViewer(fp) {
+        if (!pfpOpen) return;
+        pfpOpen = false;
+        const el = document.getElementById('pfp-viewer');
+        el.classList.add('closing');
+        el.classList.remove('active');
+        if (!fp) history.back();
+        setTimeout(() => { el.style.display = 'none';
+            el.classList.remove('closing'); }, 280);
+    }
+
+    window.addEventListener('popstate', e => {
+        if (editOverlayOpen) { closeEditProfile(true); return; }
+        if (followOverlayOpen) { closeFollowList(true); return; }
+        if (clgProfileOpen) { closeCollegeProfile(true); return; }
+        if (clgSearchOpen) { closeCollegeLinkSearch(true); return; }
+        if (modalOpen) { closePostModal(true); return; }
+        if (pfpOpen) { closePfpViewer(true); return; }
+    });
+
+    function getNeighbours(p, i) {
+        const f = p.files;
+        return { prev: f[(i - 1 + f.length) % f.length], curr: f[i], next: f[(i + 1) % f.length] };
+    }
+
+    function loadModalMedia() {
+        const p = POSTS[currentPost];
+        const file = p.files[currentFile];
+        const vid = document.getElementById('sheet-video');
+        const strip = document.getElementById('carousel-strip');
+        const isV = p.type === 'video' || (file && file.endsWith('.mp4'));
+        strip.style.transition = 'none';
+        strip.style.transform = 'translateX(-33.333%)';
+        if (isV) {
+            document.getElementById('img-curr').style.display = 'none';
+            document.getElementById('img-prev').src = '';
+            document.getElementById('img-next').src = '';
+            vid.style.display = 'block';
+            vid.src = file;
+            vid.muted = videoMuted;
+            vid.loop = true;
+            vid.play().catch(() => { vid.muted = true;
+                videoMuted = true;
+                showMuteIndicator();
+                vid.play(); });
+        } else {
+            vid.pause();
+            vid.src = '';
+            vid.style.display = 'none';
+            document.getElementById('img-curr').style.display = 'block';
+            const { prev, curr, next } = getNeighbours(p, currentFile);
+            document.getElementById('img-prev').src = p.files.length > 1 ? prev : '';
+            document.getElementById('img-curr').src = curr;
+            document.getElementById('img-next').src = p.files.length > 1 ? next : '';
+        }
+        document.getElementById('mute-tap-zone').style.display = isV ? 'block' : 'none';
+        updateCounterDots();
+    }
+
+    function updateCounterDots() {
+        const p = POSTS[currentPost];
+        const ce = document.getElementById('sheet-counter');
+        const de = document.getElementById('sheet-dots');
+        if (p.files.length > 1) { ce.style.display = 'block';
+            ce.textContent = `${currentFile + 1} / ${p.files.length}`; } else ce.style.display = 'none';
+        de.innerHTML = '';
+        if (p.files.length > 1) p.files.forEach((_, i) => {
+            const d = document.createElement('div');
+            d.className = 'sheet-dot' + (i === currentFile ? ' active' : '');
+            de.appendChild(d);
+        });
+    }
+    (() => {
+        const media = document.getElementById('sheet-media');
+        const strip = document.getElementById('carousel-strip');
+        const W = () => media.offsetWidth;
+        let sx = 0,
+            sy = 0,
+            isH = null,
+            dragging = false,
+            lastX = 0,
+            lastT = 0,
+            vel = 0;
+        const BASE = -33.333;
+
+        function toPct(px) { return (px / (W() * 3)) * 100; }
+
+        function ssp(pct, tr) { strip.style.transition = tr || 'none';
+            strip.style.transform = `translateX(${pct}%)`; }
+        media.addEventListener('touchstart', e => {
+            const p = POSTS[currentPost];
+            if (!p || p.type === 'video' || p.files.length <= 1) return;
+            sx = e.touches[0].clientX;
+            sy = e.touches[0].clientY;
+            lastT = Date.now();
+            lastX = sx;
+            vel = 0;
+            isH = null;
+            dragging = true;
+            strip.style.transition = 'none';
+        }, { passive: true });
+        media.addEventListener('touchmove', e => {
+            if (!dragging) return;
+            const cx = e.touches[0].clientX,
+                cy = e.touches[0].clientY,
+                dx = cx - sx,
+                dy = cy - sy;
+            if (isH === null) { if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
+                isH = Math.abs(dx) > Math.abs(dy); if (!isH) { dragging = false; return; } }
+            if (!isH) return;
+            const now = Date.now();
+            vel = (cx - lastX) / Math.max(now - lastT, 1);
+            lastX = cx;
+            lastT = now;
+            ssp(BASE + toPct(dx));
+        }, { passive: true });
+        media.addEventListener('touchend', e => {
+            if (!dragging || !isH) { dragging = false; return; }
+            dragging = false;
+            const p = POSTS[currentPost];
+            const dx = e.changedTouches[0].clientX - sx;
+            const thr = W() * .22;
+            const fast = Math.abs(vel) > .4;
+            const gN = dx < -thr || (fast && vel < 0),
+                gP = dx > thr || (fast && vel > 0);
+            const cN = currentFile < p.files.length - 1,
+                cP = currentFile > 0;
+            if (gN && cN) {
+                ssp(BASE + toPct(-W()), 'transform .32s cubic-bezier(.25,.72,.35,1)');
+                setTimeout(() => { currentFile++;
+                    loadModalMedia();
+                    updateCounterDots(); }, 320);
+            } else if (gP && cP) {
+                ssp(BASE + toPct(W()), 'transform .32s cubic-bezier(.25,.72,.35,1)');
+                setTimeout(() => { currentFile--;
+                    loadModalMedia();
+                    updateCounterDots(); }, 320);
+            } else ssp(BASE, 'transform .38s cubic-bezier(.25,.72,.35,1)');
+        }, { passive: true });
+    })();
+
+    function initSwipeToClose() {
+        const s = document.getElementById('post-sheet');
+        let sy = 0,
+            sx = 0,
+            dr = false,
+            raf = null;
+        s.addEventListener('touchstart', e => { sy = e.touches[0].clientY;
+            sx = e.touches[0].clientX;
+            dr = true;
+            s.style.transition = 'none'; }, { passive: true });
+        s.addEventListener('touchmove', e => {
+            if (!dr) return;
+            const dy = e.touches[0].clientY - sy,
+                dx = e.touches[0].clientX - sx;
+            if (Math.abs(dx) > Math.abs(dy)) return;
+            if (dy <= 0) return;
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => { s.style.transform = `translateY(${dy}px)`; });
+        }, { passive: true });
+        s.addEventListener('touchend', e => {
+            if (!dr) return;
+            dr = false;
+            const dy = e.changedTouches[0].clientY - sy;
+            s.style.transition = '';
+            if (dy > 90) { s.style.transform = '';
+                closePostModal(); } else s.style.transform = '';
+        }, { passive: true });
+    }
+    let lastTap = 0,
+        tapTimer = null;
+    document.getElementById('mute-tap-zone').addEventListener('click', e => {
+        const now = Date.now(),
+            gap = now - lastTap;
+        lastTap = now;
+        if (gap < 300 && gap > 0) { clearTimeout(tapTimer);
+            lastTap = 0;
+            triggerDoubleTapLike(e); } else tapTimer = setTimeout(toggleMute, 260);
+    });
+
+    function toggleMute() {
+        const v = document.getElementById('sheet-video');
+        if (!v || v.style.display === 'none') return;
+        videoMuted = !videoMuted;
+        v.muted = videoMuted;
+        showMuteIndicator();
+    }
+
+    function showMuteIndicator() {
+        if (suppressMuteFlash) return;
+        const ind = document.getElementById('mute-indicator');
+        document.getElementById('mute-icon').className = videoMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+        ind.classList.remove('flash');
+        void ind.offsetWidth;
+        ind.classList.add('flash');
+    }
+
+    function triggerDoubleTapLike() {
+        if (currentPost < 0) return;
+        if (!likedPosts[currentPost]) { likedPosts[currentPost] = true;
+            lsSet('liked_' + currentPost, true);
+            document.getElementById('like-count').textContent = (POSTS[currentPost].likes || 0) + 1;
+            updateLikeUI(); }
+        const ind = document.getElementById('dt-indicator');
+        ind.classList.remove('flash');
+        void ind.offsetWidth;
+        ind.classList.add('flash');
+    }
+
+    function toggleLike() {
+        if (currentPost < 0) return;
+        likedPosts[currentPost] = !likedPosts[currentPost];
+        lsSet('liked_' + currentPost, likedPosts[currentPost]);
+        document.getElementById('like-count').textContent = (POSTS[currentPost].likes || 0) + (likedPosts[currentPost] ? 1 : 0);
+        updateLikeUI();
+    }
+
+    function updateLikeUI() {
+        const liked = likedPosts[currentPost] || false;
+        document.getElementById('like-btn').classList.toggle('liked', liked);
+        document.getElementById('like-icon').className = liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    }
+
+    function focusComment() { document.getElementById('comment-input').focus(); }
+
+    function onCommentInput(el) { document.getElementById('comment-send').classList.toggle('visible', el.value.trim().length > 0); }
+
+    function onCommentKey(e) { if (e.key === 'Enter') sendComment(); }
+
+    function sendComment() {
+        const inp = document.getElementById('comment-input');
+        if (!inp.value.trim()) return;
+        const cc = document.getElementById('comment-count');
+        cc.textContent = parseInt(cc.textContent) + 1;
+        lsSet('comments_' + currentPost, parseInt(cc.textContent));
+        inp.value = '';
+        inp.blur();
+        document.getElementById('comment-send').classList.remove('visible');
+    }
+
+    function sharePost() { if (navigator.share) navigator.share({ title: activeProfile.displayName + ' | x0s.link', url: window.location.href }); }
 
     let musicProgressTimer;
-    function fmtTime(s){if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;}
-    function openMusicPlayer(){const ba=document.getElementById('bio-audio');if(!ba.paused){ba.pause();document.getElementById('bio-play-icon').className='fa-solid fa-play';document.getElementById('bio-eq').classList.add('paused');}const m=document.getElementById('music-modal');m.style.display='flex';setTimeout(()=>m.classList.add('active'),10);const ma=document.getElementById('music-audio-player');ma.currentTime=0;ma.play().then(()=>{document.getElementById('music-play-icon').className='fa-solid fa-pause';}).catch(()=>{});clearInterval(musicProgressTimer);musicProgressTimer=setInterval(updateMusicProgress,400);}
-    function updateMusicProgress(){const ma=document.getElementById('music-audio-player');if(!ma||isNaN(ma.duration)||ma.duration<=0){document.getElementById('music-duration').textContent='0:00';document.getElementById('music-current').textContent='0:00';document.getElementById('music-progress').value=0;return;}const c=ma.currentTime,d=ma.duration;document.getElementById('music-progress').value=(c/d)*100;document.getElementById('music-current').textContent=fmtTime(c);document.getElementById('music-duration').textContent=fmtTime(d);document.getElementById('music-play-icon').className=ma.paused?'fa-solid fa-play':'fa-solid fa-pause';}
-    function closeMusicModal(){const m=document.getElementById('music-modal');m.classList.remove('active');setTimeout(()=>m.style.display='none',300);document.getElementById('music-audio-player').pause();clearInterval(musicProgressTimer);}
-    document.getElementById('music-play-pause').addEventListener('click',()=>{const ma=document.getElementById('music-audio-player');if(!ma.src)return;if(ma.paused){ma.play().then(()=>{document.getElementById('music-play-icon').className='fa-solid fa-pause';}).catch(()=>{});}else{ma.pause();document.getElementById('music-play-icon').className='fa-solid fa-play';}});
-    document.getElementById('music-progress').addEventListener('input',e=>{const ma=document.getElementById('music-audio-player');if(!ma||isNaN(ma.duration)||ma.duration<=0)return;ma.currentTime=(e.target.value/100)*ma.duration;});
-    document.getElementById('music-prev').addEventListener('click',()=>{const ma=document.getElementById('music-audio-player');if(!ma.src)return;ma.currentTime=0;if(ma.paused)ma.play().catch(()=>{});document.getElementById('music-play-icon').className='fa-solid fa-pause';});
-    document.getElementById('music-next').addEventListener('click',()=>{const ma=document.getElementById('music-audio-player');if(!ma.src||isNaN(ma.duration)||ma.duration<=0)return;ma.currentTime=Math.min(ma.duration,ma.currentTime+10);if(ma.paused)ma.play().catch(()=>{});document.getElementById('music-play-icon').className='fa-solid fa-pause';});
-    document.getElementById('music-audio-player').addEventListener('ended',()=>{document.getElementById('music-play-icon').className='fa-solid fa-play';document.getElementById('music-progress').value=100;});
-    function toggleBioMusic(e){if(e)e.stopPropagation();const a=document.getElementById('bio-audio'),ic=document.getElementById('bio-play-icon'),eq=document.getElementById('bio-eq');if(!a.src)return;if(a.paused){a.play();ic.className='fa-solid fa-pause';eq.classList.remove('paused');}else{a.pause();ic.className='fa-solid fa-play';eq.classList.add('paused');}}
-    function shareProfile(){if(navigator.share)navigator.share({title:activeProfile.displayName+' | x0s.link',url:window.location.href});document.getElementById('dropdown-menu').classList.remove('active');}
 
-    let clgProfileOpen=false;
-    function openCollegeProfile(idx){const colleges=window.XOS_COLLEGES||[];const c=colleges[idx];if(!c)return;const np=c.name.split(',');document.getElementById('acp-pfp').src=c.pfp||'';document.getElementById('acp-name').textContent=np[0].trim()+' '+c.id;document.getElementById('acp-caption').textContent=np.slice(1).join(',').trim()||'Engineering College';document.getElementById('acp-pills').innerHTML=(c.pill1?`<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill1}</span>`:'')+( c.pill2?`<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill2}</span>`:'');clgProfileOpen=true;const el=document.getElementById('clg-profile-overlay');el.style.display='flex';requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.transform='translateX(0)'));history.pushState({modal:'clg-profile'},'');}
-    function closeCollegeProfile(fp){if(!clgProfileOpen)return;clgProfileOpen=false;const el=document.getElementById('clg-profile-overlay');el.style.transform='translateX(100%)';if(!fp)history.back();setTimeout(()=>{el.style.display='none';},380);}
-    let clgSearchOpen=false;
-    function handleCollegeLinkClick(){const stored=lsGet('linked_college',null);if(stored){const colleges=window.XOS_COLLEGES||[];const idx=colleges.findIndex(col=>col.id===stored.id);if(idx>=0){openCollegeProfile(idx);return;}}openCollegeLinkSearch();}
-    function initCollegeLink(){const stored=lsGet('linked_college',null);if(stored)setCollegeLinkUI(stored.name,true);else setCollegeLinkUI('+ Link College',false);}
-    function setCollegeLinkUI(name,linked){const el=document.getElementById('college-link-name');const icon=document.getElementById('college-link-icon');const wrap=document.querySelector('.college-link-name-wrap');el.classList.toggle('linked',linked);icon.classList.toggle('linked',linked);el.classList.remove('marquee-anim');el.textContent=linked?name:'+ Link College';requestAnimationFrame(()=>{if(wrap&&el.scrollWidth>wrap.offsetWidth&&linked){el.textContent=name+'   \u00b7   '+name;el.classList.add('marquee-anim');}});}
-    function openCollegeLinkSearch(){document.getElementById('dropdown-menu').classList.remove('active');clgSearchOpen=true;const el=document.getElementById('clg-search-overlay');el.style.display='flex';el.classList.remove('closing');requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));setTimeout(()=>document.getElementById('clg-search-input').focus(),400);history.pushState({modal:'clg-search'},'');}
-    function closeCollegeLinkSearch(fp){if(!clgSearchOpen)return;clgSearchOpen=false;const el=document.getElementById('clg-search-overlay');el.classList.remove('open');el.classList.add('closing');document.getElementById('clg-search-input').value='';document.getElementById('clg-results-list').innerHTML='';if(!fp)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},340);}
-    function onClgSearchInput(val){const q=val.trim().toLowerCase().replace(/\s/g,'');const list=document.getElementById('clg-results-list');const colleges=window.XOS_COLLEGES||[];if(!q){list.innerHTML='';return;}const showAll=q==='#college'||q==='#colleges';let matches=showAll?colleges:colleges.filter(c=>c.name.toLowerCase().replace(/\s/g,'').includes(q)).slice(0,6);if(!matches.length){list.innerHTML='<div class="clg-no-results">No colleges found</div>';return;}list.innerHTML=matches.map(c=>{const dn=c.name.split(',')[0].trim();const oi=colleges.indexOf(c);return`<div class="clg-result-item" onclick="linkCollege(${oi})"><img class="clg-pfp" src="${c.pfp||''}" onerror="this.src=''" alt=""><div style="flex:1;min-width:0;"><div class="clg-name">${dn}</div><div class="clg-id">${c.id}</div></div><i class="fa-solid fa-link clg-chevron"></i></div>`;}).join('');}
-    function linkCollege(idx){const colleges=window.XOS_COLLEGES||[];const c=colleges[idx];if(!c)return;const dn=c.name.split(',')[0].trim();lsSet('linked_college',{id:c.id,name:dn,pfp:c.pfp||''});setCollegeLinkUI(dn,true);closeCollegeLinkSearch();}
+    function fmtTime(s) { if (!s || isNaN(s)) return '0:00'; return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`; }
+
+    function openMusicPlayer() {
+        const ba = document.getElementById('bio-audio');
+        if (!ba.paused) { ba.pause();
+            document.getElementById('bio-play-icon').className = 'fa-solid fa-play';
+            document.getElementById('bio-eq').classList.add('paused'); }
+        const m = document.getElementById('music-modal');
+        m.style.display = 'flex';
+        setTimeout(() => m.classList.add('active'), 10);
+        const ma = document.getElementById('music-audio-player');
+        ma.currentTime = 0;
+        ma.play().then(() => { document.getElementById('music-play-icon').className = 'fa-solid fa-pause'; }).catch(() => {});
+        clearInterval(musicProgressTimer);
+        musicProgressTimer = setInterval(updateMusicProgress, 400);
+    }
+
+    function updateMusicProgress() {
+        const ma = document.getElementById('music-audio-player');
+        if (!ma || isNaN(ma.duration) || ma.duration <= 0) {
+            document.getElementById('music-duration').textContent = '0:00';
+            document.getElementById('music-current').textContent = '0:00';
+            document.getElementById('music-progress').value = 0;
+            return;
+        }
+        const c = ma.currentTime,
+            d = ma.duration;
+        document.getElementById('music-progress').value = (c / d) * 100;
+        document.getElementById('music-current').textContent = fmtTime(c);
+        document.getElementById('music-duration').textContent = fmtTime(d);
+        document.getElementById('music-play-icon').className = ma.paused ? 'fa-solid fa-play' : 'fa-solid fa-pause';
+    }
+
+    function closeMusicModal() {
+        const m = document.getElementById('music-modal');
+        m.classList.remove('active');
+        setTimeout(() => m.style.display = 'none', 300);
+        document.getElementById('music-audio-player').pause();
+        clearInterval(musicProgressTimer);
+    }
+    document.getElementById('music-play-pause').addEventListener('click', () => {
+        const ma = document.getElementById('music-audio-player');
+        if (!ma.src) return;
+        if (ma.paused) { ma.play().then(() => { document.getElementById('music-play-icon').className = 'fa-solid fa-pause'; }).catch(() => {}); } else { ma.pause();
+            document.getElementById('music-play-icon').className = 'fa-solid fa-play'; }
+    });
+    document.getElementById('music-progress').addEventListener('input', e => {
+        const ma = document.getElementById('music-audio-player');
+        if (!ma || isNaN(ma.duration) || ma.duration <= 0) return;
+        ma.currentTime = (e.target.value / 100) * ma.duration;
+    });
+    document.getElementById('music-prev').addEventListener('click', () => {
+        const ma = document.getElementById('music-audio-player');
+        if (!ma.src) return;
+        ma.currentTime = 0;
+        if (ma.paused) ma.play().catch(() => {});
+        document.getElementById('music-play-icon').className = 'fa-solid fa-pause';
+    });
+    document.getElementById('music-next').addEventListener('click', () => {
+        const ma = document.getElementById('music-audio-player');
+        if (!ma.src || isNaN(ma.duration) || ma.duration <= 0) return;
+        ma.currentTime = Math.min(ma.duration, ma.currentTime + 10);
+        if (ma.paused) ma.play().catch(() => {});
+        document.getElementById('music-play-icon').className = 'fa-solid fa-pause';
+    });
+    document.getElementById('music-audio-player').addEventListener('ended', () => {
+        document.getElementById('music-play-icon').className = 'fa-solid fa-play';
+        document.getElementById('music-progress').value = 100;
+    });
+
+    function toggleBioMusic(e) {
+        if (e) e.stopPropagation();
+        const a = document.getElementById('bio-audio'),
+            ic = document.getElementById('bio-play-icon'),
+            eq = document.getElementById('bio-eq');
+        if (!a.src) return;
+        if (a.paused) { a.play();
+            ic.className = 'fa-solid fa-pause';
+            eq.classList.remove('paused'); } else { a.pause();
+            ic.className = 'fa-solid fa-play';
+            eq.classList.add('paused'); }
+    }
+
+    function shareProfile() {
+        if (navigator.share) navigator.share({ title: activeProfile.displayName + ' | x0s.link', url: window.location.href });
+        document.getElementById('dropdown-menu').classList.remove('active');
+    }
+
+    let clgProfileOpen = false;
+
+    function openCollegeProfile(idx) {
+        const colleges = window.XOS_COLLEGES || [];
+        const c = colleges[idx];
+        if (!c) return;
+        const np = c.name.split(',');
+        document.getElementById('acp-pfp').src = c.pfp || '';
+        document.getElementById('acp-name').textContent = np[0].trim() + ' ' + c.id;
+        document.getElementById('acp-caption').textContent = np.slice(1).join(',').trim() || 'Engineering College';
+        document.getElementById('acp-pills').innerHTML = (c.pill1 ? `<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill1}</span>` : '') + (c.pill2 ? `<span style="padding:3px 10px;border-radius:99px;font-size:.62rem;font-weight:600;background:rgba(0,122,255,.12);border:1px solid rgba(0,122,255,.2);color:#007aff;">${c.pill2}</span>` : '');
+        clgProfileOpen = true;
+        const el = document.getElementById('clg-profile-overlay');
+        el.style.display = 'flex';
+        requestAnimationFrame(() => requestAnimationFrame(() => el.style.transform = 'translateX(0)'));
+        history.pushState({ modal: 'clg-profile' }, '');
+    }
+
+    function closeCollegeProfile(fp) {
+        if (!clgProfileOpen) return;
+        clgProfileOpen = false;
+        const el = document.getElementById('clg-profile-overlay');
+        el.style.transform = 'translateX(100%)';
+        if (!fp) history.back();
+        setTimeout(() => { el.style.display = 'none'; }, 380);
+    }
+    let clgSearchOpen = false;
+
+    function handleCollegeLinkClick() {
+        const stored = lsGet('linked_college', null);
+        if (stored) {
+            const colleges = window.XOS_COLLEGES || [];
+            const idx = colleges.findIndex(col => col.id === stored.id);
+            if (idx >= 0) { openCollegeProfile(idx); return; }
+        }
+        openCollegeLinkSearch();
+    }
+
+    function initCollegeLink() {
+        const stored = lsGet('linked_college', null);
+        if (stored) setCollegeLinkUI(stored.name, true);
+        else setCollegeLinkUI('+ Link College', false);
+    }
+
+    function setCollegeLinkUI(name, linked) {
+        const el = document.getElementById('college-link-name');
+        const icon = document.getElementById('college-link-icon');
+        const wrap = document.querySelector('.college-link-name-wrap');
+        el.classList.toggle('linked', linked);
+        icon.classList.toggle('linked', linked);
+        el.classList.remove('marquee-anim');
+        el.textContent = linked ? name : '+ Link College';
+        requestAnimationFrame(() => {
+            if (wrap && el.scrollWidth > wrap.offsetWidth && linked) {
+                el.textContent = name + '   \u00b7   ' + name;
+                el.classList.add('marquee-anim');
+            }
+        });
+    }
+
+    function openCollegeLinkSearch() {
+        document.getElementById('dropdown-menu').classList.remove('active');
+        clgSearchOpen = true;
+        const el = document.getElementById('clg-search-overlay');
+        el.style.display = 'flex';
+        el.classList.remove('closing');
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('open')));
+        setTimeout(() => document.getElementById('clg-search-input').focus(), 400);
+        history.pushState({ modal: 'clg-search' }, '');
+    }
+
+    function closeCollegeLinkSearch(fp) {
+        if (!clgSearchOpen) return;
+        clgSearchOpen = false;
+        const el = document.getElementById('clg-search-overlay');
+        el.classList.remove('open');
+        el.classList.add('closing');
+        document.getElementById('clg-search-input').value = '';
+        document.getElementById('clg-results-list').innerHTML = '';
+        if (!fp) history.back();
+        setTimeout(() => { el.style.display = 'none';
+            el.classList.remove('closing'); }, 340);
+    }
+
+    function onClgSearchInput(val) {
+        const q = val.trim().toLowerCase().replace(/\s/g, '');
+        const list = document.getElementById('clg-results-list');
+        const colleges = window.XOS_COLLEGES || [];
+        if (!q) { list.innerHTML = ''; return; }
+        const showAll = q === '#college' || q === '#colleges';
+        let matches = showAll ? colleges : colleges.filter(c => c.name.toLowerCase().replace(/\s/g, '').includes(q)).slice(0, 6);
+        if (!matches.length) { list.innerHTML = '<div class="clg-no-results">No colleges found</div>'; return; }
+        list.innerHTML = matches.map(c => {
+            const dn = c.name.split(',')[0].trim();
+            const oi = colleges.indexOf(c);
+            return `<div class="clg-result-item" onclick="linkCollege(${oi})"><img class="clg-pfp" src="${c.pfp || ''}" onerror="this.src=''" alt=""><div style="flex:1;min-width:0;"><div class="clg-name">${dn}</div><div class="clg-id">${c.id}</div></div><i class="fa-solid fa-link clg-chevron"></i></div>`;
+        }).join('');
+    }
+
+    function linkCollege(idx) {
+        const colleges = window.XOS_COLLEGES || [];
+        const c = colleges[idx];
+        if (!c) return;
+        const dn = c.name.split(',')[0].trim();
+        lsSet('linked_college', { id: c.id, name: dn, pfp: c.pfp || '' });
+        setCollegeLinkUI(dn, true);
+        closeCollegeLinkSearch();
+    }
 
     /* ════ EDIT PROFILE ════ */
-    let editOverlayOpen=false,editSongData=null,editSongPlaying=false,editLinksData=[],songSearchTimer=null;
-    const LINK_PLATFORMS=[
-        {key:'instagram',label:'Instagram',icon:'fa-brands fa-instagram',color:'color-instagram',domain:'instagram.com'},
-        {key:'github',label:'GitHub',icon:'fa-brands fa-github',color:'color-github',domain:'github.com'},
-        {key:'twitter',label:'X / Twitter',icon:'fa-brands fa-x-twitter',color:'color-twitter',domain:'x.com'},
-        {key:'linkedin',label:'LinkedIn',icon:'fa-brands fa-linkedin-in',color:'color-linkedin',domain:'linkedin.com'},
-        {key:'discord',label:'Discord',icon:'fa-brands fa-discord',color:'color-discord',domain:'discord.gg'},
-        {key:'spotify',label:'Spotify',icon:'fa-brands fa-spotify',color:'',domain:'open.spotify.com'},
-        {key:'youtube',label:'YouTube',icon:'fa-brands fa-youtube',color:'',domain:'youtube.com'},
-        {key:'other',label:'Website',icon:'fa-solid fa-link',color:'color-globe',domain:''},
+    let editOverlayOpen = false,
+        editSongData = null,
+        editSongPlaying = false,
+        editLinksData = [],
+        songSearchTimer = null;
+    const LINK_PLATFORMS = [
+        { key: 'instagram', label: 'Instagram', icon: 'fa-brands fa-instagram', color: 'color-instagram', domain: 'instagram.com' },
+        { key: 'github', label: 'GitHub', icon: 'fa-brands fa-github', color: 'color-github', domain: 'github.com' },
+        { key: 'twitter', label: 'X / Twitter', icon: 'fa-brands fa-x-twitter', color: 'color-twitter', domain: 'x.com' },
+        { key: 'linkedin', label: 'LinkedIn', icon: 'fa-brands fa-linkedin-in', color: 'color-linkedin', domain: 'linkedin.com' },
+        { key: 'discord', label: 'Discord', icon: 'fa-brands fa-discord', color: 'color-discord', domain: 'discord.gg' },
+        { key: 'spotify', label: 'Spotify', icon: 'fa-brands fa-spotify', color: '', domain: 'open.spotify.com' },
+        { key: 'youtube', label: 'YouTube', icon: 'fa-brands fa-youtube', color: '', domain: 'youtube.com' },
+        { key: 'other', label: 'Website', icon: 'fa-solid fa-link', color: 'color-globe', domain: '' },
     ];
-    function detectPlatform(url){if(!url)return LINK_PLATFORMS[LINK_PLATFORMS.length-1];const l=url.toLowerCase();return LINK_PLATFORMS.find(p=>p.domain&&l.includes(p.domain))||LINK_PLATFORMS[LINK_PLATFORMS.length-1];}
-    function validateLinkDomain(url,plat){if(!url||!plat.domain)return true;try{const host=new URL(url.startsWith('http')?url:'https://'+url).hostname.replace('www.','');return host.includes(plat.domain);}catch{return false;}}
-    function escHtml(s){return(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
-    function openEditProfile(){
+    function detectPlatform(url) {
+        if (!url) return LINK_PLATFORMS[LINK_PLATFORMS.length - 1];
+        const l = url.toLowerCase();
+        return LINK_PLATFORMS.find(p => p.domain && l.includes(p.domain)) || LINK_PLATFORMS[LINK_PLATFORMS.length - 1];
+    }
+
+    function validateLinkDomain(url, plat) {
+        if (!url || !plat.domain) return true;
+        try {
+            const host = new URL(url.startsWith('http') ? url : 'https://' + url).hostname.replace('www.', '');
+            return host.includes(plat.domain);
+        } catch { return false; }
+    }
+
+    function escHtml(s) { return (s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } [m])); }
+
+    function openEditProfile() {
         document.getElementById('dropdown-menu').classList.remove('active');
-        const sN=lsGet('edit_name',activeProfile.displayName),sB=lsGet('edit_bio',activeProfile.bio||''),sAv=lsGet('edit_avatar',null),sBn=lsGet('edit_banner',null),sT=lsGet('edit_track',activeProfile.audioTrack||null),sL=lsGet('edit_links',activeProfile.links||[]);
-        document.getElementById('edit-name-input').value=sN||'';
-        document.getElementById('edit-bio-input').value=sB||'';
-        const avP=document.getElementById('edit-avatar-preview');const avS=sAv||activeProfile.avatar||'';if(avS){avP.src=avS;avP.style.display='block';}else avP.style.display='none';
-        const bnP=document.getElementById('edit-banner-preview');const bnS=sBn||activeProfile.banner||'';if(bnS){bnP.src=bnS;bnP.style.display='block';}else bnP.style.display='none';
-        editSongData=sT||null;renderEditSongCurrent();
-        editLinksData=JSON.parse(JSON.stringify(sL||[]));renderEditLinks();
-        document.getElementById('edit-song-search-input').value='';
-        document.getElementById('edit-song-results').innerHTML='';document.getElementById('edit-song-results').classList.remove('show');
-        editOverlayOpen=true;const el=document.getElementById('edit-overlay');el.style.display='flex';el.classList.remove('closing');
-        requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
-        history.pushState({modal:'edit-profile'},'');
+        const sN = lsGet('edit_name', activeProfile.displayName),
+            sB = lsGet('edit_bio', activeProfile.bio || ''),
+            sAv = lsGet('edit_avatar', null),
+            sBn = lsGet('edit_banner', null),
+            sT = lsGet('edit_track', activeProfile.audioTrack || null),
+            sL = lsGet('edit_links', activeProfile.links || []);
+        document.getElementById('edit-name-input').value = sN || '';
+        document.getElementById('edit-bio-input').value = sB || '';
+        const avP = document.getElementById('edit-avatar-preview');
+        const avS = sAv || activeProfile.avatar || '';
+        if (avS) { avP.src = avS;
+            avP.style.display = 'block'; } else avP.style.display = 'none';
+        const bnP = document.getElementById('edit-banner-preview');
+        const bnS = sBn || activeProfile.banner || '';
+        if (bnS) { bnP.src = bnS;
+            bnP.style.display = 'block'; } else bnP.style.display = 'none';
+        editSongData = sT || null;
+        renderEditSongCurrent();
+        editLinksData = JSON.parse(JSON.stringify(sL || []));
+        renderEditLinks();
+        document.getElementById('edit-song-search-input').value = '';
+        document.getElementById('edit-song-results').innerHTML = '';
+        document.getElementById('edit-song-results').classList.remove('show');
+        editOverlayOpen = true;
+        const el = document.getElementById('edit-overlay');
+        el.style.display = 'flex';
+        el.classList.remove('closing');
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('open')));
+        history.pushState({ modal: 'edit-profile' }, '');
     }
-    function closeEditProfile(fp){if(!editOverlayOpen)return;editOverlayOpen=false;stopEditSongPreview();const el=document.getElementById('edit-overlay');el.classList.remove('open');el.classList.add('closing');if(!fp)history.back();setTimeout(()=>{el.style.display='none';el.classList.remove('closing');},380);}
-    function saveEditProfile(){
-        const name=document.getElementById('edit-name-input').value.trim();if(name)lsSet('edit_name',name);
-        lsSet('edit_bio',document.getElementById('edit-bio-input').value.trim());
-        lsSet('edit_track',editSongData||null);
-        const validLinks=[];let hasErr=false;
-        editLinksData.forEach((link,i)=>{const inp=document.getElementById(`edit-link-inp-${i}`);const err=document.getElementById(`edit-link-err-${i}`);const url=inp?inp.value.trim():link.url;const plat=detectPlatform(url);if(url&&!validateLinkDomain(url,plat)){if(err){err.textContent=`Must be a ${plat.label} URL`;err.classList.add('show');}hasErr=true;return;}if(err)err.classList.remove('show');if(url)validLinks.push({...link,url,icon:plat.icon,color:plat.color,label:plat.label});});
-        if(hasErr)return;
-        lsSet('edit_links',validLinks);
-        renderProfile();closeEditProfile();
+
+    function closeEditProfile(fp) {
+        if (!editOverlayOpen) return;
+        editOverlayOpen = false;
+        stopEditSongPreview();
+        const el = document.getElementById('edit-overlay');
+        el.classList.remove('open');
+        el.classList.add('closing');
+        if (!fp) history.back();
+        setTimeout(() => { el.style.display = 'none';
+            el.classList.remove('closing'); }, 380);
     }
-    document.getElementById('avatar-file-input').addEventListener('change',function(){const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const d=e.target.result;lsSet('edit_avatar',d);const p=document.getElementById('edit-avatar-preview');p.src=d;p.style.display='block';};r.readAsDataURL(f);});
-    document.getElementById('banner-file-input').addEventListener('change',function(){const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const d=e.target.result;lsSet('edit_banner',d);const p=document.getElementById('edit-banner-preview');p.src=d;p.style.display='block';};r.readAsDataURL(f);});
 
-    function onEditSongSearch(val){clearTimeout(songSearchTimer);const q=val.trim();const res=document.getElementById('edit-song-results');if(!q){res.innerHTML='';res.classList.remove('show');return;}res.innerHTML='<div style="padding:12px 13px;font-size:.72rem;color:var(--muted);">Searching...</div>';res.classList.add('show');songSearchTimer=setTimeout(()=>fetchSongs(q),420);}
-    async function fetchSongs(q){const res=document.getElementById('edit-song-results');try{const r=await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=6&media=music`);const data=await r.json();if(!data.results||!data.results.length){res.innerHTML='<div style="padding:12px 13px;font-size:.72rem;color:var(--muted);">No results</div>';return;}res.innerHTML=data.results.map((t,i)=>`<div class="edit-song-result" onclick="selectEditSong(${i})"><img class="edit-song-result-art" src="${t.artworkUrl100||''}" alt="" onerror="this.style.opacity='.3'"><div class="edit-song-result-info"><div class="edit-song-result-name">${escHtml(t.trackName||'')}</div><div class="edit-song-result-artist">${escHtml(t.artistName||'')}</div></div><div class="edit-song-result-dur">${t.trackTimeMillis?fmtTime(t.trackTimeMillis/1000):''}</div></div>`).join('');res._results=data.results;}catch(e){res.innerHTML='<div style="padding:12px 13px;font-size:.72rem;color:var(--muted);">Search failed</div>';}}
-    function selectEditSong(idx){const res=document.getElementById('edit-song-results');const tracks=res._results||[];const t=tracks[idx];if(!t)return;editSongData={title:t.trackName||'',artist:t.artistName||'',artworkUrl:t.artworkUrl100||'',streamUrl:t.previewUrl||''};document.getElementById('edit-song-search-input').value='';res.innerHTML='';res.classList.remove('show');renderEditSongCurrent();}
-    function renderEditSongCurrent(){const w=document.getElementById('edit-song-current-wrap');if(!editSongData||!editSongData.title){w.style.display='none';return;}w.style.display='block';document.getElementById('edit-song-art').src=editSongData.artworkUrl||'';document.getElementById('edit-song-title').textContent=editSongData.title;document.getElementById('edit-song-artist').textContent=editSongData.artist;document.getElementById('edit-song-play-icon').className='fa-solid fa-play';editSongPlaying=false;}
-    function toggleEditSongPreview(){const audio=document.getElementById('edit-preview-audio');const icon=document.getElementById('edit-song-play-icon');if(!editSongData||!editSongData.streamUrl)return;if(editSongPlaying){audio.pause();icon.className='fa-solid fa-play';editSongPlaying=false;}else{audio.src=editSongData.streamUrl;audio.play().then(()=>{icon.className='fa-solid fa-pause';editSongPlaying=true;}).catch(()=>{});}}
-    function stopEditSongPreview(){const audio=document.getElementById('edit-preview-audio');audio.pause();audio.currentTime=0;editSongPlaying=false;}
-    function clearEditSong(){stopEditSongPreview();editSongData=null;document.getElementById('edit-song-current-wrap').style.display='none';}
-
-    function renderEditLinks(){const list=document.getElementById('edit-links-list');list.innerHTML=editLinksData.map((link,i)=>{const plat=detectPlatform(link.url);return`<div id="edit-link-item-${i}"><div class="edit-link-item"><div class="edit-link-icon-wrap" id="edit-link-icon-${i}"><i class="${plat.icon} ${plat.color}"></i></div><input class="edit-link-input" id="edit-link-inp-${i}" type="url" placeholder="${plat.label} URL..." value="${escHtml(link.url||'')}" oninput="onEditLinkInput(${i},this.value)"><div class="edit-link-remove" onclick="removeEditLink(${i})"><i class="fa-solid fa-xmark"></i></div></div><div class="edit-link-err" id="edit-link-err-${i}"></div></div>`;}).join('');}
-    function onEditLinkInput(idx,val){editLinksData[idx].url=val.trim();const plat=detectPlatform(val);const wrap=document.getElementById(`edit-link-icon-${idx}`);if(wrap)wrap.innerHTML=`<i class="${plat.icon} ${plat.color}"></i>`;const err=document.getElementById(`edit-link-err-${idx}`);if(err)err.classList.remove('show');}
-    function removeEditLink(idx){editLinksData.splice(idx,1);renderEditLinks();}
-    function addEditLink(){editLinksData.push({url:'',label:'Link',icon:'fa-solid fa-link',color:'color-globe'});renderEditLinks();const list=document.getElementById('edit-links-list');setTimeout(()=>{const inputs=list.querySelectorAll('.edit-link-input');const last=inputs[inputs.length-1];if(last){last.scrollIntoView({behavior:'smooth',block:'center'});last.focus();}},80);}
-
-    document.addEventListener('DOMContentLoaded',()=>{
+    function saveEditProfile() {
+        const name = document.getElementById('edit-name-input').value.trim();
+        if (name) lsSet('edit_name', name);
+        lsSet('edit_bio', document.getElementById('edit-bio-input').value.trim());
+        lsSet('edit_track', editSongData || null);
+        const validLinks = [];
+        let hasErr = false;
+        editLinksData.forEach((link, i) => {
+            const inp = document.getElementById(`edit-link-inp-${i}`);
+            const err = document.getElementById(`edit-link-err-${i}`);
+            const url = inp ? inp.value.trim() : link.url;
+            const plat = detectPlatform(url);
+            if (url && !validateLinkDomain(url, plat)) {
+                if (err) { err.textContent = `Must be a ${plat.label} URL`;
+                    err.classList.add('show'); }
+                hasErr = true;
+                return;
+            }
+            if (err) err.classList.remove('show');
+            if (url) validLinks.push({ ...link, url, icon: plat.icon, color: plat.color, label: plat.label });
+        });
+        if (hasErr) return;
+        lsSet('edit_links', validLinks);
         renderProfile();
-        document.getElementById('followers-tap-target').addEventListener('click',e=>{e.stopPropagation();showFollowList('followers');});
-        document.getElementById('following-tap-target').addEventListener('click',e=>{e.stopPropagation();showFollowList('following');});
+        closeEditProfile();
+    }
+    document.getElementById('avatar-file-input').addEventListener('change', function() {
+        const f = this.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = e => { const d = e.target.result;
+            lsSet('edit_avatar', d);
+            const p = document.getElementById('edit-avatar-preview');
+            p.src = d;
+            p.style.display = 'block'; };
+        r.readAsDataURL(f);
+    });
+    document.getElementById('banner-file-input').addEventListener('change', function() {
+        const f = this.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = e => { const d = e.target.result;
+            lsSet('edit_banner', d);
+            const p = document.getElementById('edit-banner-preview');
+            p.src = d;
+            p.style.display = 'block'; };
+        r.readAsDataURL(f);
+    });
+
+    function onEditSongSearch(val) {
+        clearTimeout(songSearchTimer);
+        const q = val.trim();
+        const res = document.getElementById('edit-song-results');
+        if (!q) { res.innerHTML = '';
+            res.classList.remove('show'); return; }
+        res.innerHTML = '<div style="padding:12px 13px;font-size:.72rem;color:var(--muted);">Searching...</div>';
+        res.classList.add('show');
+        songSearchTimer = setTimeout(() => fetchSongs(q), 420);
+    }
+
+    async function fetchSongs(q) {
+        const res = document.getElementById('edit-song-results');
+        try {
+            const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=6&media=music`);
+            const data = await r.json();
+            if (!data.results || !data.results.length) {
+                res.innerHTML = '<div style="padding:12px 13px;font-size:.72rem;color:var(--muted);">No results</div>';
+                return;
+            }
+            res.innerHTML = data.results.map((t, i) =>
+                `<div class="edit-song-result" onclick="selectEditSong(${i})"><img class="edit-song-result-art" src="${t.artworkUrl100 || ''}" alt="" onerror="this.style.opacity='.3'"><div class="edit-song-result-info"><div class="edit-song-result-name">${escHtml(t.trackName || '')}</div><div class="edit-song-result-artist">${escHtml(t.artistName || '')}</div></div><div class="edit-song-result-dur">${t.trackTimeMillis ? fmtTime(t.trackTimeMillis / 1000) : ''}</div></div>`
+            ).join('');
+            res._results = data.results;
+        } catch (e) {
+            res.innerHTML = '<div style="padding:12px 13px;font-size:.72rem;color:var(--muted);">Search failed</div>';
+        }
+    }
+
+    function selectEditSong(idx) {
+        const res = document.getElementById('edit-song-results');
+        const tracks = res._results || [];
+        const t = tracks[idx];
+        if (!t) return;
+        editSongData = { title: t.trackName || '', artist: t.artistName || '', artworkUrl: t.artworkUrl100 || '',
+        streamUrl: t.previewUrl || '' };
+        document.getElementById('edit-song-search-input').value = '';
+        res.innerHTML = '';
+        res.classList.remove('show');
+        renderEditSongCurrent();
+    }
+
+    function renderEditSongCurrent() {
+        const w = document.getElementById('edit-song-current-wrap');
+        if (!editSongData || !editSongData.title) { w.style.display = 'none'; return; }
+        w.style.display = 'block';
+        document.getElementById('edit-song-art').src = editSongData.artworkUrl || '';
+        document.getElementById('edit-song-title').textContent = editSongData.title;
+        document.getElementById('edit-song-artist').textContent = editSongData.artist;
+        document.getElementById('edit-song-play-icon').className = 'fa-solid fa-play';
+        editSongPlaying = false;
+    }
+
+    function toggleEditSongPreview() {
+        const audio = document.getElementById('edit-preview-audio');
+        const icon = document.getElementById('edit-song-play-icon');
+        if (!editSongData || !editSongData.streamUrl) return;
+        if (editSongPlaying) { audio.pause();
+            icon.className = 'fa-solid fa-play';
+            editSongPlaying = false; } else { audio.src = editSongData.streamUrl;
+            audio.play().then(() => { icon.className = 'fa-solid fa-pause';
+                editSongPlaying = true; }).catch(() => {}); }
+    }
+
+    function stopEditSongPreview() { const audio = document.getElementById('edit-preview-audio');
+        audio.pause();
+        audio.currentTime = 0;
+        editSongPlaying = false; }
+
+    function clearEditSong() { stopEditSongPreview();
+        editSongData = null;
+        document.getElementById('edit-song-current-wrap').style.display = 'none'; }
+
+    function renderEditLinks() {
+        const list = document.getElementById('edit-links-list');
+        list.innerHTML = editLinksData.map((link, i) => {
+            const plat = detectPlatform(link.url);
+            return `<div id="edit-link-item-${i}"><div class="edit-link-item"><div class="edit-link-icon-wrap" id="edit-link-icon-${i}"><i class="${plat.icon} ${plat.color}"></i></div><input class="edit-link-input" id="edit-link-inp-${i}" type="url" placeholder="${plat.label} URL..." value="${escHtml(link.url || '')}" oninput="onEditLinkInput(${i},this.value)"><div class="edit-link-remove" onclick="removeEditLink(${i})"><i class="fa-solid fa-xmark"></i></div></div><div class="edit-link-err" id="edit-link-err-${i}"></div></div>`;
+        }).join('');
+    }
+
+    function onEditLinkInput(idx, val) {
+        editLinksData[idx].url = val.trim();
+        const plat = detectPlatform(val);
+        const wrap = document.getElementById(`edit-link-icon-${idx}`);
+        if (wrap) wrap.innerHTML = `<i class="${plat.icon} ${plat.color}"></i>`;
+        const err = document.getElementById(`edit-link-err-${idx}`);
+        if (err) err.classList.remove('show');
+    }
+
+    function removeEditLink(idx) { editLinksData.splice(idx, 1);
+        renderEditLinks(); }
+
+    function addEditLink() {
+        editLinksData.push({ url: '', label: 'Link', icon: 'fa-solid fa-link', color: 'color-globe' });
+        renderEditLinks();
+        const list = document.getElementById('edit-links-list');
+        setTimeout(() => {
+            const inputs = list.querySelectorAll('.edit-link-input');
+            const last = inputs[inputs.length - 1];
+            if (last) { last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                last.focus(); }
+        }, 80);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderProfile();
+        document.getElementById('followers-tap-target').addEventListener('click', e => { e.stopPropagation();
+            showFollowList('followers'); });
+        document.getElementById('following-tap-target').addEventListener('click', e => { e.stopPropagation();
+            showFollowList('following'); });
     });
     </script>
 </body>
