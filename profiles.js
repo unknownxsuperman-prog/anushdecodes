@@ -64,7 +64,7 @@ window.XOS_PROFILES = {
     displayName: 'Raghavendra',
     verified: 'green',
     banner: 'Picsart_26-04-18_23-43-21-546.jpg',
-    avatar: 'Screenshot_20260418-234611.png',
+    avatar: 'Screenshot_20260715-212813.png',
     bio: 'natty',
     followers: ['anush'],
     following: ['anush'],
