@@ -3013,9 +3013,11 @@
     <script src="colleges.js" onerror="console.warn('colleges.js not found')"></script>
     <script src="Dishabase.js" onerror="console.warn('Dishabase.js not found')"></script>
     <script src="disha-extensions.js" onerror="console.warn('disha-extensions.js not found')"></script>
+    <!-- ── 1. LOAD DISHA FAVOURITES INTELLIGENCE ── -->
+    <script src="disha-favourites-intelligence.js" onerror="console.warn('disha-favourites-intelligence.js not found')"></script>
 
     <script>
-        // ── DISHA FAVOURITES — inline disha-fav.js ──
+        // ── DISHA FAVOURITES — inline disha-fav.js (fallback) ──
         (function() {
             'use strict';
 
@@ -3243,7 +3245,7 @@
                 card.className = 'es-result-card';
                 const idx = (window.XOS_COLLEGES || []).indexOf(college);
                 card.onclick = () => { if (typeof window.openCollegeProfile === 'function') window.openCollegeProfile(
-                    idx); };
+                        idx); };
                 const parts = college.name.split(',');
                 const displayName = parts[0].trim();
                 const caption = parts.slice(1).join(',').trim();
@@ -3263,7 +3265,7 @@
             }
 
             // ── expose ──
-            window.DISHA_FAV = {
+            window.DISHA_FAV = window.DISHA_FAV || {
                 bindAutocomplete,
                 handleQuery,
                 getFavUsers,
@@ -3345,15 +3347,15 @@
             });
         }
 
+        // ── 2. BIND DISHA FAV AUTOCOMPLETE ──
         document.addEventListener('DOMContentLoaded', () => {
             initFeedCollegeRows();
             renderFeed();
             renderPeopleGrid();
 
-            // ── BIND DISHA FAV AUTOCOMPLETE ──
             const esInput = document.getElementById('es-input');
             const esContainer = document.getElementById('es-input-wrap-el');
-            if (esInput && esContainer && window.DISHA_FAV) {
+            if (esInput && esContainer && window.DISHA_FAV && typeof window.DISHA_FAV.bindAutocomplete === 'function') {
                 window.DISHA_FAV.bindAutocomplete(esContainer, esInput, (selectedText) => {
                     esInput.value = selectedText;
                     esInput.dispatchEvent(new Event('input'));
@@ -3986,62 +3988,46 @@
                 el.classList.remove('closing'); }, 380);
         }
 
+        // ── 3. UPDATED onEsInput & doEsSearch ──
         function onEsInput(val) {
             const send = document.getElementById('es-send');
             send.classList.toggle('visible', val.trim().length > 0);
+            // Let DISHA_FAV's own dropdown handle # queries — hide the old chip strip
+            if (val.includes('#')) {
+                document.getElementById('es-suggestions').style.display = 'none';
+                return;
+            }
             buildEsSuggestions(val.trim());
-        }
-
-        function buildEsSuggestions(q) {
-            const strip = document.getElementById('es-suggestions');
-            if (!q) { strip.style.display = 'none'; return; }
-            const ql = q.toLowerCase().replace(/\s/g, '');
-            const colleges = window.XOS_COLLEGES || [];
-            const profiles = window.XOS_PROFILES || {};
-            const matchColleges = colleges.filter(c => c.name.toLowerCase().replace(/\s/g, '').includes(ql)).slice(0, 2);
-            const matchUsers = Object.values(profiles).filter(u =>
-                (u.displayName || '').toLowerCase().includes(ql) ||
-                (u.userid || '').toLowerCase().includes(ql) ||
-                (u.handle || '').toLowerCase().includes(ql)
-            ).slice(0, 2);
-            const chips = [
-                ...matchColleges.map(c => {
-                    const displayName = c.name.split(',')[0].trim();
-                    return `<div class="es-suggest-chip college-chip" onclick="esSearchCollege(${colleges.indexOf(c)})"><i class="fa-solid fa-building-columns"></i>${displayName}</div>`;
-                }),
-                ...matchUsers.map(u =>
-                    `<div class="es-suggest-chip user-chip" onclick="esSearchUser('${u.userid}')"><i class="fa-regular fa-user"></i>${u.displayName}</div>`
-                    )
-            ];
-            if (chips.length === 0) { strip.style.display = 'none'; return; }
-            strip.innerHTML = chips.join('');
-            strip.style.display = 'flex';
         }
 
         function doEsSearch(val) {
             if (!val || !val.trim()) return;
             const q = val.trim();
-            const msgContainer = document.getElementById('es-messages');
-
-            // ── FAVOURITES HANDLER ──
-            if (window.DISHA_FAV && window.DISHA_FAV.handleQuery(q, msgContainer)) {
-                document.getElementById('es-input').value = '';
-                document.getElementById('es-send').classList.remove('visible');
-                document.getElementById('es-suggestions').style.display = 'none';
-                const greet = document.getElementById('es-greeting');
-                if (greet) greet.style.display = 'none';
-                return;
-            }
-
-            // ── REGULAR SEARCH ──
-            const ql = q.toLowerCase().replace(/\s/g, '');
             document.getElementById('es-input').value = '';
             document.getElementById('es-send').classList.remove('visible');
             document.getElementById('es-suggestions').style.display = 'none';
             const greet = document.getElementById('es-greeting');
             if (greet) greet.style.display = 'none';
             appendEsBubbleUser(q);
+            const msgContainer = document.getElementById('es-messages');
 
+            if (window.DISHA_FAV && q.includes('#')) {
+                // If handleQuery returns a promise, await it; otherwise treat as boolean.
+                const result = window.DISHA_FAV.handleQuery(q, msgContainer);
+                if (result && typeof result.then === 'function') {
+                    result.then(handled => {
+                        if (!handled) doNormalEsSearch(q);
+                    });
+                } else if (result !== true) {
+                    doNormalEsSearch(q);
+                }
+                return;
+            }
+            doNormalEsSearch(q);
+        }
+
+        function doNormalEsSearch(q) {
+            const ql = q.toLowerCase().replace(/\s/g, '');
             const colleges = window.XOS_COLLEGES || [];
             const profiles = window.XOS_PROFILES || {};
             const matchCollege = colleges.find(c => c.name.toLowerCase().replace(/\s/g, '').includes(ql));
@@ -4050,7 +4036,6 @@
                 (u.userid || '').toLowerCase().includes(ql) ||
                 (u.handle || '').toLowerCase().includes(ql)
             );
-
             setTimeout(() => {
                 if (!matchCollege && !matchUser) {
                     appendEsNotFound(q);
@@ -4074,6 +4059,7 @@
             }, 320);
         }
 
+        // Legacy helpers kept for compatibility
         function esSearchCollege(idx) {
             const colleges = window.XOS_COLLEGES || [];
             const c = colleges[idx];
@@ -4161,6 +4147,32 @@
         function scrollEsToBottom() {
             const el = document.getElementById('es-messages');
             setTimeout(() => el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }), 50);
+        }
+
+        function buildEsSuggestions(q) {
+            const strip = document.getElementById('es-suggestions');
+            if (!q) { strip.style.display = 'none'; return; }
+            const ql = q.toLowerCase().replace(/\s/g, '');
+            const colleges = window.XOS_COLLEGES || [];
+            const profiles = window.XOS_PROFILES || {};
+            const matchColleges = colleges.filter(c => c.name.toLowerCase().replace(/\s/g, '').includes(ql)).slice(0, 2);
+            const matchUsers = Object.values(profiles).filter(u =>
+                (u.displayName || '').toLowerCase().includes(ql) ||
+                (u.userid || '').toLowerCase().includes(ql) ||
+                (u.handle || '').toLowerCase().includes(ql)
+            ).slice(0, 2);
+            const chips = [
+                ...matchColleges.map(c => {
+                    const displayName = c.name.split(',')[0].trim();
+                    return `<div class="es-suggest-chip college-chip" onclick="esSearchCollege(${colleges.indexOf(c)})"><i class="fa-solid fa-building-columns"></i>${displayName}</div>`;
+                }),
+                ...matchUsers.map(u =>
+                    `<div class="es-suggest-chip user-chip" onclick="esSearchUser('${u.userid}')"><i class="fa-regular fa-user"></i>${u.displayName}</div>`
+                    )
+            ];
+            if (chips.length === 0) { strip.style.display = 'none'; return; }
+            strip.innerHTML = chips.join('');
+            strip.style.display = 'flex';
         }
 
         // ── SEARCH OVERLAY ──
