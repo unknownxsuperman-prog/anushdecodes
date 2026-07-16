@@ -226,222 +226,218 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-hei
 <script src="xos-favourites-data.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════════
-   XOS FAVOURITES
-
-   profiles.js        -> profile/account data per userid (unchanged)
-   xos-favourites-data.js -> ONLY favourite names per userid:
-       { userid: { userid, favourites: { music[], album[], movie[],
-                                          series[], anime[] } } }
-
-   This file does everything else:
-   - looks up "?user=" to know whose favourites to show
-   - decodes a bare name into a display card (art/artist/year/rating)
-     via iTunes (music) and TMDB-with-fallback (shows)
-   - search, add, remove
-   - ALL interactivity is wired with addEventListener + event
-     delegation (not inline onclick="..."), so a title containing an
-     apostrophe (e.g. "Grey's Anatomy") can never break a button by
-     corrupting an HTML attribute — that was the previous bug.
+   XOS FAVOURITES — FIXED: no hardcoded 'nikhil'
    ════════════════════════════════════════════════════════════ */
 
-// ── State declared up top, before anything that could throw,
-//    so every button handler below always has valid state to read ──
-let currentTab = 'music';
-let currentSub = 'movie';
-let sType = 'music';
-let editMode = false;
-let searchOpen = false;
-let sTimer = null;
-let queue = [], qIdx = -1, playing = false, pTimer = null;
+// ── Helper: get the default user ID from whatever profiles exist ──
+function getDefaultUserId() {
+  var profiles = window.XOS_PROFILES || {};
+  var keys = Object.keys(profiles);
+  return keys.length > 0 ? keys[0] : 'guest';
+}
 
-const params = new URLSearchParams(location.search);
-const USERID = params.get('user') || 'nikhil';
-const TMDB_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e'; // placeholder — swap for a real key if you have one
-const TMDB_IMG = 'https://image.tmdb.org/t/p/w342';
+var params = new URLSearchParams(location.search);
+var USERID = params.get('user') || getDefaultUserId();
 
-// ── Defensive fallback: if xos-favourites-data.js failed to load
-//    (wrong path, blocked, etc), keep the page working in-memory
-//    instead of every button silently dying. ──
+// If the requested user doesn't exist, fall back to the first available profile
+var allProfiles = window.XOS_PROFILES || {};
+var allProfileKeys = Object.keys(allProfiles);
+if (!allProfiles[USERID] && allProfileKeys.length > 0) {
+  USERID = allProfileKeys[0];
+}
+
+// ── State ──
+var currentTab = 'music';
+var currentSub = 'movie';
+var sType = 'music';
+var editMode = false;
+var searchOpen = false;
+var sTimer = null;
+var queue = [], qIdx = -1, playing = false, pTimer = null;
+
+var TMDB_KEY = '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e';
+var TMDB_IMG = 'https://image.tmdb.org/t/p/w342';
+
+// ── Defensive fallback for XOS_FAV ──
 if (!window.XOS_FAV) {
-  console.error('[xos-favourites] xos-favourites-data.js did not load — using a temporary in-memory store. Check the <script src> path.');
+  console.error('[xos-favourites] xos-favourites-data.js did not load — using in-memory store.');
   window.XOS_FAV = (function(){
-    const mem = {};
-    const empty = () => ({ music:[], album:[], movie:[], series:[], anime:[] });
+    var mem = {};
+    var empty = function(){ return { music:[], album:[], movie:[], series:[], anime:[] }; };
     return {
-      getUser(u){ return mem[u] || null; },
-      getAllUsers(){ return mem; },
-      get(u,t){ return mem[u] ? mem[u].favourites[t] : []; },
-      set(u,t,names){ mem[u] = mem[u] || { userid:u, favourites: empty() }; mem[u].favourites[t] = names; },
-      add(u,t,name){ mem[u] = mem[u] || { userid:u, favourites: empty() }; const l = mem[u].favourites[t]; if(l.some(n=>n.toLowerCase()===name.toLowerCase())) return false; l.push(name); return true; },
-      remove(u,t,name){ if(!mem[u]) return; mem[u].favourites[t] = mem[u].favourites[t].filter(n=>n.toLowerCase()!==name.toLowerCase()); },
-      has(u,t,name){ return mem[u] ? mem[u].favourites[t].some(n=>n.toLowerCase()===name.toLowerCase()) : false; },
-      seedDefaults(u){ mem[u] = mem[u] || { userid:u, favourites: { music:['Blinding Lights'], album:['After Hours'], movie:['Inception'], series:['Breaking Bad'], anime:['Attack on Titan'] } }; }
+      getUser: function(u){ return mem[u] || null; },
+      getAllUsers: function(){ return mem; },
+      get: function(u,t){ return mem[u] ? mem[u].favourites[t] : []; },
+      set: function(u,t,names){ mem[u] = mem[u] || { userid:u, favourites: empty() }; mem[u].favourites[t] = names; },
+      add: function(u,t,name){ mem[u] = mem[u] || { userid:u, favourites: empty() }; var l = mem[u].favourites[t]; if(l.some(function(n){ return n.toLowerCase()===name.toLowerCase(); })) return false; l.push(name); return true; },
+      remove: function(u,t,name){ if(!mem[u]) return; mem[u].favourites[t] = mem[u].favourites[t].filter(function(n){ return n.toLowerCase()!==name.toLowerCase(); }); },
+      has: function(u,t,name){ return mem[u] ? mem[u].favourites[t].some(function(n){ return n.toLowerCase()===name.toLowerCase(); }) : false; },
+      seedDefaults: function(u){ mem[u] = mem[u] || { userid:u, favourites: { music:['Blinding Lights'], album:['After Hours'], movie:['Inception'], series:['Breaking Bad'], anime:['Attack on Titan'] } }; }
     };
   })();
 }
 
-try { window.XOS_FAV.seedDefaults(USERID); } catch(e){ console.error('[xos-favourites] seedDefaults failed', e); }
+try { window.XOS_FAV.seedDefaults(USERID); } catch(e){ /* ignore */ }
 
-const audio = document.getElementById('audio');
+var audio = document.getElementById('audio');
 
-/* ── LOOKUP CACHE (name -> display info), persisted so repeat visits are instant ── */
-const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
-function cacheKey(type, name){ return `xos_fav_cache_${type}_${name.toLowerCase()}`; }
+/* ── LOOKUP CACHE ── */
+var CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+function cacheKey(type, name){ return 'xos_fav_cache_' + type + '_' + name.toLowerCase(); }
 function cacheGet(type, name){
   try{
-    const raw = localStorage.getItem(cacheKey(type, name));
+    var raw = localStorage.getItem(cacheKey(type, name));
     if(!raw) return null;
-    const { info, t } = JSON.parse(raw);
-    if(Date.now() - t > CACHE_TTL) return null;
-    return info;
+    var data = JSON.parse(raw);
+    if(Date.now() - data.t > CACHE_TTL) return null;
+    return data.info;
   }catch{ return null; }
 }
 function cacheSet(type, name, info){
-  try{ localStorage.setItem(cacheKey(type, name), JSON.stringify({ info, t: Date.now() })); }catch{}
+  try{ localStorage.setItem(cacheKey(type, name), JSON.stringify({ info: info, t: Date.now() })); }catch{}
 }
 
-/* ── WALLPAPER (pulled from profiles.js if available) ── */
+/* ── WALLPAPER ── */
 (function(){
   try{
-    const banner = localStorage.getItem(`xos_edit_banner_${USERID}`) ||
-      (window.XOS_PROFILES && window.XOS_PROFILES[USERID]?.banner) || '';
-    const wp = document.getElementById('wp-img');
+    var banner = localStorage.getItem('xos_edit_banner_' + USERID) ||
+      (window.XOS_PROFILES && window.XOS_PROFILES[USERID] && window.XOS_PROFILES[USERID].banner) || '';
+    var wp = document.getElementById('wp-img');
     if(banner){ try{ wp.src = JSON.parse(banner); }catch{ wp.src = banner; } }
     else {
-      const fallbacks=['https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80','https://images.unsplash.com/photo-1470071459604-7b5ec3d8b6d4?w=800&q=80'];
-      wp.src=fallbacks[Math.floor(Math.random()*fallbacks.length)];
+      var fallbacks=['https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80','https://images.unsplash.com/photo-1470071459604-7b5ec3d8b6d4?w=800&q=80'];
+      wp.src = fallbacks[Math.floor(Math.random() * fallbacks.length)];
     }
-  }catch(e){ console.error('[xos-favourites] wallpaper setup failed', e); }
+  }catch(e){ /* ignore */ }
 })();
 
 /* ── TABS ── */
 function switchTab(t){
-  currentTab=t;
-  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===t));
-  document.querySelectorAll('.panel').forEach(el=>el.classList.toggle('active',el.id==='panel-'+t));
-  if(t==='shows') renderShows(); else renderMusic();
+  currentTab = t;
+  document.querySelectorAll('.tab').forEach(function(el){ el.classList.toggle('active', el.dataset.tab === t); });
+  document.querySelectorAll('.panel').forEach(function(el){ el.classList.toggle('active', el.id === 'panel-' + t); });
+  if(t === 'shows') renderShows(); else renderMusic();
 }
 function switchSub(s){
-  currentSub=s;
-  document.querySelectorAll('.sub-tab').forEach(el=>el.classList.toggle('active',el.dataset.sub===s));
+  currentSub = s;
+  document.querySelectorAll('.sub-tab').forEach(function(el){ el.classList.toggle('active', el.dataset.sub === s); });
   renderShows();
 }
 
-/* ══════════════ LOOKUPS (name -> display info) ══════════════ */
-
+/* ══════════════ LOOKUPS ══════════════ */
 function hasTmdbKey(){
   return TMDB_KEY && !/^your[_-]?tmdb[_-]?key$/i.test(TMDB_KEY) && TMDB_KEY !== '4f4e4e4f4e4e4f4e4f4e4f4e4f4e4f4e';
 }
 
 async function lookupTrack(name){
-  const cached = cacheGet('music', name);
+  var cached = cacheGet('music', name);
   if(cached) return cached;
-  let info = { title:name, artist:'Unknown artist', artwork:'', year:'', genre:'', stream:'' };
+  var info = { title:name, artist:'Unknown artist', artwork:'', year:'', genre:'', stream:'' };
   try{
-    const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&entity=song&limit=1&media=music`);
-    const d = await r.json();
-    const item = d.results && d.results[0];
+    var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(name) + '&entity=song&limit=1&media=music');
+    var d = await r.json();
+    var item = d.results && d.results[0];
     if(item){
       info = {
         title: item.trackName || name,
         artist: item.artistName || 'Unknown artist',
-        artwork: (item.artworkUrl100||'').replace('100x100','400x400'),
+        artwork: (item.artworkUrl100 || '').replace('100x100','400x400'),
         year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
         genre: item.primaryGenreName || '',
         stream: item.previewUrl || ''
       };
     }
-  }catch(e){ /* keep fallback info */ }
+  }catch(e){ /* keep fallback */ }
   cacheSet('music', name, info);
   return info;
 }
 
 async function lookupAlbum(name){
-  const cached = cacheGet('album', name);
+  var cached = cacheGet('album', name);
   if(cached) return cached;
-  let info = { title:name, artist:'Unknown artist', artwork:'', year:'', trackCount:0 };
+  var info = { title:name, artist:'Unknown artist', artwork:'', year:'', trackCount:0 };
   try{
-    const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&entity=album&limit=1&media=music`);
-    const d = await r.json();
-    const item = d.results && d.results[0];
+    var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(name) + '&entity=album&limit=1&media=music');
+    var d = await r.json();
+    var item = d.results && d.results[0];
     if(item){
       info = {
         title: item.collectionName || name,
         artist: item.artistName || 'Unknown artist',
-        artwork: (item.artworkUrl100||'').replace('100x100','400x400'),
+        artwork: (item.artworkUrl100 || '').replace('100x100','400x400'),
         year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
         trackCount: item.trackCount || 0
       };
     }
-  }catch(e){ /* keep fallback info */ }
+  }catch(e){ /* keep fallback */ }
   cacheSet('album', name, info);
   return info;
 }
 
 async function tmdbFind(name, type){
   if(!hasTmdbKey()) throw new Error('no tmdb key');
-  const tmdbType = type==='movie' ? 'movie' : 'tv';
-  const query = type==='anime' ? name+' anime' : name;
-  const r = await fetch(`https://api.themoviedb.org/3/search/${tmdbType}?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&include_adult=false`);
-  const d = await r.json();
-  if(!r.ok || d.success===false) throw new Error(d.status_message || 'tmdb failed');
-  const item = (d.results||[])[0];
+  var tmdbType = type === 'movie' ? 'movie' : 'tv';
+  var query = type === 'anime' ? name + ' anime' : name;
+  var r = await fetch('https://api.themoviedb.org/3/search/' + tmdbType + '?api_key=' + TMDB_KEY + '&query=' + encodeURIComponent(query) + '&include_adult=false');
+  var d = await r.json();
+  if(!r.ok || d.success === false) throw new Error(d.status_message || 'tmdb failed');
+  var item = (d.results || [])[0];
   if(!item) throw new Error('no tmdb result');
-  const year = (item.release_date || item.first_air_date || '').substring(0,4);
+  var year = (item.release_date || item.first_air_date || '').substring(0,4);
   return {
     title: item.title || item.name || name,
-    subtitle: item.overview ? item.overview.substring(0,60)+'…' : '',
-    artwork: item.poster_path ? TMDB_IMG+item.poster_path : '',
-    year,
+    subtitle: item.overview ? item.overview.substring(0,60) + '…' : '',
+    artwork: item.poster_path ? TMDB_IMG + item.poster_path : '',
+    year: year,
     rating: item.vote_average ? item.vote_average.toFixed(1) : '—'
   };
 }
 
 async function publicFind(name, type){
-  if(type==='movie'){
-    const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(name)}&media=movie&entity=movie&limit=1`);
-    const d = await r.json();
-    const item = (d.results||[])[0];
+  if(type === 'movie'){
+    var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(name) + '&media=movie&entity=movie&limit=1');
+    var d = await r.json();
+    var item = (d.results || [])[0];
     if(!item) return null;
     return {
       title: item.trackName || name,
       subtitle: item.primaryGenreName || '',
-      artwork: (item.artworkUrl100||'').replace('100x100','400x600'),
+      artwork: (item.artworkUrl100 || '').replace('100x100','400x600'),
       year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
       rating: item.contentAdvisoryRating || '—'
     };
   }
-  if(type==='anime'){
-    const r = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(name)}&limit=1`);
-    const d = await r.json();
-    const item = (d.data||[])[0];
+  if(type === 'anime'){
+    r = await fetch('https://api.jikan.moe/v4/anime?q=' + encodeURIComponent(name) + '&limit=1');
+    d = await r.json();
+    item = (d.data || [])[0];
     if(!item) return null;
     return {
       title: item.title_english || item.title || name,
-      subtitle: (item.synopsis||'').substring(0,60)+(item.synopsis && item.synopsis.length>60?'…':''),
-      artwork: item.images?.jpg?.image_url || '',
-      year: item.year || (item.aired?.from||'').substring(0,4),
+      subtitle: (item.synopsis || '').substring(0,60) + ((item.synopsis && item.synopsis.length > 60) ? '…' : ''),
+      artwork: (item.images && item.images.jpg && item.images.jpg.image_url) || '',
+      year: item.year || (item.aired && item.aired.from ? item.aired.from.substring(0,4) : ''),
       rating: item.score ? item.score.toFixed(1) : '—'
     };
   }
-  const r = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(name)}`);
-  const d = await r.json();
-  const first = (d||[])[0];
+  var r2 = await fetch('https://api.tvmaze.com/search/shows?q=' + encodeURIComponent(name));
+  var d2 = await r2.json();
+  var first = (d2 || [])[0];
   if(!first) return null;
-  const show = first.show;
+  var show = first.show;
   return {
     title: show.name || name,
-    subtitle: (show.genres||[]).slice(0,2).join(', '),
-    artwork: show.image?.medium || show.image?.original || '',
+    subtitle: (show.genres || []).slice(0,2).join(', '),
+    artwork: show.image && (show.image.medium || show.image.original) || '',
     year: show.premiered ? show.premiered.substring(0,4) : '',
-    rating: show.rating?.average ? show.rating.average.toFixed(1) : '—'
+    rating: show.rating && show.rating.average ? show.rating.average.toFixed(1) : '—'
   };
 }
 
 async function lookupShow(name, type){
-  const cached = cacheGet(type, name);
+  var cached = cacheGet(type, name);
   if(cached) return cached;
-  let info;
+  var info;
   try{
     info = await tmdbFind(name, type);
   }catch(e){
@@ -452,369 +448,364 @@ async function lookupShow(name, type){
   return info;
 }
 
-/* ══════════════ RENDER FAVOURITES ══════════════ */
-
+/* ══════════════ RENDER ══════════════ */
 function skeletonGrid(count, poster){
-  let html='';
-  for(let i=0;i<count;i++){
-    html += `<div class="item-card"><div class="${poster?'card-poster-wrap':'card-art-wrap'} loading">
-      <div class="${poster?'card-poster':'card-art'}"></div>
-    </div><div class="card-info"><div class="card-title">&nbsp;</div></div></div>`;
+  var html = '';
+  for(var i=0; i<count; i++){
+    html += '<div class="item-card"><div class="' + (poster ? 'card-poster-wrap' : 'card-art-wrap') + ' loading">' +
+      '<div class="' + (poster ? 'card-poster' : 'card-art') + '"></div>' +
+      '</div><div class="card-info"><div class="card-title">&nbsp;</div></div></div>';
   }
   return html;
 }
+
+function esc(s){ return (s || '').toString().replace(/[&<>"']/g,function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }); }
+function escAttr(s){ return esc(s); }
 
 async function renderMusic(){
   await Promise.all([renderTracks(), renderAlbums()]);
 }
 
 async function renderTracks(){
-  const names = window.XOS_FAV.get(USERID,'music');
-  const el = document.getElementById('grid-music');
+  var names = window.XOS_FAV.get(USERID, 'music');
+  var el = document.getElementById('grid-music');
   if(!names.length){ el.innerHTML = '<div class="empty"><i class="fa-solid fa-music"></i><p>No tracks yet</p><span>Tap + to add</span></div>'; return; }
-  el.innerHTML = skeletonGrid(names.length,false);
-  const infos = await Promise.all(names.map(n=>lookupTrack(n)));
-  el.innerHTML = names.map((name,i)=>{
-    const t = infos[i];
-    const artIsPlaying = qIdx===i && playing;
-    return `<div class="item-card" data-index="${i}">
-      <div class="card-art-wrap">
-        <img class="card-art" src="${t.artwork||'https://placehold.co/400x400/141414/444?text=♪'}" alt="" loading="lazy" onerror="this.src='https://placehold.co/400x400/141414/444?text=♪'">
-        <div class="card-badge music">${esc(t.genre||'Track')}</div>
-        <div class="card-play ${artIsPlaying?'playing':''}" data-play-index="${i}">
-          <i class="fa-solid ${artIsPlaying?'fa-pause':'fa-play'}"></i>
-        </div>
-        <div class="card-remove" data-remove-type="music" data-remove-name="${escAttr(name)}"><i class="fa-solid fa-xmark"></i></div>
-      </div>
-      <div class="card-info">
-        <div class="card-title">${esc(t.title)}</div>
-        <div class="card-sub">${esc(t.artist)}</div>
-        <div class="card-meta">${esc(t.year||'')}</div>
-      </div>
-    </div>`;
+  el.innerHTML = skeletonGrid(names.length, false);
+  var infos = await Promise.all(names.map(function(n){ return lookupTrack(n); }));
+  el.innerHTML = names.map(function(name, i){
+    var t = infos[i];
+    var artIsPlaying = qIdx === i && playing;
+    return '<div class="item-card" data-index="' + i + '">' +
+      '<div class="card-art-wrap">' +
+      '<img class="card-art" src="' + (t.artwork || 'https://placehold.co/400x400/141414/444?text=♪') + '" alt="" loading="lazy" onerror="this.src=\'https://placehold.co/400x400/141414/444?text=♪\'">' +
+      '<div class="card-badge music">' + esc(t.genre || 'Track') + '</div>' +
+      '<div class="card-play ' + (artIsPlaying ? 'playing' : '') + '" data-play-index="' + i + '">' +
+      '<i class="fa-solid ' + (artIsPlaying ? 'fa-pause' : 'fa-play') + '"></i>' +
+      '</div>' +
+      '<div class="card-remove" data-remove-type="music" data-remove-name="' + escAttr(name) + '"><i class="fa-solid fa-xmark"></i></div>' +
+      '</div>' +
+      '<div class="card-info">' +
+      '<div class="card-title">' + esc(t.title) + '</div>' +
+      '<div class="card-sub">' + esc(t.artist) + '</div>' +
+      '<div class="card-meta">' + esc(t.year || '') + '</div>' +
+      '</div></div>';
   }).join('');
-  // sync queue with resolved stream data for playback
-  queue = names.map((name,i)=>({ name, ...infos[i] }));
+  queue = names.map(function(name, i){ var info = infos[i]; return { name: name, title: info.title, artist: info.artist, artwork: info.artwork, stream: info.stream }; });
   updatePlayBtns();
 }
 
 async function renderAlbums(){
-  const names = window.XOS_FAV.get(USERID,'album');
-  const el = document.getElementById('grid-album');
+  var names = window.XOS_FAV.get(USERID, 'album');
+  var el = document.getElementById('grid-album');
   if(!names.length){ el.innerHTML = '<div class="empty"><i class="fa-solid fa-compact-disc"></i><p>No albums yet</p></div>'; return; }
-  el.innerHTML = skeletonGrid(names.length,false);
-  const infos = await Promise.all(names.map(n=>lookupAlbum(n)));
-  el.innerHTML = names.map((name,i)=>{
-    const a = infos[i];
-    return `<div class="item-card">
-      <div class="card-art-wrap">
-        <img class="card-art" src="${a.artwork||'https://placehold.co/400x400/141414/444?text=💿'}" alt="" loading="lazy" onerror="this.src='https://placehold.co/400x400/141414/444?text=💿'">
-        <div class="card-badge music">${a.trackCount?a.trackCount+' tracks':'Album'}</div>
-        <div class="card-remove" data-remove-type="album" data-remove-name="${escAttr(name)}"><i class="fa-solid fa-xmark"></i></div>
-      </div>
-      <div class="card-info">
-        <div class="card-title">${esc(a.title)}</div>
-        <div class="card-sub">${esc(a.artist)}</div>
-        <div class="card-meta">${esc(a.year||'')}</div>
-      </div>
-    </div>`;
+  el.innerHTML = skeletonGrid(names.length, false);
+  var infos = await Promise.all(names.map(function(n){ return lookupAlbum(n); }));
+  el.innerHTML = names.map(function(name, i){
+    var a = infos[i];
+    return '<div class="item-card">' +
+      '<div class="card-art-wrap">' +
+      '<img class="card-art" src="' + (a.artwork || 'https://placehold.co/400x400/141414/444?text=💿') + '" alt="" loading="lazy" onerror="this.src=\'https://placehold.co/400x400/141414/444?text=💿\'">' +
+      '<div class="card-badge music">' + (a.trackCount ? a.trackCount + ' tracks' : 'Album') + '</div>' +
+      '<div class="card-remove" data-remove-type="album" data-remove-name="' + escAttr(name) + '"><i class="fa-solid fa-xmark"></i></div>' +
+      '</div>' +
+      '<div class="card-info">' +
+      '<div class="card-title">' + esc(a.title) + '</div>' +
+      '<div class="card-sub">' + esc(a.artist) + '</div>' +
+      '<div class="card-meta">' + esc(a.year || '') + '</div>' +
+      '</div></div>';
   }).join('');
 }
 
 async function renderShows(){
-  const names = window.XOS_FAV.get(USERID, currentSub);
-  const el = document.getElementById('grid-shows');
-  const typeClass = currentSub==='movie'?'movie':currentSub==='series'?'series':'anime';
-  if(!names.length){ el.innerHTML = `<div class="empty"><i class="fa-solid fa-film"></i><p>No ${currentSub}s yet</p><span>Tap + to add</span></div>`; return; }
-  el.innerHTML = skeletonGrid(names.length,true);
-  const infos = await Promise.all(names.map(n=>lookupShow(n,currentSub)));
-  el.innerHTML = names.map((name,i)=>{
-    const item = infos[i];
-    return `<div class="item-card">
-      <div class="card-poster-wrap">
-        <img class="card-poster" src="${item.artwork||'https://placehold.co/400x600/141414/444?text=🎬'}" alt="" loading="lazy" onerror="this.src='https://placehold.co/400x600/141414/444?text=🎬'">
-        <div class="card-badge ${typeClass}">${typeClass.charAt(0).toUpperCase()+typeClass.slice(1)}</div>
-        <div class="card-rating">⭐ ${esc(item.rating||'—')}</div>
-        <div class="card-remove" data-remove-type="${currentSub}" data-remove-name="${escAttr(name)}"><i class="fa-solid fa-xmark"></i></div>
-      </div>
-      <div class="card-info">
-        <div class="card-title">${esc(item.title)}</div>
-        <div class="card-sub">${esc(item.subtitle||'')}</div>
-        <div class="card-meta">${esc(item.year||'')}</div>
-      </div>
-    </div>`;
+  var names = window.XOS_FAV.get(USERID, currentSub);
+  var el = document.getElementById('grid-shows');
+  var typeClass = currentSub === 'movie' ? 'movie' : currentSub === 'series' ? 'series' : 'anime';
+  if(!names.length){ el.innerHTML = '<div class="empty"><i class="fa-solid fa-film"></i><p>No ' + currentSub + 's yet</p><span>Tap + to add</span></div>'; return; }
+  el.innerHTML = skeletonGrid(names.length, true);
+  var infos = await Promise.all(names.map(function(n){ return lookupShow(n, currentSub); }));
+  el.innerHTML = names.map(function(name, i){
+    var item = infos[i];
+    return '<div class="item-card">' +
+      '<div class="card-poster-wrap">' +
+      '<img class="card-poster" src="' + (item.artwork || 'https://placehold.co/400x600/141414/444?text=🎬') + '" alt="" loading="lazy" onerror="this.src=\'https://placehold.co/400x600/141414/444?text=🎬\'">' +
+      '<div class="card-badge ' + typeClass + '">' + typeClass.charAt(0).toUpperCase() + typeClass.slice(1) + '</div>' +
+      '<div class="card-rating">⭐ ' + esc(item.rating || '—') + '</div>' +
+      '<div class="card-remove" data-remove-type="' + currentSub + '" data-remove-name="' + escAttr(name) + '"><i class="fa-solid fa-xmark"></i></div>' +
+      '</div>' +
+      '<div class="card-info">' +
+      '<div class="card-title">' + esc(item.title) + '</div>' +
+      '<div class="card-sub">' + esc(item.subtitle || '') + '</div>' +
+      '<div class="card-meta">' + esc(item.year || '') + '</div>' +
+      '</div></div>';
   }).join('');
 }
 
-/* ── EDIT MODE ── */
 function toggleEdit(){
-  editMode=!editMode;
-  document.getElementById('content').classList.toggle('edit-mode',editMode);
-  const btn=document.getElementById('tb-edit');
-  btn.classList.toggle('active',editMode);
-  btn.innerHTML=editMode?'<i class="fa-solid fa-check"></i>':'<i class="fa-solid fa-pen"></i>';
+  editMode = !editMode;
+  document.getElementById('content').classList.toggle('edit-mode', editMode);
+  var btn = document.getElementById('tb-edit');
+  btn.classList.toggle('active', editMode);
+  btn.innerHTML = editMode ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-pen"></i>';
   if(editMode) openSearch();
 }
 
-function removeItem(type,name){
-  window.XOS_FAV.remove(USERID,type,name);
-  if(type==='music'||type==='album') renderMusic(); else renderShows();
+function removeItem(type, name){
+  window.XOS_FAV.remove(USERID, type, name);
+  if(type === 'music' || type === 'album') renderMusic(); else renderShows();
 }
 
 /* ══════════════ SEARCH ══════════════ */
-
 function openSearch(){
-  if(currentTab==='music') switchSType('music'); else switchSType(currentSub);
-  searchOpen=true;
-  const el=document.getElementById('search-overlay');
-  el.style.display='flex'; el.classList.remove('closing');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('open')));
-  setTimeout(()=>document.getElementById('s-input').focus(),400);
-  history.pushState({modal:'search'},'');
+  if(currentTab === 'music') switchSType('music'); else switchSType(currentSub);
+  searchOpen = true;
+  var el = document.getElementById('search-overlay');
+  el.style.display = 'flex'; el.classList.remove('closing');
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.classList.add('open'); }); });
+  setTimeout(function(){ document.getElementById('s-input').focus(); }, 400);
+  history.pushState({modal:'search'}, '');
 }
 function closeSearch(){
   if(!searchOpen) return;
-  searchOpen=false;
-  const el=document.getElementById('search-overlay');
+  searchOpen = false;
+  var el = document.getElementById('search-overlay');
   el.classList.remove('open'); el.classList.add('closing');
   history.back();
-  setTimeout(()=>{el.style.display='none';el.classList.remove('closing');document.getElementById('s-input').value='';},360);
+  setTimeout(function(){ el.style.display = 'none'; el.classList.remove('closing'); document.getElementById('s-input').value = ''; }, 360);
 }
 function switchSType(t){
-  sType=t;
-  document.querySelectorAll('.s-type').forEach(el=>el.classList.toggle('active',el.dataset.stype===t));
-  const q=document.getElementById('s-input').value.trim();
+  sType = t;
+  document.querySelectorAll('.s-type').forEach(function(el){ el.classList.toggle('active', el.dataset.stype === t); });
+  var q = document.getElementById('s-input').value.trim();
   if(q) doSearch(q);
-  else document.getElementById('s-results').innerHTML='<div class="s-empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add favourites</p></div>';
+  else document.getElementById('s-results').innerHTML = '<div class="s-empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add favourites</p></div>';
 }
 function onSearch(val){
   clearTimeout(sTimer);
-  const el=document.getElementById('s-results');
-  if(!val.trim()){el.innerHTML='<div class="s-empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add favourites</p></div>';return;}
-  el.innerHTML='<div class="s-loading">Searching…</div>';
-  sTimer=setTimeout(()=>doSearch(val.trim()),380);
+  var el = document.getElementById('s-results');
+  if(!val.trim()){ el.innerHTML = '<div class="s-empty"><i class="fa-solid fa-magnifying-glass"></i><p>Search to add favourites</p></div>'; return; }
+  el.innerHTML = '<div class="s-loading">Searching…</div>';
+  sTimer = setTimeout(function(){ doSearch(val.trim()); }, 380);
 }
 
-// Each result row's "add" button carries its data safely in data-* attributes
-// (encodeURIComponent output has no quote characters, so it can never break
-// the HTML it's embedded in — unlike the old inline-onclick approach).
 async function doSearch(q){
-  const el=document.getElementById('s-results');
+  var el = document.getElementById('s-results');
   try{
-    if(sType==='music'||sType==='album'){
-      const entity = sType==='album' ? 'album' : 'song';
-      const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=${entity}&limit=12&media=music`);
-      const d = await r.json();
-      const results = d.results||[];
-      if(!results.length){ el.innerHTML='<div class="s-empty"><i class="fa-solid fa-face-meh"></i><p>No results</p></div>'; return; }
-      el.innerHTML = results.map((item)=>{
-        const isTrack = sType==='music';
-        const title = (isTrack ? item.trackName : item.collectionName) || '—';
-        const sub = item.artistName || '—';
-        const meta = isTrack ? (item.primaryGenreName||'') : `${item.trackCount||'?'} tracks`;
-        const year = item.releaseDate ? item.releaseDate.substring(0,4) : '';
-        const art = (item.artworkUrl100||'').replace('100x100','400x400');
-        const already = window.XOS_FAV.has(USERID, sType, title);
-        const cacheInfo = isTrack
-          ? { title, artist:sub, artwork:art, year, genre:item.primaryGenreName||'', stream:item.previewUrl||'' }
-          : { title, artist:sub, artwork:art, year, trackCount:item.trackCount||0 };
-        return `<div class="s-item">
-          <img class="s-img sq" src="${art||'https://placehold.co/46x46/141414/444?text=♪'}" alt="" onerror="this.src='https://placehold.co/46x46/141414/444?text=♪'">
-          <div class="s-info"><div class="s-title">${esc(title)}</div><div class="s-sub">${esc(sub)}</div><div class="s-meta">${esc(meta)}${year?' · '+year:''}</div></div>
-          <div class="s-add ${already?'added':''}" data-add-type="${sType}" data-add-name="${encodeURIComponent(title)}" data-add-info="${encodeURIComponent(JSON.stringify(cacheInfo))}"><i class="fa-solid ${already?'fa-check':'fa-plus'}"></i></div>
-        </div>`;
+    if(sType === 'music' || sType === 'album'){
+      var entity = sType === 'album' ? 'album' : 'song';
+      var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(q) + '&entity=' + entity + '&limit=12&media=music');
+      var d = await r.json();
+      var results = d.results || [];
+      if(!results.length){ el.innerHTML = '<div class="s-empty"><i class="fa-solid fa-face-meh"></i><p>No results</p></div>'; return; }
+      el.innerHTML = results.map(function(item){
+        var isTrack = sType === 'music';
+        var title = (isTrack ? item.trackName : item.collectionName) || '—';
+        var sub = item.artistName || '—';
+        var meta = isTrack ? (item.primaryGenreName || '') : (item.trackCount || '?') + ' tracks';
+        var year = item.releaseDate ? item.releaseDate.substring(0,4) : '';
+        var art = (item.artworkUrl100 || '').replace('100x100','400x400');
+        var already = window.XOS_FAV.has(USERID, sType, title);
+        var cacheInfo = isTrack
+          ? { title:title, artist:sub, artwork:art, year:year, genre:item.primaryGenreName || '', stream:item.previewUrl || '' }
+          : { title:title, artist:sub, artwork:art, year:year, trackCount:item.trackCount || 0 };
+        return '<div class="s-item">' +
+          '<img class="s-img sq" src="' + (art || 'https://placehold.co/46x46/141414/444?text=♪') + '" alt="" onerror="this.src=\'https://placehold.co/46x46/141414/444?text=♪\'">' +
+          '<div class="s-info"><div class="s-title">' + esc(title) + '</div><div class="s-sub">' + esc(sub) + '</div><div class="s-meta">' + esc(meta) + (year ? ' · ' + year : '') + '</div></div>' +
+          '<div class="s-add ' + (already ? 'added' : '') + '" data-add-type="' + sType + '" data-add-name="' + encodeURIComponent(title) + '" data-add-info="' + encodeURIComponent(JSON.stringify(cacheInfo)) + '"><i class="fa-solid ' + (already ? 'fa-check' : 'fa-plus') + '"></i></div>' +
+          '</div>';
       }).join('');
     } else {
-      let results = [];
+      var results2 = [];
       try{
-        results = await tmdbSearchAll(q, sType);
+        results2 = await tmdbSearchAll(q, sType);
       }catch(e){
-        results = await publicSearchAll(q, sType);
+        results2 = await publicSearchAll(q, sType);
       }
-      if(!results.length){ el.innerHTML='<div class="s-empty"><i class="fa-solid fa-face-meh"></i><p>No results</p></div>'; return; }
-      el.innerHTML = results.map((item)=>{
-        const already = window.XOS_FAV.has(USERID, sType, item.title);
-        const cacheInfo = { title:item.title, subtitle:item.subtitle||'', artwork:item.artwork||'', year:item.year||'', rating:item.rating||'—' };
-        return `<div class="s-item">
-          <img class="s-img" src="${item.artwork||'https://placehold.co/46x62/141414/444?text=🎬'}" alt="" onerror="this.src='https://placehold.co/46x62/141414/444?text=🎬'">
-          <div class="s-info"><div class="s-title">${esc(item.title)}</div><div class="s-sub">⭐ ${esc(item.rating||'—')}</div><div class="s-meta">${sType}${item.year?' · '+item.year:''}</div></div>
-          <div class="s-add ${already?'added':''}" data-add-type="${sType}" data-add-name="${encodeURIComponent(item.title)}" data-add-info="${encodeURIComponent(JSON.stringify(cacheInfo))}"><i class="fa-solid ${already?'fa-check':'fa-plus'}"></i></div>
-        </div>`;
+      if(!results2.length){ el.innerHTML = '<div class="s-empty"><i class="fa-solid fa-face-meh"></i><p>No results</p></div>'; return; }
+      el.innerHTML = results2.map(function(item){
+        var already = window.XOS_FAV.has(USERID, sType, item.title);
+        var cacheInfo = { title:item.title, subtitle:item.subtitle || '', artwork:item.artwork || '', year:item.year || '', rating:item.rating || '—' };
+        return '<div class="s-item">' +
+          '<img class="s-img" src="' + (item.artwork || 'https://placehold.co/46x62/141414/444?text=🎬') + '" alt="" onerror="this.src=\'https://placehold.co/46x62/141414/444?text=🎬\'">' +
+          '<div class="s-info"><div class="s-title">' + esc(item.title) + '</div><div class="s-sub">⭐ ' + esc(item.rating || '—') + '</div><div class="s-meta">' + sType + (item.year ? ' · ' + item.year : '') + '</div></div>' +
+          '<div class="s-add ' + (already ? 'added' : '') + '" data-add-type="' + sType + '" data-add-name="' + encodeURIComponent(item.title) + '" data-add-info="' + encodeURIComponent(JSON.stringify(cacheInfo)) + '"><i class="fa-solid ' + (already ? 'fa-check' : 'fa-plus') + '"></i></div>' +
+          '</div>';
       }).join('');
     }
   }catch(e){
-    el.innerHTML='<div class="s-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Search failed</p></div>';
+    el.innerHTML = '<div class="s-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Search failed</p></div>';
   }
 }
 
 async function tmdbSearchAll(q, type){
   if(!hasTmdbKey()) throw new Error('no tmdb key');
-  const tmdbType = type==='movie' ? 'movie' : 'tv';
-  const query = type==='anime' ? q+' anime' : q;
-  const r = await fetch(`https://api.themoviedb.org/3/search/${tmdbType}?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}&include_adult=false`);
-  const d = await r.json();
-  if(!r.ok || d.success===false) throw new Error(d.status_message||'tmdb failed');
-  return (d.results||[]).slice(0,12).map(item=>{
-    const year = (item.release_date || item.first_air_date || '').substring(0,4);
+  var tmdbType = type === 'movie' ? 'movie' : 'tv';
+  var query = type === 'anime' ? q + ' anime' : q;
+  var r = await fetch('https://api.themoviedb.org/3/search/' + tmdbType + '?api_key=' + TMDB_KEY + '&query=' + encodeURIComponent(query) + '&include_adult=false');
+  var d = await r.json();
+  if(!r.ok || d.success === false) throw new Error(d.status_message || 'tmdb failed');
+  return (d.results || []).slice(0,12).map(function(item){
+    var year = (item.release_date || item.first_air_date || '').substring(0,4);
     return {
       title: item.title || item.name || '—',
-      subtitle: item.overview ? item.overview.substring(0,40)+'…' : '',
-      artwork: item.poster_path ? TMDB_IMG+item.poster_path : '',
-      year,
+      subtitle: item.overview ? item.overview.substring(0,40) + '…' : '',
+      artwork: item.poster_path ? TMDB_IMG + item.poster_path : '',
+      year: year,
       rating: item.vote_average ? item.vote_average.toFixed(1) : '—'
     };
   });
 }
 
 async function publicSearchAll(q, type){
-  if(type==='movie'){
-    const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=movie&entity=movie&limit=12`);
-    const d = await r.json();
-    return (d.results||[]).map(item=>({
-      title: item.trackName || '—',
-      subtitle: item.primaryGenreName || '',
-      artwork: (item.artworkUrl100||'').replace('100x100','400x600'),
-      year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
-      rating: item.contentAdvisoryRating || '—'
-    }));
+  if(type === 'movie'){
+    var r = await fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(q) + '&media=movie&entity=movie&limit=12');
+    var d = await r.json();
+    return (d.results || []).map(function(item){
+      return {
+        title: item.trackName || '—',
+        subtitle: item.primaryGenreName || '',
+        artwork: (item.artworkUrl100 || '').replace('100x100','400x600'),
+        year: item.releaseDate ? item.releaseDate.substring(0,4) : '',
+        rating: item.contentAdvisoryRating || '—'
+      };
+    });
   }
-  if(type==='anime'){
-    const r = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=12`);
-    const d = await r.json();
-    return (d.data||[]).map(item=>({
-      title: item.title_english || item.title || '—',
-      subtitle: (item.synopsis||'').substring(0,40)+(item.synopsis && item.synopsis.length>40?'…':''),
-      artwork: item.images?.jpg?.image_url || '',
-      year: item.year || (item.aired?.from||'').substring(0,4),
-      rating: item.score ? item.score.toFixed(1) : '—'
-    }));
+  if(type === 'anime'){
+    r = await fetch('https://api.jikan.moe/v4/anime?q=' + encodeURIComponent(q) + '&limit=12');
+    d = await r.json();
+    return (d.data || []).map(function(item){
+      return {
+        title: item.title_english || item.title || '—',
+        subtitle: (item.synopsis || '').substring(0,40) + ((item.synopsis && item.synopsis.length > 40) ? '…' : ''),
+        artwork: (item.images && item.images.jpg && item.images.jpg.image_url) || '',
+        year: item.year || (item.aired && item.aired.from ? item.aired.from.substring(0,4) : ''),
+        rating: item.score ? item.score.toFixed(1) : '—'
+      };
+    });
   }
-  const r = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
-  const d = await r.json();
-  return (d||[]).slice(0,12).map(({show})=>({
-    title: show.name || '—',
-    subtitle: (show.genres||[]).slice(0,2).join(', '),
-    artwork: show.image?.medium || show.image?.original || '',
-    year: show.premiered ? show.premiered.substring(0,4) : '',
-    rating: show.rating?.average ? show.rating.average.toFixed(1) : '—'
-  }));
+  var r2 = await fetch('https://api.tvmaze.com/search/shows?q=' + encodeURIComponent(q));
+  var d2 = await r2.json();
+  return (d2 || []).slice(0,12).map(function(item){
+    var show = item.show;
+    return {
+      title: show.name || '—',
+      subtitle: (show.genres || []).slice(0,2).join(', '),
+      artwork: (show.image && (show.image.medium || show.image.original)) || '',
+      year: show.premiered ? show.premiered.substring(0,4) : '',
+      rating: show.rating && show.rating.average ? show.rating.average.toFixed(1) : '—'
+    };
+  });
 }
 
 function addFav(type, title, info, btnEl){
   if(btnEl.classList.contains('added')) return;
-  const added = window.XOS_FAV.add(USERID, type, title);
+  var added = window.XOS_FAV.add(USERID, type, title);
   if(added) cacheSet(type, title, info);
   btnEl.classList.add('added');
-  btnEl.innerHTML='<i class="fa-solid fa-check"></i>';
-  if(type==='music'||type==='album') renderMusic();
-  else if(currentTab==='shows' && currentSub===type) renderShows();
+  btnEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+  if(type === 'music' || type === 'album') renderMusic();
+  else if(currentTab === 'shows' && currentSub === type) renderShows();
 }
-
-function esc(s){ return (s||'').toString().replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function escAttr(s){ return esc(s); }
 
 /* ══════════════ MUSIC PLAYER ══════════════ */
 function playTrack(i){
   if(!queue[i]) return;
-  if(qIdx===i && playing){ pauseAudio(); return; }
-  if(qIdx===i && !playing){ resumeAudio(); return; }
-  qIdx=i;
+  if(qIdx === i && playing){ pauseAudio(); return; }
+  if(qIdx === i && !playing){ resumeAudio(); return; }
+  qIdx = i;
   loadTrack(queue[i]);
 }
 function loadTrack(t){
-  audio.src=t.stream||''; audio.load();
-  audio.play().catch(()=>{});
-  playing=true;
-  document.getElementById('pb-art').src=t.artwork||'';
-  document.getElementById('pb-title').textContent=t.title||t.name||'—';
-  document.getElementById('pb-artist').textContent=t.artist||'—';
-  document.getElementById('pb-icon').className='fa-solid fa-pause';
+  audio.src = t.stream || '';
+  audio.load();
+  audio.play().catch(function(){});
+  playing = true;
+  document.getElementById('pb-art').src = t.artwork || '';
+  document.getElementById('pb-title').textContent = t.title || t.name || '—';
+  document.getElementById('pb-artist').textContent = t.artist || '—';
+  document.getElementById('pb-icon').className = 'fa-solid fa-pause';
   document.getElementById('player-bar').classList.remove('hidden');
   startProg(); updatePlayBtns();
 }
-function pauseAudio(){ audio.pause(); playing=false; document.getElementById('pb-icon').className='fa-solid fa-play'; clearInterval(pTimer); updatePlayBtns(); }
-function resumeAudio(){ audio.play().catch(()=>{}); playing=true; document.getElementById('pb-icon').className='fa-solid fa-pause'; startProg(); updatePlayBtns(); }
-function togglePlay(){ if(qIdx===-1){ playTrack(0); return; } playing?pauseAudio():resumeAudio(); }
-function nextTrack(){ if(!queue.length) return; qIdx=(qIdx+1)%queue.length; loadTrack(queue[qIdx]); }
-function prevTrack(){ if(!queue.length) return; qIdx=(qIdx-1+queue.length)%queue.length; loadTrack(queue[qIdx]); }
+function pauseAudio(){ audio.pause(); playing = false; document.getElementById('pb-icon').className = 'fa-solid fa-play'; clearInterval(pTimer); updatePlayBtns(); }
+function resumeAudio(){ audio.play().catch(function(){}); playing = true; document.getElementById('pb-icon').className = 'fa-solid fa-pause'; startProg(); updatePlayBtns(); }
+function togglePlay(){ if(qIdx === -1){ playTrack(0); return; } playing ? pauseAudio() : resumeAudio(); }
+function nextTrack(){ if(!queue.length) return; qIdx = (qIdx + 1) % queue.length; loadTrack(queue[qIdx]); }
+function prevTrack(){ if(!queue.length) return; qIdx = (qIdx - 1 + queue.length) % queue.length; loadTrack(queue[qIdx]); }
 
 function updatePlayBtns(){
-  document.querySelectorAll('[data-play-index]').forEach(el=>{
-    const i=parseInt(el.dataset.playIndex);
-    const active = i===qIdx && playing;
-    el.classList.toggle('playing',active);
-    el.innerHTML=`<i class="fa-solid ${active?'fa-pause':'fa-play'}"></i>`;
+  document.querySelectorAll('[data-play-index]').forEach(function(el){
+    var i = parseInt(el.dataset.playIndex);
+    var active = i === qIdx && playing;
+    el.classList.toggle('playing', active);
+    el.innerHTML = '<i class="fa-solid ' + (active ? 'fa-pause' : 'fa-play') + '"></i>';
   });
 }
 function startProg(){
   clearInterval(pTimer);
-  pTimer=setInterval(()=>{
-    if(!audio.duration||isNaN(audio.duration)) return;
-    const pct=(audio.currentTime/audio.duration)*100;
-    document.getElementById('pb-fill').style.width=pct+'%';
-    document.getElementById('pb-time').textContent=fmt(audio.currentTime);
-  },250);
+  pTimer = setInterval(function(){
+    if(!audio.duration || isNaN(audio.duration)) return;
+    var pct = (audio.currentTime / audio.duration) * 100;
+    document.getElementById('pb-fill').style.width = pct + '%';
+    document.getElementById('pb-time').textContent = fmt(audio.currentTime);
+  }, 250);
 }
-function fmt(s){ if(!s||isNaN(s)) return '0:00'; return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+function fmt(s){ if(!s || isNaN(s)) return '0:00'; return Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0'); }
 audio.addEventListener('ended', nextTrack);
 
 /* ── BACK ── */
 function goBack(){
   if(searchOpen){ closeSearch(); return; }
-  if(history.length>1) history.back();
-  else location.href='anush-decodes.html?user='+USERID;
+  if(history.length > 1) history.back();
+  else location.href = 'anush-decodes.html?user=' + USERID;
 }
-window.addEventListener('popstate',()=>{ if(searchOpen){ closeSearch(); } });
+window.addEventListener('popstate', function(){ if(searchOpen){ closeSearch(); } });
 
-/* ══════════════ EVENT WIRING (delegation — robust against dynamic content) ══════════════ */
+/* ══════════════ EVENT WIRING ══════════════ */
 function wireEvents(){
   document.getElementById('tb-back').addEventListener('click', goBack);
   document.getElementById('tb-edit').addEventListener('click', toggleEdit);
   document.getElementById('add-fab').addEventListener('click', openSearch);
   document.getElementById('search-back').addEventListener('click', closeSearch);
-  document.getElementById('s-input').addEventListener('input', (e)=>onSearch(e.target.value));
+  document.getElementById('s-input').addEventListener('input', function(e){ onSearch(e.target.value); });
   document.getElementById('pb-play').addEventListener('click', togglePlay);
   document.getElementById('pb-prev').addEventListener('click', prevTrack);
   document.getElementById('pb-next').addEventListener('click', nextTrack);
 
-  document.querySelectorAll('.tab').forEach(el=>{
-    el.addEventListener('click', ()=>switchTab(el.dataset.tab));
+  document.querySelectorAll('.tab').forEach(function(el){
+    el.addEventListener('click', function(){ switchTab(el.dataset.tab); });
   });
-  document.querySelectorAll('.sub-tab').forEach(el=>{
-    el.addEventListener('click', ()=>switchSub(el.dataset.sub));
+  document.querySelectorAll('.sub-tab').forEach(function(el){
+    el.addEventListener('click', function(){ switchSub(el.dataset.sub); });
   });
-  document.querySelectorAll('.s-type').forEach(el=>{
-    el.addEventListener('click', ()=>switchSType(el.dataset.stype));
+  document.querySelectorAll('.s-type').forEach(function(el){
+    el.addEventListener('click', function(){ switchSType(el.dataset.stype); });
   });
 
-  // delegated: card remove / play buttons (grids get re-rendered constantly)
-  document.getElementById('content').addEventListener('click', (e)=>{
-    const removeBtn = e.target.closest('[data-remove-type]');
+  document.getElementById('content').addEventListener('click', function(e){
+    var removeBtn = e.target.closest('[data-remove-type]');
     if(removeBtn){
       e.stopPropagation();
       removeItem(removeBtn.dataset.removeType, removeBtn.dataset.removeName);
       return;
     }
-    const playBtn = e.target.closest('[data-play-index]');
+    var playBtn = e.target.closest('[data-play-index]');
     if(playBtn){
       e.stopPropagation();
       playTrack(parseInt(playBtn.dataset.playIndex));
     }
   });
 
-  // delegated: search-result add buttons
-  document.getElementById('s-results').addEventListener('click', (e)=>{
-    const addBtn = e.target.closest('[data-add-type]');
+  document.getElementById('s-results').addEventListener('click', function(e){
+    var addBtn = e.target.closest('[data-add-type]');
     if(!addBtn) return;
-    const type = addBtn.dataset.addType;
-    const name = decodeURIComponent(addBtn.dataset.addName);
-    const info = JSON.parse(decodeURIComponent(addBtn.dataset.addInfo));
+    var type = addBtn.dataset.addType;
+    var name = decodeURIComponent(addBtn.dataset.addName);
+    var info = JSON.parse(decodeURIComponent(addBtn.dataset.addInfo));
     addFav(type, name, info, addBtn);
   });
 }
 
-/* ── INIT ── */
-document.addEventListener('DOMContentLoaded',()=>{
+document.addEventListener('DOMContentLoaded', function(){
   wireEvents();
   renderMusic();
   renderShows();
