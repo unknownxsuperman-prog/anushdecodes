@@ -11,7 +11,7 @@ window.XOS_PROFILES = {
     handle: 'anush@x0s',
     displayName: 'Anush Decodes',
     verified: 'gold',
-    banner: 'Picsart_26-04-18_23-43-21-546.jpg',
+    banner: 'https://unknownxsuperman-prog.github.io/anushdecodes/Picsart_26-04-18_23-43-21-546.jpg',
     avatar: 'https://unknownxsuperman-prog.github.io/anushdecodes/Screenshot_20260418-234611.png',
     bio: 'Decoding logic at the kernel level.\nBuilding the future one commit at a time.',
     followers: ['gemini'],
@@ -33,7 +33,7 @@ window.XOS_PROFILES = {
     ],
     posts: [
       {
-        files: ['file_00000000862871fab1161995ce9f104e.png', 'XOS_STAMP_1776237339190.png'],
+        files: ['https://unknownxsuperman-prog.github.io/anushdecodes/file_00000000862871fab1161995ce9f104e.png', 'https://unknownxsuperman-prog.github.io/anushdecodes/XOS_STAMP_1776237339190.png'],
         type: 'image',
         caption: 'Deep logic toggle.',
         time: '2h ago',
@@ -41,7 +41,7 @@ window.XOS_PROFILES = {
         comments: 5
       },
       {
-        files: ['lv_7587788892909276421_20260417222425.mp4'],
+        files: ['https://unknownxsuperman-prog.github.io/anushdecodes/lv_7587788892909276421_20260417222425.mp4'],
         type: 'video',
         caption: '✨✨',
         time: '1d ago',
@@ -49,7 +49,7 @@ window.XOS_PROFILES = {
         comments: 14
       },
       {
-        files: ['Video-784.mp4'],
+        files: ['https://unknownxsuperman-prog.github.io/anushdecodes/Video-784.mp4'],
         type: 'video',
         caption: '😇😇',
         time: '2h ago',
@@ -63,8 +63,8 @@ window.XOS_PROFILES = {
     handle: 'raghavendra@x0s',
     displayName: 'Raghavendra',
     verified: 'green',
-    banner: 'Picsart_26-04-18_23-43-21-546.jpg',
-    avatar: 'Screenshot_20260715-212813.png',
+    banner: 'https://unknownxsuperman-prog.github.io/anushdecodes/Picsart_26-04-18_23-43-21-546.jpg',
+    avatar: 'https://unknownxsuperman-prog.github.io/anushdecodes/Screenshot_20260715-212813.png',
     bio: 'natty',
     followers: ['anush'],
     following: ['anush'],
@@ -92,8 +92,8 @@ window.XOS_PROFILES = {
     handle: 'niranjan@xos',
     displayName: 'Niranjan',
     verified: 'green',
-    banner: 'Picsart_26-04-21_09-30-21-870.png',
-    avatar: '1770636198936.png',
+    banner: 'https://unknownxsuperman-prog.github.io/anushdecodes/Picsart_26-04-21_09-30-21-870.png',
+    avatar: 'https://unknownxsuperman-prog.github.io/anushdecodes/1770636198936.png',
     bio: "chasing greatness, medico 🇮🇳 ' 🇷🇺",
     followers: ['gemini'],
     following: ['gemini'],
@@ -110,7 +110,7 @@ window.XOS_PROFILES = {
     ],
     posts: [
       {
-        files: ['nirup1.mp4'],
+        files: ['https://unknownxsuperman-prog.github.io/anushdecodes/nirup1.mp4'],
         type: 'video',
         caption: '🕉️',
         time: '1d ago',
