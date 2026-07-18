@@ -12,7 +12,7 @@ window.XOS_PROFILES = {
     displayName: 'Anush Decodes',
     verified: 'gold',
     banner: 'Picsart_26-04-18_23-43-21-546.jpg',
-    avatar: 'Screenshot_20260418-234611.png',
+    avatar: 'https://unknownxsuperman-prog.github.io/anushdecodes/Screenshot_20260418-234611.png',
     bio: 'Decoding logic at the kernel level.\nBuilding the future one commit at a time.',
     followers: ['gemini'],
     following: ['gemini'],
