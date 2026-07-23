@@ -2685,9 +2685,78 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
+
+        /* ── CONNECT OVERLAY (x0s ↔ Proton) ── */
+        .connect-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .connect-overlay.show { display: flex; }
+        .connect-overlay .conn-wrap {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .connect-overlay .conn-icon {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            animation: pulse-glow 1.2s infinite alternate ease-in-out;
+        }
+        .connect-overlay .conn-dots {
+            display: flex;
+            gap: 10px;
+        }
+        .connect-overlay .conn-dot {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            animation: dot-bounce 1.4s infinite ease-in-out both;
+        }
+        .connect-overlay .conn-dot:nth-child(1) { animation-delay: -0.32s; }
+        .connect-overlay .conn-dot:nth-child(2) { animation-delay: -0.16s; }
+        .connect-overlay .conn-label {
+            color: #fff;
+            font-family: var(--font);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 24px;
+            letter-spacing: 0.05em;
+        }
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.2)); transform: scale(0.95); }
+            100% { filter: drop-shadow(0 0 24px rgba(255,255,255,0.6)); transform: scale(1.05); }
+        }
+        @keyframes dot-bounce {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- CONNECT OVERLAY (x0s → Proton) -->
+    <div class="connect-overlay" id="connectOverlay">
+        <div class="conn-wrap">
+            <img src="./xoslink.png" class="conn-icon" id="connLeft" alt="x0s">
+            <div class="conn-dots">
+                <span class="conn-dot"></span>
+                <span class="conn-dot"></span>
+                <span class="conn-dot"></span>
+            </div>
+            <img src="./logo.svg" class="conn-icon" id="connRight" alt="Proton">
+        </div>
+        <div class="conn-label" id="connLabel">Returning to Proton…</div>
+    </div>
 
     <!-- DRAWER -->
     <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()">
@@ -2872,6 +2941,12 @@
                     <div style="font-size:.68rem;color:var(--muted);line-height:1.5;max-width:240px;">Posts, events, and full college profile will be available here shortly.</div>
                 </div>
                 <div class="divider"></div>
+                <div style="text-align:center;padding:6px 0 16px;">
+                    <div style="font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.06em;margin-bottom:8px;">KCET 2026</div>
+                    <div style="font-size:.62rem;color:var(--accent);cursor:pointer;padding:6px 14px;border:1px solid rgba(255,255,255,.08);border-radius:99px;display:inline-block;transition:.2s;" id="kcet2026Trigger" onclick="openProtonReverse()">
+                        <i class="fa-solid fa-arrow-right"></i> View Cutoff
+                    </div>
+                </div>
                 <button class="cta-btn">Follow College</button>
             </div>
         </div>
@@ -3000,11 +3075,11 @@
             }
         };
         window.XOS_COLLEGES = window.XOS_COLLEGES || [
-            { id: 'rce', name: 'RV College of Engineering, Bangalore', pfp: '1000046129.png', pill1: 'Engineering',
+            { id: 'E001', name: 'RV College of Engineering, Bangalore', pfp: '1000046129.png', pill1: 'Engineering',
                 pill2: 'Bangalore' },
-            { id: 'bms', name: 'BMS College of Engineering, Bangalore', pfp: '1000046129.png', pill1: 'Engineering',
+            { id: 'E002', name: 'BMS College of Engineering, Bangalore', pfp: '1000046129.png', pill1: 'Engineering',
                 pill2: 'Bangalore' },
-            { id: 'pes', name: 'PES University, Bangalore', pfp: '1000046129.png', pill1: 'University',
+            { id: 'E003', name: 'PES University, Bangalore', pfp: '1000046129.png', pill1: 'University',
             pill2: 'Bangalore' }
         ];
     </script>
@@ -3013,11 +3088,41 @@
     <script src="colleges.js" onerror="console.warn('colleges.js not found')"></script>
     <script src="Dishabase.js" onerror="console.warn('Dishabase.js not found')"></script>
     <script src="disha-extensions.js" onerror="console.warn('disha-extensions.js not found')"></script>
-    <!-- ── 1. LOAD DISHA FAVOURITES INTELLIGENCE ── -->
     <script src="disha-favourites-intelligence.js" onerror="console.warn('disha-favourites-intelligence.js not found')"></script>
 
     <script>
-        // ── DISHA FAVOURITES — inline disha-fav.js (fallback) ──
+        // ── CONNECT OVERLAY (x0s → Proton) ──
+        function showConnectOverlayReverse(callback) {
+            const overlay = document.getElementById('connectOverlay');
+            overlay.classList.add('show');
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                if (callback) callback();
+            }, 1800);
+        }
+
+        function openProtonReverse() {
+            if (!currentCollege) return;
+            const collegeName = currentCollege.name.split(',')[0].trim();
+            const collegeCode = currentCollege.id || 'E001';
+            // Get branch & cutoff from the college data if available, else use defaults
+            // For this demo, we'll simulate the data. In production, this would come from the dataset.
+            // For the demo, we'll pass a dummy cutoff.
+            // Ideally, the branch and cutoff are stored in the college object or fetched.
+            // Since the original dataset is in Proton, we'll pass a placeholder.
+            const branch = 'Computer Science and Engineering';
+            const cutoff = 1500; // placeholder — in real use, this comes from Proton's dataset
+            const category = 'GM';
+
+            const url =
+                `https://unknownxsuperman-prog.github.io/anushdecodes/index.html?college=${encodeURIComponent(collegeName)}&branch=${encodeURIComponent(branch)}&cutoff=${cutoff}&category=${category}&code=${collegeCode}`;
+
+            showConnectOverlayReverse(() => {
+                window.open(url, '_blank');
+            });
+        }
+
+        // ── DISHA FAVOURITES (inline) ──
         (function() {
             'use strict';
 
@@ -3055,7 +3160,6 @@
                 return favourites.colleges.map(id => c.find(x => (x.id || x.name) === id)).filter(Boolean);
             }
 
-            // ── autocomplete ──
             let activeSugg = -1,
                 suggItems = [];
 
@@ -3182,7 +3286,6 @@
                 }
             }
 
-            // ── query handler ──
             function handleQuery(query, msgContainer) {
                 if (!query || typeof query !== 'string') return false;
                 const trimmed = query.trim();
@@ -3264,7 +3367,6 @@
                 setTimeout(() => msgContainer.scrollTo({ top: msgContainer.scrollHeight, behavior: 'smooth' }), 50);
             }
 
-            // ── expose ──
             window.DISHA_FAV = window.DISHA_FAV || {
                 bindAutocomplete,
                 handleQuery,
@@ -3347,11 +3449,23 @@
             });
         }
 
-        // ── 2. BIND DISHA FAV AUTOCOMPLETE ──
+        // ── BIND DISHA FAV AUTOCOMPLETE ──
         document.addEventListener('DOMContentLoaded', () => {
             initFeedCollegeRows();
             renderFeed();
             renderPeopleGrid();
+
+            // check for ?code= param and auto-open college profile
+            const codeParam = new URLSearchParams(window.location.search).get('code');
+            if (codeParam) {
+                const colleges = window.XOS_COLLEGES || [];
+                const idx = colleges.findIndex(c => c.id === codeParam);
+                if (idx >= 0) {
+                    setTimeout(() => {
+                        openCollegeProfile(idx);
+                    }, 400);
+                }
+            }
 
             const esInput = document.getElementById('es-input');
             const esContainer = document.getElementById('es-input-wrap-el');
@@ -3988,11 +4102,9 @@
                 el.classList.remove('closing'); }, 380);
         }
 
-        // ── 3. UPDATED onEsInput & doEsSearch ──
         function onEsInput(val) {
             const send = document.getElementById('es-send');
             send.classList.toggle('visible', val.trim().length > 0);
-            // Let DISHA_FAV's own dropdown handle # queries — hide the old chip strip
             if (val.includes('#')) {
                 document.getElementById('es-suggestions').style.display = 'none';
                 return;
@@ -4012,7 +4124,6 @@
             const msgContainer = document.getElementById('es-messages');
 
             if (window.DISHA_FAV && q.includes('#')) {
-                // If handleQuery returns a promise, await it; otherwise treat as boolean.
                 const result = window.DISHA_FAV.handleQuery(q, msgContainer);
                 if (result && typeof result.then === 'function') {
                     result.then(handled => {
@@ -4059,7 +4170,6 @@
             }, 320);
         }
 
-        // Legacy helpers kept for compatibility
         function esSearchCollege(idx) {
             const colleges = window.XOS_COLLEGES || [];
             const c = colleges[idx];
